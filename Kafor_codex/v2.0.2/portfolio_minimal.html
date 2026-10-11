@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafora — Black Minimal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Barlow', 'sans-serif'],
+            display: ['"Barlow Condensed"', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              accent: 'var(--color-accent)', // Dynamic accent color
+              dark: '#050505'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --color-accent: #B08D57; /* Kafora Gold by default */
+    }
+    body {
+      background-color: theme('colors.brand.dark');
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+    
+    .noise-overlay {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Scroll animations GSAP init classes */
+    .fade-up { opacity: 0; transform: translateY(40px); }
+    .fade-left { opacity: 0; transform: translateX(-40px); }
+    .scale-up { opacity: 0; transform: scale(0.9); }
+    
+    .exp-media-link-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 12rem; width: 12rem; flex-shrink: 0; border-radius: 0.375rem;
+      background: rgba(255,255,255,0.05); color: white;
+      text-decoration: none; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase;
+      border: 1px dashed rgba(255,255,255,0.2); transition: all 300ms;
+    }
+    .exp-media-link-btn:hover { background: var(--color-accent); color: black; border-color: var(--color-accent); }
+    @media (max-width: 768px) { .exp-media-link-btn { height: 8rem; width: 8rem; font-size: 10px; } }
+
+    /* ── Ticket Experience Cards ── */
+    .exp-tickets-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding: 0 8px;
+    }
+    .exp-ticket {
+      position: relative;
+      display: flex;
+      height: 280px;
+      border-radius: 6px;
+      overflow: visible;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .exp-ticket-parchment {
+      background: #EAE2D4;
+      color: #0A0A0A;
+    }
+    .exp-ticket-dark {
+      background: #161412;
+      color: #EAE2D4;
+      border: 1px solid rgba(234,226,212,0.08);
+    }
+    /* Left image panel */
+    .exp-ticket-img {
+      width: 260px;
+      flex-shrink: 0;
+      padding: 12px;
+      padding-right: 0;
+    }
+    .exp-ticket-img > div {
+      width: 100%; height: 100%;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .exp-ticket-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: contrast(1.05);
+      transition: transform 0.6s ease;
+    }
+    .exp-ticket:hover .exp-ticket-img img { transform: scale(1.04); }
+    .exp-ticket-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px; font-weight: 900;
+    }
+    .exp-ticket-parchment .exp-ticket-img-placeholder { background: rgba(10,10,10,0.06); color: #0A0A0A; opacity: 0.18; }
+    .exp-ticket-dark .exp-ticket-img-placeholder { background: rgba(234,226,212,0.04); color: #EAE2D4; opacity: 0.18; }
+    /* Main content */
+    .exp-ticket-body {
+      flex: 1;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+    .exp-ticket-top {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .exp-ticket-role-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      opacity: 0.45;
+    }
+    .exp-ticket-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(34px, 4.5vw, 58px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin: 0;
+    }
+    .exp-ticket-desc {
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px; font-weight: 300; line-height: 1.65;
+      opacity: 0.6; margin-top: 10px;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .exp-ticket-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .exp-ticket-year {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 900; line-height: 1;
+    }
+    .exp-ticket-meta-right {
+      text-align: right;
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+    .exp-ticket-meta-right .t-city {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+    }
+    .exp-ticket-meta-right .t-linked {
+      display: inline-block; margin-top: 6px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase;
+      text-decoration: none; padding: 5px 10px;
+      border: 1px solid currentColor; opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .exp-ticket-meta-right .t-linked:hover { opacity: 1; }
+    /* Dashed divider with cutout circles */
+    .exp-ticket-divider {
+      position: relative;
+      width: 0;
+      flex-shrink: 0;
+      border-left: 2px dashed currentColor;
+      opacity: 0.2;
+      align-self: stretch;
+      margin: 0 2px;
+    }
+    .exp-ticket-divider::before,
+    .exp-ticket-divider::after {
+      content: '';
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      width: 22px; height: 22px; border-radius: 50%;
+    }
+    .exp-ticket-parchment .exp-ticket-divider::before,
+    .exp-ticket-parchment .exp-ticket-divider::after { background: #050505; }
+    .exp-ticket-dark .exp-ticket-divider::before,
+    .exp-ticket-dark .exp-ticket-divider::after { background: #050505; }
+    .exp-ticket-divider::before { top: -11px; }
+    .exp-ticket-divider::after  { bottom: -11px; }
+    /* Stub */
+    .exp-ticket-stub {
+      width: 110px;
+      flex-shrink: 0;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .exp-ticket-stub-idx {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.3em;
+      text-transform: uppercase; opacity: 0.4;
+    }
+    .exp-ticket-barcode {
+      display: flex; flex-direction: column;
+      gap: 2px; width: 18px; flex: 1;
+      margin: 12px 0;
+    }
+    .exp-ticket-barcode span {
+      display: block; width: 100%;
+      background: currentColor; opacity: 0.3; border-radius: 1px;
+    }
+    .exp-ticket-stub-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 900; opacity: 0.8;
+    }
+    .exp-ticket-wrap { display: flex; flex-direction: column; }
+
+    /* ── Galerie artistique sous le ticket ── */
+    .exp-gallery {
+      padding: 28px 12px 8px;
+      position: relative;
+    }
+    .exp-gallery-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.45em;
+      text-transform: uppercase; opacity: 0.35;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .exp-gallery-label::after {
+      content: ''; flex: 1; height: 1px; background: currentColor; opacity: 0.2;
+    }
+    .exp-gallery-scroll {
+      display: flex; gap: 24px;
+      overflow-x: auto; padding: 16px 28px 40px;
+      align-items: flex-end;
+      scrollbar-width: none;
+    }
+    .exp-gallery-scroll::-webkit-scrollbar { display: none; }
+
+    /* Polaroid images — même taille que les cartes IG */
+    .exp-polaroid {
+      flex-shrink: 0;
+      background: #f4ebe1;
+      padding: 10px 10px 44px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.3);
+      transform: rotate(var(--rot, 0deg));
+      transform-origin: bottom center;
+      transition: transform 0.35s cubic-bezier(0.34,1.25,0.64,1), box-shadow 0.35s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .exp-polaroid:hover {
+      transform: rotate(0deg) scale(1.05);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      z-index: 10;
+    }
+    .exp-polaroid img {
+      display: block; width: 266px; height: 266px;
+      object-fit: cover; filter: contrast(1.05) saturate(0.92);
+    }
+    .exp-polaroid-caption {
+      position: absolute; bottom: 10px; left: 0; right: 0;
+      text-align: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #5c4028; opacity: 0.55;
+    }
+
+    /* Instagram embed card — image seule, header/footer masqués */
+    .exp-ig-wrap {
+      flex-shrink: 0;
+      position: relative;
+      padding: 3px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      transform: rotate(var(--rot, 0deg));
+      transition: transform 0.35s cubic-bezier(0.34,1.25,0.64,1), box-shadow 0.35s ease;
+    }
+    .exp-ig-wrap:hover {
+      transform: rotate(0deg) scale(1.04);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      z-index: 10;
+    }
+    .exp-ig-inner {
+      background: #050505; border-radius: 8px;
+      overflow: hidden;
+      /* Masque le header IG (~60px) et le footer (~90px) — ne montre que l'image */
+      height: 286px;
+      position: relative;
+    }
+    .exp-ig-inner iframe {
+      display: block; border-radius: 0;
+      margin-top: -60px; /* cache le header Instagram */
+    }
+    /* Bouton "Voir sur Instagram" en overlay bas */
+    .exp-ig-profile-btn {
+      display: block;
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 8px 12px;
+      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+      text-align: right;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; color: #fff; text-decoration: none;
+      opacity: 0; transition: opacity 0.25s;
+      border-radius: 0 0 8px 8px;
+    }
+    .exp-ig-wrap:hover .exp-ig-profile-btn { opacity: 1; }
+
+    /* External link card */
+    .exp-link-card {
+      flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      width: 130px; height: 170px;
+      background: rgba(234,226,212,0.04);
+      border: 1px dashed rgba(234,226,212,0.25);
+      border-radius: 4px; text-decoration: none; color: inherit;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; opacity: 0.6;
+      transition: opacity 0.2s, background 0.2s;
+      transform: rotate(var(--rot, 0deg));
+    }
+    .exp-link-card:hover { opacity: 1; background: rgba(234,226,212,0.08); }
+    .exp-link-card svg { width: 28px; height: 28px; opacity: 0.5; }
+
+    @media (max-width: 768px) {
+      .exp-ticket { height: auto; flex-direction: column; }
+      .exp-ticket-img { width: 100%; height: 180px; padding: 12px 12px 0; }
+      .exp-ticket-divider { display: none; }
+      .exp-ticket-stub { width: 100%; flex-direction: row; height: 48px; padding: 0 16px; }
+      .exp-ticket-barcode { display: none; }
+      .exp-polaroid img { width: 180px; height: 180px; }
+    }
+  </style>
+</head>
+<body class="selection:bg-brand-accent selection:text-black">
+
+  <!-- Fixed Background -->
+  <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div id="bg-parallax" class="absolute inset-0 opacity-20 bg-cover bg-center bg-no-repeat mix-blend-luminosity scale-110" style="background-image: url('https://images.unsplash.com/photo-1682687982501-1e5898cb8f4b?q=80&w=2070&auto=format&fit=crop')"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/80 to-[#050505]"></div>
+    <div class="absolute inset-0 opacity-[0.02] noise-overlay"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-8 md:p-12 lg:p-16 pointer-events-none mix-blend-difference">
+    <!-- Logo -->
+    <div class="flex items-center gap-4 text-xl font-bold tracking-tight pointer-events-auto">
+      <span class="text-3xl font-display" id="logoInit">B</span>
+      <span class="h-[2px] w-8 bg-white"></span>
+      <span class="text-sm font-medium tracking-widest text-white/80 lowercase" id="logoText">black.</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex flex-col items-end gap-6 text-right pointer-events-auto">
+      <span class="text-[10px] font-bold tracking-[0.3em] text-brand-accent uppercase">Menu</span>
+      <ul class="flex flex-col gap-2 text-2xl font-bold tracking-tight md:text-3xl font-display uppercase">
+        <li><a href="dashboard.html" class="transition-colors hover:text-brand-accent">Dashboard.</a></li>
+        <li><a href="#works" class="transition-colors hover:text-brand-accent">Works.</a></li>
+        <li><a href="createurs.html" class="transition-colors hover:text-brand-accent">Directory.</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Content -->
+  <div class="relative z-10">
+    <!-- Hero Section -->
+    <section class="flex min-h-screen flex-col justify-center p-8 md:p-12 lg:p-16 pt-32">
+      <main class="flex-1 flex items-center">
+        <div class="max-w-4xl">
+          <h1 id="heroTitle" class="font-display text-7xl font-bold tracking-tighter md:text-[10rem] lg:text-[12rem] leading-[0.85] uppercase fade-up">
+            Black.
+          </h1>
+          <div class="mt-8 flex items-center gap-6 md:mt-12 fade-left" id="heroSubtitleContainer">
+            <span class="h-[2px] w-12 md:w-16 bg-white"></span>
+            <span id="heroSubtitle" class="text-2xl font-medium tracking-wide uppercase md:text-4xl lg:text-5xl text-gray-300">
+              Minimal Portfolio.
+            </span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="flex items-end justify-between text-[10px] font-bold tracking-[0.2em] text-white/40 pb-4" id="heroFooter">
+        <div class="uppercase" id="heroDiscipline">UI / UX - 2026.</div>
+        
+        <a href="#works" class="flex flex-col items-center gap-6 transition-colors hover:text-white group">
+          <div id="arrow-down" class="text-white group-hover:text-brand-accent transition-colors">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+          </div>
+          <span class="text-white uppercase group-hover:text-brand-accent transition-colors">Works</span>
+        </a>
+
+        <div class="flex items-center gap-8" id="socialLinks">
+          <!-- Will be injected -->
+        </div>
+      </footer>
+    </section>
+
+    <!-- Works Section -->
+    <section id="works" class="flex min-h-screen flex-col items-center justify-center p-8 md:p-12 lg:p-16 relative overflow-hidden">
+      <!-- Huge Background Text -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none opacity-[0.03] w-full">
+        <span id="bgText" class="font-display text-[15rem] md:text-[25rem] lg:text-[35rem] font-bold tracking-tighter whitespace-nowrap leading-none uppercase">
+          BLACK
+        </span>
+      </div>
+
+      <!-- Works Header -->
+      <div class="relative z-10 text-center mt-24">
+        <h2 class="font-display text-6xl font-black tracking-tighter uppercase md:text-8xl lg:text-9xl fade-up works-header">
+          Works.
+        </h2>
+        <div class="mt-6 flex items-center justify-center gap-6 md:mt-8 scale-up works-header-sub">
+          <span class="h-[2px] w-8 md:w-12 bg-white/50"></span>
+          <span class="text-lg font-medium tracking-widest uppercase md:text-2xl lg:text-3xl text-white/90">
+            see my design
+          </span>
+          <span class="h-[2px] w-8 md:w-12 bg-white/50"></span>
+        </div>
+      </div>
+
+      <!-- Works Grid -->
+      <div id="worksGrid" class="mt-24 grid w-full max-w-7xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 z-10">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- Experiences Section -->
+    <section id="experiences" class="flex flex-col relative z-10 w-full max-w-5xl mx-auto mt-24 mb-24">
+      <div class="mb-12 px-0">
+        <h2 class="font-display text-5xl font-black tracking-tighter uppercase md:text-7xl fade-up exp-header-anim">
+          Experiences.
+        </h2>
+        <div class="h-[2px] w-16 bg-brand-accent mt-6 fade-up exp-header-anim delay-100"></div>
+      </div>
+
+      <div id="experiencesList" class="exp-tickets-wrap">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // MOCK DATA (Idem que sur le portfolio artistique)
+    const MOCK_DATA = {
+      amara: { id: 'amara', name: "Amara Diallo", city: "Paris", discipline: "Direction Artistique", style: "Mode", heroImage: "file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg", 
+        experiences: [
+          { year: '2024', brand: 'Vogue France', role: 'Directrice de Création', description: 'Direction artistique du shooting exclusif Fashion Week de Paris. Supervision des équipes de stylisme et gestion des sets complexes.', linkedProfile: 'vogue', media: ['file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg', 'file:///E:/AfroPunk/e7ca30197ff55a5d8b8d182df3d3f997.jpg', 'file:///E:/AfroPunk/e8efb2d315c0cf421331db3594ee6212.jpg'] },
+          { year: '2022 - 2023', brand: 'Jacquemus', role: 'Styliste Senior', description: 'Stylisme pour la collection "Soleil de l\'Afrique".\nMise en valeur des tissus traditionnels africains dans une approche moderne et asymétrique. Collaboration sur la scénographie du défilé. Instagram pré-chargé en exemple.', media: ['file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] }
+        ],
+        projects: [{id:1, title:'NEON', category:'Photo', image:'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop'}, {id:2, title:'URBAN', category:'Editorial', image:'https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=800&auto=format&fit=crop'}, {id:3, title:'SYNTHESIS', category:'Art', image:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop'}], socials: ['IG', 'TW'] },
+      kofi: { id: 'kofi', name: "Kofi Mensah", city: "NYC", discipline: "Art Contemporain", style: "Sculpture/Digital", heroImage: "file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg", 
+        experiences: [
+          { year: '2024', brand: 'MoMA', role: 'Exposition collective — New Voices', description: 'Installation digitale immersive avec projection mapping sur 4 espaces distincts. Utilisation de technologies interactives.', media: ['file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] },
+          { year: '2024', brand: 'Tate Modern', role: 'Résidence artistique — African Program', description: 'Création d\'un corpus d\'oeuvres 3D avec focus sur les masques culturels modélisés et intégrés dans un décor onirique urbain.', media: ['file:///E:/AfroPunk/ed22ba242943b39456246d71ef190208.jpg'] }
+        ],
+        projects: [{id:1, title:'ANCESTOR', category:'3D', image:'https://images.unsplash.com/photo-1544256718-3b6102ddf82e?q=80&w=800&auto=format&fit=crop'}, {id:2, title:'WORLD', category:'Digital', image:'https://images.unsplash.com/photo-1601289176378-0cb9fd3c4d7e?q=80&w=800&auto=format&fit=crop'}], socials: ['IG'] }
+    };
+    const defaultData = MOCK_DATA['amara'];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Recupération Data
+      const params = new URLSearchParams(window.location.search);
+      const creatorId = params.get('creator') || 'amara';
+      let data;
+
+      if (creatorId === 'me') {
+        const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+        const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+        const fn = p.fn || u.firstName || 'Ton';
+        const ln = p.ln || u.lastName || 'Nom';
+        data = {
+          name: fn + ' ' + ln,
+          firstName: fn,
+          discipline: (p.discs && p.discs.length > 0) ? p.discs[0] : 'Créatif',
+          style: (p.discs && p.discs.length > 1) ? p.discs[1] : 'Kafora',
+          heroImage: p.photo || 'https://images.unsplash.com/photo-1682687982501-1e5898cb8f4b?q=80&w=2070&auto=format&fit=crop',
+          projects: p.portfolio || [],
+          experiences: p.experiences || [],
+          socials: ['IG']
+        };
+        // Injection couleur accent du builder !
+        if(p.accentColor) document.documentElement.style.setProperty('--color-accent', p.accentColor);
+      } else {
+        data = MOCK_DATA[creatorId.toLowerCase()] || defaultData;
+        data.firstName = data.name.split(' ')[0];
+      }
+
+      // 2. Injection DOM
+      document.getElementById('bg-parallax').style.backgroundImage = `url('${data.heroImage}')`;
+      document.getElementById('logoInit').textContent = data.firstName.charAt(0).toUpperCase();
+      document.getElementById('logoText').textContent = data.firstName.toLowerCase() + '.';
+      
+      const titleLines = data.name.split(' ');
+      document.getElementById('heroTitle').innerHTML = titleLines[0] + '.<br/><span style="color:var(--color-accent);">' + (titleLines[1]||'') + '</span>';
+      document.getElementById('bgText').textContent = titleLines[0];
+      
+      document.getElementById('heroSubtitle').textContent = data.discipline;
+      document.getElementById('heroDiscipline').textContent = data.style.toUpperCase() + ' - 2026.';
+
+      const socialsHTML = data.socials.map(s => `<a href="#" class="transition-colors hover:text-white">${s}</a>`).join('');
+      document.getElementById('socialLinks').innerHTML = socialsHTML || `<a href="#" class="transition-colors hover:text-white">INSTAGRAM</a>`;
+
+      // 3. Grid Generation
+      const grid = document.getElementById('worksGrid');
+      if (data.projects && data.projects.length) {
+        data.projects.forEach((proj, i) => {
+          const hasAffiliate = !!(proj.affiliateUrl);
+          const tag = hasAffiliate ? 'a' : 'div';
+          const attrs = hasAffiliate
+            ? `href="#" onclick="handleAffiliateClick(event,'${proj.affiliateUrl}','${creatorId}','${proj.affiliatePartner||'unknown'}')" `
+            : '';
+          grid.innerHTML += `
+            <${tag} ${attrs}class="project-card group relative aspect-[3/4] overflow-hidden bg-white/5 cursor-pointer opacity-0 translate-y-12">
+              <img src="${proj.image || proj.img}" alt="${proj.title || proj.label}" class="h-full w-full object-cover transition-all duration-1000 group-hover:scale-110 opacity-50 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-80"></div>
+              ${hasAffiliate ? `<span class="absolute top-3 right-3 bg-[var(--color-accent)] text-black text-[8px] font-bold tracking-[0.22em] uppercase px-2 py-1 opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">Voir la pièce →</span>` : ''}
+              <div class="absolute bottom-0 left-0 p-8 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                <h3 class="text-2xl font-bold font-display uppercase tracking-tight">${proj.title || proj.label}</h3>
+                <p class="mt-2 text-xs text-brand-accent font-bold uppercase tracking-[0.2em]">${proj.category || 'PROJET'}</p>
+              </div>
+            </${tag}>`;
+        });
+      } else {
+        grid.innerHTML = '<p class="col-span-1 md:col-span-2 lg:col-span-3 text-center text-white/40 tracking-widest text-sm uppercase">Le portfolio est vide.</p>';
+      }
+
+      // 3.5 Experiences Generation — Editorial Cards
+      const expList = document.getElementById('experiencesList');
+      const total = data.experiences ? data.experiences.length : 0;
+
+      // ── Barcode CSS generator ──
+      function buildBarcode() {
+        const heights = [4,2,6,2,3,5,8,2,4,3,2,6,3,2,4,8,4,2,6,2,3,5,2,4,3,6];
+        return heights.map(h => `<span style="height:${h}px"></span>`).join('');
+      }
+
+      function parseMedia(m) {
+        if (m.includes('instagram.com/p/') || m.includes('instagram.com/reel/')) {
+          let u = m.split('?')[0];
+          if (!u.endsWith('/')) u += '/';
+          return { type: 'iframe', url: u + 'embed', original: u };
+        }
+        if (m.includes('tiktok.com') || (!m.match(/\.(jpeg|jpg|gif|png|webp)/i) && m.startsWith('http'))) {
+          return { type: 'link', url: m };
+        }
+        return { type: 'img', url: m };
+      }
+
+      if (total > 0) {
+        expList.innerHTML = data.experiences.map((exp, i) => {
+          const isParchment = i % 2 === 0;
+          const ticketClass = isParchment ? 'exp-ticket-parchment' : 'exp-ticket-dark';
+          const numStr = String(i + 1).padStart(2, '0');
+          const totalStr = String(total).padStart(2, '0');
+
+          // Split media: first image → hero, rest → strip
+          let heroImgUrl = '';
+          let extraItems = [];
+          if (exp.media && exp.media.length > 0) {
+            const parsed = exp.media.map(parseMedia);
+            const firstImg = parsed.find(m => m.type === 'img');
+            heroImgUrl = firstImg ? firstImg.url : '';
+            extraItems = parsed.filter(m => m !== firstImg);
+          }
+
+          const imgHtml = heroImgUrl
+            ? `<img src="${heroImgUrl}" alt="${exp.brand}" loading="lazy" />`
+            : `<div class="exp-ticket-img-placeholder">${exp.brand ? exp.brand.charAt(0) : '✦'}</div>`;
+
+          const descHtml = exp.description
+            ? `<p class="exp-ticket-desc">${exp.description}</p>` : '';
+
+          const linkedHtml = exp.linkedProfile
+            ? `<a href="profil.html?creator=${exp.linkedProfile}" class="t-linked">↗ Profil lié</a>` : '';
+
+          // ── Galerie artistique ──
+          const ROTS = [-4, 2, -2, 3, -3, 1, -1, 4];
+          let galleryHtml = '';
+          if (extraItems.length > 0) {
+            const items = extraItems.map((m, j) => {
+              const rot = ROTS[j % ROTS.length];
+              if (m.type === 'iframe') {
+                return `<div class="exp-ig-wrap" style="--rot:${rot}deg">
+                  <div class="exp-ig-inner">
+                    <iframe src="${m.url}" width="286" height="440" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+                    <a href="${m.original}" target="_blank" class="exp-ig-profile-btn">↗ Voir sur Instagram</a>
+                  </div>
+                </div>`;
+              }
+              if (m.type === 'link') {
+                return `<a href="${m.url}" target="_blank" class="exp-link-card" style="--rot:${rot}deg">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+                  </svg>
+                  <span>Voir le lien</span>
+                </a>`;
+              }
+              return `<div class="exp-polaroid" style="--rot:${rot}deg">
+                <img src="${m.url}" alt="media" loading="lazy" />
+                <span class="exp-polaroid-caption">${exp.brand}</span>
+              </div>`;
+            }).join('');
+
+            galleryHtml = `<div class="exp-gallery">
+              <div class="exp-gallery-label">Galerie · ${exp.brand}</div>
+              <div class="exp-gallery-scroll">${items}</div>
+            </div>`;
+          }
+
+          return `
+          <div class="exp-ticket-wrap opacity-0 translate-y-8">
+            <div class="exp-ticket ${ticketClass}">
+              <!-- Image -->
+              <div class="exp-ticket-img"><div>${imgHtml}</div></div>
+              <!-- Main content -->
+              <div class="exp-ticket-body">
+                <div class="exp-ticket-top">
+                  <span class="exp-ticket-role-tag">${exp.role || ''}</span>
+                  <h2 class="exp-ticket-brand">${exp.brand}</h2>
+                  ${descHtml}
+                </div>
+                <div class="exp-ticket-bottom">
+                  <div class="exp-ticket-year">${exp.year}</div>
+                  <div class="exp-ticket-meta-right">
+                    ${exp.city ? `<div class="t-city">${exp.city}</div>` : ''}
+                    ${linkedHtml}
+                  </div>
+                </div>
+              </div>
+              <!-- Dashed divider -->
+              <div class="exp-ticket-divider"></div>
+              <!-- Stub -->
+              <div class="exp-ticket-stub">
+                <span class="exp-ticket-stub-idx">KAFORA</span>
+                <div class="exp-ticket-barcode">${buildBarcode()}</div>
+                <span class="exp-ticket-stub-num">${numStr}/${totalStr}</span>
+              </div>
+            </div>
+            ${galleryHtml}
+          </div>`;
+        }).join('');
+      } else {
+        document.getElementById('experiences').style.display = 'none';
+      }
+
+      // 4. GSAP Animations Setup
+      
+      // Parallax Background
+      gsap.to('#bg-parallax', {
+        yPercent: 30, ease: "none",
+        scrollTrigger: { trigger: "body", start: "top top", end: "bottom top", scrub: true }
+      });
+      // Fade out Hero Footer
+      gsap.to('#heroFooter', {
+        opacity: 0, ease: "none",
+        scrollTrigger: { trigger: "body", start: "top top", end: "20% top", scrub: true }
+      });
+
+      // Bouncing Arrow
+      gsap.to('#arrow-down', { y: 10, repeat: -1, yoyo: true, duration: 1, ease: 'power1.inOut' });
+
+      // Initial Reveal Animation
+      const tl = gsap.timeline();
+      tl.to('.fade-up', { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out', stagger: 0.2, delay: 0.1 })
+        .to('.fade-left', { x: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, "-=0.9");
+        
+      // Works Section Reveal
+      gsap.to('.works-header', {
+        y: 0, opacity: 1, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: '#works', start: 'top 75%' }
+      });
+      gsap.to('.works-header-sub', {
+        scale: 1, opacity: 1, duration: 1, delay: 0.2, ease: 'power3.out',
+        scrollTrigger: { trigger: '#works', start: 'top 75%' }
+      });
+
+      // Projects Grid Reveal with Stagger
+      ScrollTrigger.batch('.project-card', {
+        onEnter: batch => gsap.to(batch, { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out' }),
+        start: 'top 85%'
+      });
+
+      // Experiences Reveal
+      gsap.to('.exp-header-anim', {
+        y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: 'power3.out',
+        scrollTrigger: { trigger: '#experiences', start: 'top 80%' }
+      });
+      ScrollTrigger.batch('.exp-ticket-wrap', {
+        onEnter: batch => gsap.to(batch, { y: 0, opacity: 1, duration: 0.9, stagger: 0.18, ease: 'power2.out' }),
+        start: 'top 88%'
+      });
+    });
+
+    // ── Attribution affiliation 30 jours ──
+    function handleAffiliateClick(e, affiliateUrl, creatorId, partnerId) {
+      e.preventDefault();
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      localStorage.setItem(
+        'kafora-attribution-' + creatorId,
+        JSON.stringify({ creatorId: creatorId, partnerId: partnerId, expiry: expiry, at: Date.now() })
+      );
+      window.open(affiliateUrl, '_blank', 'noopener');
+    }
+  </script>
+</body>
+</html>

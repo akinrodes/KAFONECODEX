@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Accès Marques</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    :root { --ink: #0A0A0A; --parch: #EAE2D4; --bronze: #B08D57; --ash: #8C8478; }
+
+    /* ══ HERO ══ */
+    .brand-hero {
+      min-height: 100vh;
+      background: #0A0A0A;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 48px 80px;
+      position: relative; overflow: hidden;
+    }
+    .brand-hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(176,141,87,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 30%, rgba(176,141,87,0.05) 0%, transparent 50%);
+    }
+    .brand-hero::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .brand-hero-inner { position: relative; z-index: 2; max-width: 900px; }
+    .brand-hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.38em; text-transform: uppercase;
+      color: var(--bronze); margin-bottom: 28px;
+    }
+    .brand-hero-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(52px, 9vw, 120px);
+      line-height: 0.92; letter-spacing: -0.01em;
+      color: var(--parch); margin-bottom: 28px;
+    }
+    .brand-hero-headline em {
+      font-style: normal;
+      background: linear-gradient(135deg, #EAE2D4 0%, #B08D57 55%, #EAE2D4 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-hero-sub {
+      font-family: 'Barlow', sans-serif;
+      font-size: 16px; font-weight: 300;
+      color: rgba(234,226,212,0.55); line-height: 1.7;
+      max-width: 600px; margin: 0 auto 48px;
+    }
+    .brand-hero-cta {
+      display: inline-block;
+      background: var(--bronze); color: #0A0A0A;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      padding: 16px 36px; text-decoration: none;
+      transition: opacity 200ms;
+    }
+    .brand-hero-cta:hover { opacity: 0.85; }
+
+    /* ══ FEATURES ══ */
+    .features-section {
+      padding: 100px 48px;
+      background: #080808;
+      border-top: 1px solid rgba(176,141,87,0.10);
+    }
+    .features-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: var(--bronze); margin-bottom: 56px;
+      text-align: center;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: rgba(176,141,87,0.08);
+      max-width: 960px; margin: 0 auto;
+    }
+    .feature-cell {
+      background: #080808;
+      padding: 40px 36px;
+    }
+    .feature-icon {
+      font-size: 28px; margin-bottom: 20px; display: block;
+    }
+    .feature-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 20px;
+      letter-spacing: 0.02em; text-transform: uppercase;
+      color: var(--parch); margin-bottom: 12px;
+    }
+    .feature-desc {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 300;
+      color: rgba(234,226,212,0.45); line-height: 1.7;
+    }
+
+    /* ══ PREVIEW CRÉATEURS ══ */
+    .preview-section {
+      padding: 100px 48px;
+      background: #0A0A0A;
+    }
+    .preview-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between; margin-bottom: 48px;
+    }
+    .preview-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 42px;
+      letter-spacing: -0.01em; color: var(--parch);
+    }
+    .preview-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ash);
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .preview-card {
+      background: #0d0c0a;
+      border: 1px solid rgba(234,226,212,0.07);
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-card-img {
+      width: 100%; height: 260px;
+      object-fit: cover; display: block;
+      filter: brightness(0.75);
+    }
+    .preview-card-body { padding: 20px; }
+    .preview-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 22px;
+      letter-spacing: 0.02em; text-transform: uppercase;
+      color: var(--parch); margin-bottom: 4px;
+    }
+    .preview-card-disc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ash); margin-bottom: 16px;
+    }
+    .preview-card-contact {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 300;
+      color: rgba(234,226,212,0.30);
+      filter: blur(4px); user-select: none;
+      margin-bottom: 4px;
+    }
+    .badge-boosted {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: #0A0A0A; background: #EAE2D4;
+      padding: 3px 8px;
+    }
+    .preview-lock-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(0deg, rgba(10,10,10,0.96) 60%, transparent 100%);
+      padding: 24px 20px 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .preview-lock-icon {
+      font-size: 14px;
+    }
+    .preview-lock-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(176,141,87,0.80);
+    }
+
+    /* ══ PRICING B2B ══ */
+    .brand-pricing {
+      padding: 100px 48px;
+      background: #080808;
+      border-top: 1px solid rgba(176,141,87,0.10);
+    }
+    .brand-pricing-inner { max-width: 720px; margin: 0 auto; }
+    .brand-pricing-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: var(--bronze); margin-bottom: 48px;
+      text-align: center;
+    }
+    .brand-pricing-card {
+      border: 1px solid rgba(176,141,87,0.30);
+      background: #0A0A0A;
+      padding: 48px;
+      position: relative; overflow: hidden;
+    }
+    .brand-pricing-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, #B08D57, transparent);
+    }
+    .brand-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 36px;
+    }
+    .brand-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 36px;
+      letter-spacing: -0.01em; color: var(--parch);
+    }
+    .brand-card-price {
+      text-align: right;
+    }
+    .brand-card-amount {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 52px;
+      color: var(--bronze); line-height: 1;
+    }
+    .brand-card-period {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.14em; color: var(--ash);
+    }
+    .brand-card-features {
+      list-style: none; display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 36px;
+    }
+    .brand-card-features li {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 300;
+      color: rgba(234,226,212,0.65);
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .brand-card-features li::before {
+      content: '✓';
+      color: var(--bronze); font-weight: 700;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .brand-card-cta {
+      display: block; width: 100%;
+      background: var(--bronze); color: #0A0A0A;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      padding: 18px 24px; text-align: center;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: opacity 200ms;
+    }
+    .brand-card-cta:hover { opacity: 0.85; }
+    .brand-card-note {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300;
+      letter-spacing: 0.14em; color: rgba(234,226,212,0.25);
+      text-align: center; margin-top: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .preview-grid { grid-template-columns: 1fr; }
+      .brand-card-top { flex-direction: column; gap: 16px; }
+      .brand-card-features { grid-template-columns: 1fr; }
+      .brand-hero { padding: 100px 24px 60px; }
+      .features-section, .preview-section, .brand-pricing { padding: 72px 24px; }
+    }
+
+    /* ══ ENHANCEMENTS ÉDITORIAUX ══════════════════════════════ */
+
+    /* Ghost text on hero */
+    .brand-hero-ghost {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: clamp(100px, 18vw, 280px); line-height: 1;
+      color: rgba(176,141,87,0.03); letter-spacing: -0.04em;
+      pointer-events: none; user-select: none;
+      white-space: nowrap; z-index: 1;
+    }
+
+    /* Feature cell grain */
+    .feature-cell {
+      position: relative; overflow: hidden;
+      transition: background 300ms;
+    }
+    .feature-cell::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .feature-cell > * { position: relative; z-index: 1; }
+    .feature-cell:hover { background: #0a0a0a; }
+    .feature-cell:hover .feature-title { color: var(--bronze); }
+    .feature-title { transition: color 300ms; }
+
+    /* Section numbering */
+    .marques-section-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: rgba(176,141,87,0.35);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 28px;
+    }
+    .marques-section-num::after {
+      content: ''; display: block; width: 40px; height: 1px;
+      background: rgba(176,141,87,0.30);
+    }
+
+    /* Preview card hover */
+    .preview-card {
+      transition: transform 300ms cubic-bezier(0.34,1.25,0.64,1), border-color 300ms;
+    }
+    .preview-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(176,141,87,0.25);
+    }
+
+    /* Brand pricing card grain */
+    .brand-pricing-card::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .brand-pricing-card > * { position: relative; z-index: 1; }
+
+    /* ── Marquee ticker marques ── */
+    .brand-ticker {
+      overflow: hidden; padding: 10px 0;
+      background: rgba(176,141,87,0.05);
+      border-top: 1px solid rgba(176,141,87,0.12);
+      border-bottom: 1px solid rgba(176,141,87,0.12);
+    }
+    .brand-ticker-track {
+      display: flex; width: max-content;
+      animation: brand-tick 36s linear infinite;
+    }
+    .brand-ticker-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: rgba(176,141,87,0.30); padding: 0 36px;
+      white-space: nowrap; display: flex; align-items: center; gap: 36px;
+    }
+    .brand-ticker-item::after { content: '◆'; font-size: 5px; opacity: 0.5; }
+    @keyframes brand-tick {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* Hero barcode decoration */
+    .brand-hero-barcode {
+      display: flex; gap: 1.5px; align-items: center;
+      height: 20px; opacity: 0.15;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .brand-hero-barcode b { display: block; width: 1.5px; background: #B08D57; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══ -->
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="casting.html">Casting</a></li>
+      <li><a href="missions.html">Missions</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+      <li><a href="marques.html" class="active">Marques</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="connexion.html" class="nav-icon" title="Connexion"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="brand-hero">
+    <div class="brand-hero-ghost">MARQUES</div>
+    <div class="brand-hero-inner">
+      <div class="brand-hero-barcode"><b style="height:100%"></b><b style="height:55%"></b><b style="height:80%"></b><b style="height:40%"></b><b style="height:100%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:90%"></b><b style="height:50%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:60%"></b><b style="height:30%"></b><b style="height:85%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:40%"></b></div>
+      <p class="brand-hero-eyebrow">Pour les Marques & Agences</p>
+      <h1 class="brand-hero-headline">Scoutez les<br>créateurs de <em>demain</em></h1>
+      <p class="brand-hero-sub">Accédez au premier directory de créateurs de la diaspora africaine. Filtrez par discipline, ville et audience. Contactez en direct — sans intermédiaire.</p>
+      <a href="#pricing" class="brand-hero-cta">Démarrer — 99€/mois →</a>
+    </div>
+  </section>
+
+  <!-- ══ TICKER ══ -->
+  <div class="brand-ticker">
+    <div class="brand-ticker-track">
+      <span class="brand-ticker-item">1571+ Créateurs Vérifiés</span>
+      <span class="brand-ticker-item">Mode · Art · Musique · Photographie</span>
+      <span class="brand-ticker-item">Paris · Dakar · Accra · Lagos · NYC</span>
+      <span class="brand-ticker-item">Contact Direct — Sans Intermédiaire</span>
+      <span class="brand-ticker-item">Kafora Accès Marques</span>
+      <span class="brand-ticker-item">1571+ Créateurs Vérifiés</span>
+      <span class="brand-ticker-item">Mode · Art · Musique · Photographie</span>
+      <span class="brand-ticker-item">Paris · Dakar · Accra · Lagos · NYC</span>
+      <span class="brand-ticker-item">Contact Direct — Sans Intermédiaire</span>
+      <span class="brand-ticker-item">Kafora Accès Marques</span>
+    </div>
+  </div>
+
+  <!-- ══ FEATURES ══ -->
+  <section class="features-section">
+    <div class="marques-section-num" style="justify-content:center;">01 — Avantages</div>
+    <p class="features-label">Ce que vous obtenez</p>
+    <div class="features-grid">
+
+      <div class="feature-cell">
+        <span class="feature-icon">🔍</span>
+        <div class="feature-title">Recherche avancée</div>
+        <p class="feature-desc">Filtrez l'intégralité du catalogue par discipline (mode, photo, musique, art…), ville, langue et niveau de plan. Trouvez le bon profil en moins de 3 clics.</p>
+      </div>
+
+      <div class="feature-cell">
+        <span class="feature-icon">✉️</span>
+        <div class="feature-title">Contact direct</div>
+        <p class="feature-desc">Accédez aux coordonnées complètes des créateurs vérifiés — Instagram pro, email, site. Envoyez un brief directement depuis leur profil Kafora, sans agence.</p>
+      </div>
+
+      <div class="feature-cell">
+        <span class="feature-icon">✓</span>
+        <div class="feature-title">Profils vérifiés</div>
+        <p class="feature-desc">Chaque créateur Vérifié a été contrôlé manuellement par l'équipe Kafora. Compte actif, audience réelle, discipline confirmée. Zéro fake.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ PREVIEW CRÉATEURS ══ -->
+  <section class="preview-section">
+    <div class="marques-section-num">02 — Le Catalogue</div>
+    <div class="preview-header">
+      <h2 class="preview-headline">Le catalogue</h2>
+      <span class="preview-sub">Extrait · Accès complet avec Accès Marque</span>
+    </div>
+    <div class="preview-grid">
+
+      <div class="preview-card">
+        <img class="preview-card-img" src="file:///E:/AfroPunk/6fb830fe4265057425a90408bedb3b48.jpg" alt="Amara Diallo" />
+        <div class="preview-card-body">
+          <div class="preview-card-name">Amara Diallo <span style="font-size:10px;background:#B08D57;color:#0A0A0A;padding:2px 7px;vertical-align:middle;font-weight:700;letter-spacing:0.2em;">✓</span> <span class="badge-boosted">★ En vedette</span></div>
+          <div class="preview-card-disc">Mode · Direction Artistique · Paris, France</div>
+          <div class="preview-card-contact">@amaradiallo.paris · contact@amaradiallo.com</div>
+        </div>
+        <div class="preview-lock-overlay">
+          <span class="preview-lock-icon">🔒</span>
+          <span class="preview-lock-text">Visible avec Accès Marque</span>
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <img class="preview-card-img" src="file:///C:/Users/toto/Documents/te/1eb230d1dfa1e0d22dd2c42d7c9243e8.jpg" alt="Kofi Mensah" />
+        <div class="preview-card-body">
+          <div class="preview-card-name">Kofi Mensah <span style="font-size:10px;background:#B08D57;color:#0A0A0A;padding:2px 7px;vertical-align:middle;font-weight:700;letter-spacing:0.2em;">✓</span></div>
+          <div class="preview-card-disc">Art Contemporain · Sculpture · Accra, Ghana</div>
+          <div class="preview-card-contact">@kofi.mensah.art · studio@kofimensah.com</div>
+        </div>
+        <div class="preview-lock-overlay">
+          <span class="preview-lock-icon">🔒</span>
+          <span class="preview-lock-text">Visible avec Accès Marque</span>
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <img class="preview-card-img" src="file:///C:/Users/toto/Documents/te/36b3634cb200cf3a6f9fea2151046d14.jpg" alt="Nia Osei" />
+        <div class="preview-card-body">
+          <div class="preview-card-name">Nia Osei <span style="font-size:10px;background:#B08D57;color:#0A0A0A;padding:2px 7px;vertical-align:middle;font-weight:700;letter-spacing:0.2em;">✓</span> <span class="badge-boosted">★ En vedette</span></div>
+          <div class="preview-card-disc">Photographie · Editorial · Londres, UK</div>
+          <div class="preview-card-contact">@niaframes · nia@niaframes.co.uk</div>
+        </div>
+        <div class="preview-lock-overlay">
+          <span class="preview-lock-icon">🔒</span>
+          <span class="preview-lock-text">Visible avec Accès Marque</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ PRICING B2B ══ -->
+  <section class="brand-pricing" id="pricing">
+    <div class="brand-pricing-inner">
+      <p class="brand-pricing-label">Accès Marque</p>
+      <div class="brand-pricing-card">
+        <div class="brand-card-top">
+          <div>
+            <div class="brand-card-name">Accès Marque</div>
+            <p style="font-family:'Barlow',sans-serif;font-size:13px;font-weight:300;color:rgba(234,226,212,0.45);margin-top:8px;max-width:360px;">Pour les agences créatives, labels, maisons de mode et directeurs artistiques qui scoutent régulièrement.</p>
+          </div>
+          <div class="brand-card-price">
+            <div class="brand-card-amount">99€</div>
+            <div class="brand-card-period">par mois · sans engagement</div>
+          </div>
+        </div>
+        <ul class="brand-card-features">
+          <li>Contacts complets de tous les créateurs Vérifiés</li>
+          <li>Filtres avancés : discipline, ville, audience, langue</li>
+          <li>Envoi de briefs directs depuis les profils</li>
+          <li>Badge "Marque Partenaire" visible des créateurs</li>
+          <li>Accès aux nouvelles inscriptions en avant-première</li>
+          <li>Support prioritaire par email</li>
+        </ul>
+        <a href="https://buy.stripe.com/kafora-brand-access" onclick="event.preventDefault();window.location.href='https://buy.stripe.com/kafora-brand-access'" class="brand-card-cta">Démarrer mon accès →</a>
+        <p class="brand-card-note">Sans engagement · Résiliation à tout moment · Facture mensuelle · TVA non applicable (micro-entreprise)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="casting.html">Casting</a></li>
+      <li><a href="missions.html">Missions</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html" class="active">Marques</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+
+    // ── Si déjà connecté en tant que marque → bouton accès direct ──
+    (function() {
+      const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+      if (u.role === 'marque') {
+        const cta = document.querySelector('.brand-hero-cta');
+        if (cta) {
+          cta.textContent = 'Accéder à mon Portail →';
+          cta.href = 'dashboard-marque.html';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

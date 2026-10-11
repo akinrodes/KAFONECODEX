@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Discover The Culture</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    body { overflow: hidden; height: 100vh; }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: rgba(10,10,10,0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      z-index: 10;
+    }
+    .bn-item {
+      display: flex; flex-direction: column;
+      padding: 26px 32px 28px;
+      text-decoration: none;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      transition: background 350ms ease;
+      position: relative; overflow: hidden;
+    }
+    .bn-item:last-child { border-right: none; }
+    .bn-item::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--bronze);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 400ms ease;
+    }
+    .bn-item:hover { background: rgba(176,141,87,0.07); }
+    .bn-item:hover::after { transform: scaleX(1); }
+
+    .bn-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300;
+      letter-spacing: 0.20em; color: var(--ash);
+      margin-bottom: 8px; transition: color 300ms;
+    }
+    .bn-item:hover .bn-num { color: var(--bronze); }
+    .bn-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(17px,1.8vw,24px);
+      letter-spacing: -0.01em; color: var(--void);
+      line-height: 1; margin-bottom: 7px;
+      transition: color 300ms;
+    }
+    .bn-item:hover .bn-title { color: var(--bronze); }
+    .bn-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.10em;
+      color: rgba(255,255,255,0.25);
+      transition: color 300ms;
+    }
+    .bn-item:hover .bn-desc { color: rgba(255,255,255,0.50); }
+    .bn-arrow {
+      position: absolute; bottom: 28px; right: 28px;
+      color: rgba(255,255,255,0.15);
+      transition: color 300ms, transform 300ms;
+    }
+    .bn-item:hover .bn-arrow { color: var(--bronze); transform: translate(3px,-3px); }
+
+    .slide-dots-wrap {
+      position: absolute; bottom: 128px;
+      left: 50%; transform: translateX(-50%);
+      z-index: 10;
+    }
+    .hero-copy {
+      position: absolute; bottom: 172px; left: 48px;
+      z-index: 10;
+    }
+    .eyebrow { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .eyebrow-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: rgba(255,255,255,0.40);
+    }
+    @media (max-width: 768px) {
+      .bottom-nav { grid-template-columns: repeat(2,1fr); }
+      .hero-copy { left: 24px; bottom: 240px; }
+      .slide-dots-wrap { bottom: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="premium.html" class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <section class="hero-section">
+
+    <div class="hero-slide active" style="background-image:url('file:///E:/AfroPunk/86b4849f724e79786db3ccd0b418a93c.jpg');background-position:center top;"></div>
+    <div class="hero-slide" style="background-image:url('file:///E:/AfroPunk/c78917647cdcb2262e3424b8ec875098.jpg');"></div>
+    <div class="hero-slide" style="background-image:url('file:///E:/AfroPunk/edbf6e221e7d36de896a033428cf7866.jpg');"></div>
+
+    <div class="hero-vignette"></div>
+    <div class="hero-vignette-side"></div>
+
+    <div class="social-rail">
+      <div class="social-rail-inner">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <div class="eyebrow">
+        <span class="eyebrow-text">Mode · Art · Musique</span>
+        <span class="pill ghost">Saison 2025</span>
+      </div>
+      <h1 class="t-hero">Discover<br>The Culture</h1>
+    </div>
+
+    <div class="slide-dots-wrap">
+      <div class="slide-dots">
+        <button class="s-dot active" data-slide="0">01</button>
+        <button class="s-dot" data-slide="1">02</button>
+        <button class="s-dot" data-slide="2">03</button>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a href="createurs.html" class="bn-item">
+        <span class="bn-num">01</span>
+        <span class="bn-title">Créateurs</span>
+        <span class="bn-desc">Découvrir l'annuaire</span>
+        <span class="bn-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="evenements.html" class="bn-item">
+        <span class="bn-num">02</span>
+        <span class="bn-title">Événements</span>
+        <span class="bn-desc">Agenda & Billetterie</span>
+        <span class="bn-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="titans.html" class="bn-item">
+        <span class="bn-num">03</span>
+        <span class="bn-title">Titans</span>
+        <span class="bn-desc">Espace Recruteur B2B</span>
+        <span class="bn-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="premium.html" class="bn-item">
+        <span class="bn-num">04</span>
+        <span class="bn-title">Premium</span>
+        <span class="bn-desc">Rejoindre l'élite</span>
+        <span class="bn-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+    </nav>
+  </section>
+
+  <script>
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots   = document.querySelectorAll('.s-dot');
+    let cur = 0;
+    function goTo(i) {
+      slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
+      cur = i;
+      slides[cur].classList.add('active'); dots[cur].classList.add('active');
+    }
+    dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.slide)));
+    setInterval(() => goTo((cur + 1) % slides.length), 5500);
+  </script>
+</body>
+</html>

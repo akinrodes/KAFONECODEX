@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Press Kit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink:     #0A0A0A;
+      --parch:   #EAE2D4;
+      --bronze:  #B08D57;
+      --ash:     #8C8478;
+      --w:       1920px;
+      --h:       1080px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 32px 0 64px;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    /* ── DECK WRAPPER ── */
+    #deck-wrapper {
+      width: var(--w);
+      transform-origin: top center;
+    }
+
+    /* ── SLIDE ── */
+    .slide {
+      width: var(--w);
+      height: var(--h);
+      position: relative;
+      overflow: hidden;
+      background: var(--ink);
+      display: none;
+    }
+    .slide.active { display: flex; }
+
+    /* Grain overlay */
+    .slide::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23g)'/></svg>");
+      mix-blend-mode: screen;
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ── WATERMARK ── */
+    .watermark {
+      position: absolute;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: rgba(176,141,87,0.40);
+      z-index: 5;
+    }
+    .watermark-top { top: 40px; left: 56px; }
+    .watermark-corner {
+      bottom: 40px; right: 56px;
+      text-align: right;
+    }
+
+    /* ── SLIDE NUMBER ── */
+    .slide-num {
+      position: absolute;
+      top: 40px; right: 56px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(234,226,212,0.25);
+      z-index: 5;
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 1 — COVER
+    ══════════════════════════════════════════ */
+    #slide-cover {
+      flex-direction: row;
+    }
+    .cover-photo {
+      width: 46%;
+      height: 100%;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .cover-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 15%;
+      display: block;
+      filter: grayscale(18%);
+    }
+    .cover-photo-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, transparent 60%, var(--ink) 100%);
+    }
+    .cover-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 80px 80px 64px;
+      position: relative;
+    }
+    .cover-kaf-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.48em; text-transform: uppercase;
+      color: var(--bronze);
+      margin-bottom: 48px;
+    }
+    .cover-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(80px, 7vw, 140px);
+      line-height: 0.9;
+      text-transform: uppercase;
+      color: var(--parch);
+      margin-bottom: 28px;
+    }
+    .cover-disc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 300;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--bronze);
+      margin-bottom: 16px;
+    }
+    .cover-loc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 300;
+      letter-spacing: 0.20em; text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 64px;
+    }
+    .cover-stats {
+      display: flex;
+      gap: 48px;
+    }
+    .cover-stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 52px; font-weight: 900;
+      color: var(--parch);
+      line-height: 1;
+    }
+    .cover-stat-lbl {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: var(--ash);
+      margin-top: 6px;
+    }
+    .cover-verified {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase;
+      background: var(--bronze); color: var(--ink);
+      padding: 6px 14px;
+      position: absolute; top: 80px; right: 80px;
+    }
+    .cover-divider {
+      width: 48px; height: 1px;
+      background: var(--bronze);
+      margin: 40px 0;
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 2 — MANIFESTE
+    ══════════════════════════════════════════ */
+    #slide-manifeste {
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 80px 120px;
+      background: linear-gradient(135deg, #0A0A0A 0%, #0f0d0a 100%);
+    }
+    .man-overline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.52em; text-transform: uppercase;
+      color: var(--bronze);
+      margin-bottom: 40px;
+    }
+    .man-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: end;
+    }
+    .man-bio {
+      font-family: 'Barlow', sans-serif;
+      font-size: 24px; font-weight: 300;
+      line-height: 1.75;
+      color: rgba(234,226,212,0.80);
+    }
+    .man-right {}
+    .man-tags-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 20px;
+    }
+    .man-tags {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .man-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 400;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--parch);
+      border: 1px solid rgba(234,226,212,0.20);
+      padding: 8px 18px;
+    }
+    .man-exps {
+      margin-top: 48px;
+    }
+    .man-exps-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 20px;
+    }
+    .man-exp-row {
+      display: flex; gap: 24px; align-items: baseline;
+      border-top: 1px solid rgba(234,226,212,0.08);
+      padding: 14px 0;
+    }
+    .man-exp-year {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 300;
+      letter-spacing: 0.14em;
+      color: var(--bronze);
+      min-width: 36px;
+    }
+    .man-exp-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--parch);
+      min-width: 120px;
+    }
+    .man-exp-role {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 300;
+      color: var(--ash);
+    }
+    .man-title-bg {
+      position: absolute;
+      top: 80px; right: 120px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 220px; font-weight: 900;
+      text-transform: uppercase;
+      color: rgba(176,141,87,0.04);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 3 — STATS & RÉSEAUX
+    ══════════════════════════════════════════ */
+    #slide-stats {
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 120px;
+    }
+    .stats-overline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.52em; text-transform: uppercase;
+      color: var(--bronze);
+      margin-bottom: 64px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-bottom: 80px;
+    }
+    .stats-card {
+      background: rgba(234,226,212,0.04);
+      padding: 48px 40px;
+      border-top: 2px solid var(--bronze);
+    }
+    .stats-card-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 80px; font-weight: 900;
+      color: var(--parch);
+      line-height: 1;
+    }
+    .stats-card-lbl {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 400;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: var(--ash);
+      margin-top: 12px;
+    }
+    .stats-networks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .stats-net {
+      display: flex; align-items: center; gap: 20px;
+      border-left: 2px solid rgba(176,141,87,0.30);
+      padding-left: 24px;
+    }
+    .stats-net-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .stats-net-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 400;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--ash);
+    }
+    .stats-net-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--parch);
+      margin-top: 4px;
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 4 — PORTFOLIO
+    ══════════════════════════════════════════ */
+    #slide-portfolio {
+      flex-direction: column;
+    }
+    .port-header {
+      padding: 56px 80px 40px;
+      display: flex; align-items: baseline; justify-content: space-between;
+      border-bottom: 1px solid rgba(234,226,212,0.08);
+      flex-shrink: 0;
+    }
+    .port-overline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.52em; text-transform: uppercase;
+      color: var(--bronze);
+    }
+    .port-season {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ash);
+    }
+    .port-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      flex: 1;
+      gap: 2px;
+    }
+    .port-cell {
+      position: relative;
+      overflow: hidden;
+      background: #111;
+    }
+    .port-cell img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 600ms cubic-bezier(0.34, 1.25, 0.64, 1);
+    }
+    .port-cell-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.75) 0%, transparent 50%);
+    }
+    .port-cell-label {
+      position: absolute;
+      bottom: 16px; left: 16px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--parch);
+    }
+    .port-cell-empty {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(234,226,212,0.12);
+    }
+
+    /* ── NAVIGATION ── */
+    #nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid rgba(176,141,87,0.20);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      z-index: 100;
+    }
+    .nav-info {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ash);
+    }
+    .nav-creator {
+      color: var(--bronze);
+      font-weight: 700;
+    }
+    .nav-btns {
+      display: flex; gap: 12px;
+    }
+    .nav-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      padding: 10px 28px;
+      border: 1px solid rgba(234,226,212,0.20);
+      background: transparent;
+      color: var(--parch);
+      cursor: pointer;
+      transition: background 200ms, border-color 200ms;
+    }
+    .nav-btn:hover { background: rgba(234,226,212,0.06); border-color: rgba(234,226,212,0.40); }
+    .nav-btn-close {
+      border-color: rgba(176,141,87,0.40);
+      color: var(--bronze);
+    }
+    .nav-btn-close:hover { background: rgba(176,141,87,0.10); }
+    .nav-dots {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .nav-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(234,226,212,0.20);
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .nav-dot.active { background: var(--bronze); }
+  </style>
+</head>
+<body>
+
+<div id="deck-wrapper">
+
+  <!-- ══ SLIDE 1 — COVER ══ -->
+  <div class="slide active" id="slide-cover">
+    <div class="watermark watermark-top">Kafora · Press Kit</div>
+    <span class="watermark watermark-corner" id="wm-date"></span>
+    <div class="slide-num">01 / 04</div>
+    <div class="cover-photo">
+      <img id="cover-photo-img" src="" alt="" />
+      <div class="cover-photo-over"></div>
+    </div>
+    <div class="cover-right">
+      <span id="cover-verified" class="cover-verified" style="display:none">✓ Vérifié Kafora</span>
+      <div class="cover-kaf-label">Kafora · Directory Créatif · Diaspora Africaine</div>
+      <h1 class="cover-name" id="cover-name">—</h1>
+      <div class="cover-disc" id="cover-disc">—</div>
+      <div class="cover-loc" id="cover-loc">—</div>
+      <div class="cover-divider"></div>
+      <div class="cover-stats">
+        <div>
+          <div class="cover-stat-val" id="stat-followers">—</div>
+          <div class="cover-stat-lbl">Abonnés</div>
+        </div>
+        <div>
+          <div class="cover-stat-val" id="stat-collabs">—</div>
+          <div class="cover-stat-lbl">Collaborations</div>
+        </div>
+        <div>
+          <div class="cover-stat-val" id="stat-years">—</div>
+          <div class="cover-stat-lbl">Années actif</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 2 — MANIFESTE ══ -->
+  <div class="slide" id="slide-manifeste">
+    <div class="watermark watermark-top">Kafora · Press Kit</div>
+    <div class="slide-num">02 / 04</div>
+    <div class="man-title-bg" id="man-title-bg">ADN</div>
+    <div class="man-overline">Univers · Manifeste</div>
+    <div class="man-grid">
+      <p class="man-bio" id="man-bio">—</p>
+      <div class="man-right">
+        <div class="man-tags-label">Disciplines & Univers</div>
+        <div class="man-tags" id="man-tags"></div>
+        <div class="man-exps">
+          <div class="man-exps-label">Expériences & Collaborations</div>
+          <div id="man-exps-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 3 — STATS & RÉSEAUX ══ -->
+  <div class="slide" id="slide-stats">
+    <div class="watermark watermark-top">Kafora · Press Kit</div>
+    <div class="slide-num">03 / 04</div>
+    <div class="stats-overline">Chiffres & Présence Digitale</div>
+    <div class="stats-grid">
+      <div class="stats-card">
+        <div class="stats-card-val" id="sc-followers">—</div>
+        <div class="stats-card-lbl">Abonnés</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-val" id="sc-clicks">—</div>
+        <div class="stats-card-lbl">Clics affiliés</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-val" id="sc-collabs">—</div>
+        <div class="stats-card-lbl">Collaborations</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-card-val" id="sc-years">—</div>
+        <div class="stats-card-lbl">Années d'activité</div>
+      </div>
+    </div>
+    <div class="stats-networks">
+      <div class="stats-net">
+        <div class="stats-net-icon">📸</div>
+        <div>
+          <div class="stats-net-label">Instagram</div>
+          <div class="stats-net-val" id="net-ig">—</div>
+        </div>
+      </div>
+      <div class="stats-net">
+        <div class="stats-net-icon">🌐</div>
+        <div>
+          <div class="stats-net-label">Site web</div>
+          <div class="stats-net-val" id="net-web">—</div>
+        </div>
+      </div>
+      <div class="stats-net">
+        <div class="stats-net-icon">✉️</div>
+        <div>
+          <div class="stats-net-label">Contact pro</div>
+          <div class="stats-net-val" id="net-email">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 4 — PORTFOLIO ══ -->
+  <div class="slide" id="slide-portfolio">
+    <div class="watermark watermark-top">Kafora · Press Kit</div>
+    <div class="slide-num">04 / 04</div>
+    <div class="port-header">
+      <span class="port-overline">Portfolio · Travaux Sélectionnés</span>
+      <span class="port-season" id="port-season">—</span>
+    </div>
+    <div class="port-grid" id="port-grid"></div>
+  </div>
+
+</div>
+
+<!-- ══ NAV BAR ══ -->
+<div id="nav-bar">
+  <div class="nav-info">
+    <span class="nav-creator" id="nav-creator-name">—</span>
+    &nbsp;·&nbsp; Press Kit Kafora
+  </div>
+  <div class="nav-dots">
+    <div class="nav-dot active" onclick="goToSlide(0)"></div>
+    <div class="nav-dot" onclick="goToSlide(1)"></div>
+    <div class="nav-dot" onclick="goToSlide(2)"></div>
+    <div class="nav-dot" onclick="goToSlide(3)"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="prevSlide()">← Préc.</button>
+    <button class="nav-btn" onclick="nextSlide()">Suiv. →</button>
+    <button class="nav-btn nav-btn-close" onclick="window.close()">✕ Fermer</button>
+  </div>
+</div>
+
+<script>
+// ── CREATORS FALLBACK (données publiques) ──
+const CREATORS = {
+  amara: {
+    verified: true, boosted: true,
+    name: 'Amara Diallo',
+    discipline: 'Mode · Styliste Éditoriale',
+    city: 'Paris', country: 'France',
+    bio: 'Styliste éditoriale et directrice artistique basée à Paris. Fondatrice du Collectif Wax Moderne, elle tisse entre patrimoine africain et avant-garde parisienne. Collaborations avec LVMH, Jacquemus et ASOS Africa.',
+    tags: ['Mode', 'Stylisme', 'Direction Artistique', 'Couture', 'Wax'],
+    photo: '',
+    followers: '48k', collabs: '120', years: '6',
+    ig: '@amaradiallo', web: 'amaradiallo.fr', email: 'contact@amaradiallo.fr',
+    portSeason: 'Collections 2023—2025',
+    portfolio: [
+      { img: '', label: 'LVMH Métiers d\'Art' },
+      { img: '', label: 'Backstage Paris FW' },
+      { img: '', label: 'Collectif Wax Moderne' },
+    ],
+    experiences: [
+      { year: '2024', brand: 'LVMH', role: 'Directrice Artistique — Métiers d\'Art Africa Collection' },
+      { year: '2023', brand: 'Jacquemus', role: 'Styliste Éditoriale — Campagne Soleil de l\'Afrique' },
+      { year: '2022', brand: 'Paris FW', role: 'Directrice Casting — Afro Couture Week' },
+    ]
+  },
+  kofi: {
+    verified: true, boosted: true,
+    name: 'Kofi Mensah',
+    discipline: 'Art Contemporain · Plasticien',
+    city: 'Accra', country: 'Ghana',
+    bio: 'Artiste plasticien basé à Accra dont le travail explore la mémoire collective de la diaspora africaine à travers la peinture, l\'installation et la photographie. Expositions à Lagos, Londres et New York.',
+    tags: ['Peinture', 'Installation', 'Photographie', 'Art Urbain'],
+    photo: '',
+    followers: '32k', collabs: '87', years: '8',
+    ig: '@kofimensah.art', web: 'kofimensah.art', email: 'studio@kofimensah.art',
+    portSeason: 'Œuvres 2023—2025',
+    portfolio: [
+      { img: '', label: 'Lagos Calling' },
+      { img: '', label: 'Paris Series' },
+      { img: '', label: 'Accra Gold' },
+    ],
+    experiences: [
+      { year: '2024', brand: 'MoMA', role: 'Exposition collective — New Voices of the Diaspora' },
+      { year: '2024', brand: 'Tate Modern', role: 'Résidence artistique — African Contemporary Program' },
+      { year: '2023', brand: 'Lagos BF', role: 'Artiste vedette — Lagos Biennale of Contemporary Art' },
+    ]
+  },
+  lea: {
+    verified: false, boosted: false,
+    name: 'Léa Traoré',
+    discipline: 'Musique · Artiste & Productrice',
+    city: 'Dakar', country: 'Sénégal',
+    bio: 'Artiste musicale et productrice basée à Dakar. Son univers mêle afrobeats, soul et sonorités mandingues. Tournées internationales, collaborations avec des labels européens et africains.',
+    tags: ['Afrobeats', 'Soul', 'Production', 'Live Performance'],
+    photo: '',
+    followers: '61k', collabs: '53', years: '5',
+    ig: '@leatraore.music', web: 'leatraore.com', email: 'booking@leatraore.com',
+    portSeason: 'Discographie & Lives',
+    portfolio: [
+      { img: '', label: 'Album Cover — Mbaye' },
+      { img: '', label: 'Live Olympia Paris' },
+      { img: '', label: 'Festival Lagos' },
+    ],
+    experiences: [
+      { year: '2024', brand: 'Olympia', role: 'Artiste solo — Sold Out 2 dates' },
+      { year: '2023', brand: 'Universal', role: 'Signature label — Album Mbaye' },
+    ]
+  },
+  nia: {
+    verified: true, boosted: true,
+    name: 'Nia Osei',
+    discipline: 'Photographie · Éditoriale & Mode',
+    city: 'Londres', country: 'Royaume-Uni',
+    bio: 'Photographe éditoriale et de mode basée à Londres. Son œil capture la grâce et la puissance des corps noirs dans toute leur diversité. Publications dans Vogue, i-D et Dazed.',
+    tags: ['Photographie', 'Éditorial', 'Mode', 'Portrait'],
+    photo: '',
+    followers: '89k', collabs: '145', years: '9',
+    ig: '@niaosei.photo', web: 'niaosei.com', email: 'studio@niaosei.com',
+    portSeason: 'Éditoriaux 2023—2025',
+    portfolio: [
+      { img: '', label: 'Vogue UK — Juillet 2024' },
+      { img: '', label: 'i-D Diaspora Issue' },
+      { img: '', label: 'Campagne Nike Women' },
+    ],
+    experiences: [
+      { year: '2024', brand: 'Vogue UK', role: 'Photographe — Couverture Juillet' },
+      { year: '2023', brand: 'Nike', role: 'Photographe Principal — Campagne Women' },
+      { year: '2023', brand: 'i-D Mag', role: 'Éditoriale — The Diaspora Issue' },
+    ]
+  }
+};
+
+// ── ÉTAT ──
+let currentSlide = 0;
+const SLIDE_IDS = ['slide-cover', 'slide-manifeste', 'slide-stats', 'slide-portfolio'];
+
+// ── SCALE DECK ──
+function scaleDeck() {
+  const wrapper = document.getElementById('deck-wrapper');
+  const vw = window.innerWidth;
+  const scale = vw / 1920;
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.marginBottom = ((1080 * scale) - 1080) + 'px';
+}
+window.addEventListener('resize', scaleDeck);
+scaleDeck();
+
+// ── NAVIGATION ──
+function goToSlide(n) {
+  document.querySelectorAll('.slide').forEach((s, i) => {
+    s.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.nav-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === n);
+  });
+  currentSlide = n;
+}
+
+function nextSlide() {
+  goToSlide(Math.min(currentSlide + 1, SLIDE_IDS.length - 1));
+}
+function prevSlide() {
+  goToSlide(Math.max(currentSlide - 1, 0));
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prevSlide();
+});
+
+// ── LOAD DATA ──
+function loadData() {
+  const params = new URLSearchParams(window.location.search);
+  const param  = params.get('creator') || 'me';
+
+  let data;
+
+  if (param === 'me') {
+    // Données du créateur connecté (localStorage)
+    const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+    const u = JSON.parse(localStorage.getItem('kafora-user')   || '{}');
+    const links   = JSON.parse(localStorage.getItem('kafora-links')    || '[]');
+    const partners = JSON.parse(localStorage.getItem('kafora-partners') || '{}');
+
+    const totalClicks = links.reduce((s, l) => s + (l.clicks || 0), 0)
+      + Object.values(partners).reduce((s, pt) => s + (pt.clicks || 0), 0);
+
+    data = {
+      verified: u.kaforaVerified === 'true',
+      name: ((p.fn || u.firstName || '') + ' ' + (p.ln || u.lastName || '')).trim() || 'Créateur',
+      discipline: (p.discs && p.discs.length) ? p.discs.join(' · ') : 'Créateur',
+      city: p.city || '—', country: p.country || '',
+      bio: p.bio || 'Aucune biographie renseignée.',
+      tags: p.discs || [],
+      photo: p.photo || '',
+      followers: '—', collabs: '—', years: '—',
+      ig: p.ig || '—', web: p.web || '—', email: p.email || '—',
+      portSeason: 'Portfolio',
+      portfolio: (p.portfolio || []).slice(0, 6),
+      experiences: p.experiences || [],
+      totalClicks
+    };
+  } else if (CREATORS[param]) {
+    const c = CREATORS[param];
+    data = Object.assign({}, c, { totalClicks: 0 });
+  } else {
+    document.body.innerHTML = `<div style="color:#EAE2D4;font-family:'Barlow Condensed',sans-serif;padding:80px;font-size:24px;letter-spacing:0.14em;">Créateur introuvable.</div>`;
+    return;
+  }
+
+  renderDeck(data);
+}
+
+function renderDeck(d) {
+  const name = d.name || '—';
+  const disc = d.discipline || '—';
+  const loc  = [d.city, d.country].filter(Boolean).join(', ') || '—';
+
+  // ── SLIDE 1 COVER ──
+  document.getElementById('cover-name').innerHTML = name.replace(' ', '<br>');
+  document.getElementById('cover-disc').textContent  = disc;
+  document.getElementById('cover-loc').textContent   = loc;
+  document.getElementById('stat-followers').textContent = d.followers || '—';
+  document.getElementById('stat-collabs').textContent   = d.collabs   || '—';
+  document.getElementById('stat-years').textContent     = d.years     || '—';
+  document.getElementById('nav-creator-name').textContent = name;
+
+  if (d.verified) document.getElementById('cover-verified').style.display = 'inline-flex';
+
+  if (d.photo) {
+    const img = document.getElementById('cover-photo-img');
+    img.src = d.photo;
+    img.alt = name;
+  } else {
+    document.querySelector('.cover-photo').style.background = '#141414';
+    document.getElementById('cover-photo-img').style.display = 'none';
+  }
+
+  // Date
+  const dateStr = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('wm-date').textContent = dateStr;
+
+  // ── SLIDE 2 MANIFESTE ──
+  document.getElementById('man-bio').textContent = d.bio || '—';
+  document.getElementById('man-title-bg').textContent = (d.tags && d.tags[0] || 'ADN').toUpperCase();
+  document.getElementById('man-tags').innerHTML = (d.tags || []).map(t =>
+    `<span class="man-tag">${t}</span>`
+  ).join('');
+  document.getElementById('man-exps-list').innerHTML = (d.experiences || []).slice(0, 4).map(e =>
+    `<div class="man-exp-row">
+      <span class="man-exp-year">${e.year}</span>
+      <span class="man-exp-brand">${e.brand}</span>
+      <span class="man-exp-role">${e.role}</span>
+    </div>`
+  ).join('') || '<p style="color:rgba(234,226,212,0.25);font-family:\'Barlow\',sans-serif;font-size:14px;padding:16px 0">Aucune expérience renseignée.</p>';
+
+  // ── SLIDE 3 STATS ──
+  document.getElementById('sc-followers').textContent = d.followers || '—';
+  document.getElementById('sc-clicks').textContent    = d.totalClicks !== undefined ? (d.totalClicks > 999 ? Math.round(d.totalClicks/1000) + 'k' : d.totalClicks) : '—';
+  document.getElementById('sc-collabs').textContent   = d.collabs    || '—';
+  document.getElementById('sc-years').textContent     = d.years      || '—';
+  document.getElementById('net-ig').textContent    = d.ig    || '—';
+  document.getElementById('net-web').textContent   = d.web   || '—';
+  document.getElementById('net-email').textContent = d.email || '—';
+
+  // ── SLIDE 4 PORTFOLIO ──
+  document.getElementById('port-season').textContent = d.portSeason || 'Portfolio';
+  const items = (d.portfolio || []).slice(0, 6);
+  const cells = [];
+  for (let i = 0; i < 6; i++) {
+    const item = items[i];
+    if (item && item.img) {
+      cells.push(`<div class="port-cell">
+        <img src="${item.img}" alt="${item.label || ''}" loading="lazy" />
+        <div class="port-cell-over"></div>
+        <span class="port-cell-label">${item.label || ''}</span>
+      </div>`);
+    } else if (item) {
+      cells.push(`<div class="port-cell">
+        <div class="port-cell-empty">${item.label || ''}</div>
+      </div>`);
+    } else {
+      cells.push(`<div class="port-cell"><div class="port-cell-empty">—</div></div>`);
+    }
+  }
+  document.getElementById('port-grid').innerHTML = cells.join('');
+}
+
+// ── INIT ──
+loadData();
+</script>
+</body>
+</html>

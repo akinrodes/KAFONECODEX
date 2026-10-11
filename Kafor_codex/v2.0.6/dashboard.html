@@ -1,0 +1,2386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="kafora-db.js"></script>
+  <script src="kafora-currency.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0A0A0A; --parch: #EAE2D4; --bronze: #B08D57;
+      --ash: #8C8478; --surface: #0d0c0a;
+      --border: rgba(176,141,87,0.10); --muted: rgba(234,226,212,0.35);
+    }
+    body { background: var(--ink); color: var(--parch); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 32px 0; z-index: 100;
+    }
+    .sidebar-logo { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:20px; letter-spacing:0.06em; color:var(--parch); text-decoration:none; padding:0 28px; margin-bottom:40px; display:block; flex-shrink:0; }
+    .sidebar-logo:hover { color:var(--bronze); }
+    .sidebar-menu { flex:1; overflow-y:auto; display:flex; flex-direction:column; padding-bottom:10px; }
+    .sidebar-menu::-webkit-scrollbar { width: 4px; }
+    .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(176,141,87,0.2); border-radius: 4px; }
+    .sidebar-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.36em; text-transform:uppercase; color:rgba(234,226,212,0.20); padding:0 28px; margin:20px 0 6px; flex-shrink: 0; }
+    .sidebar-nav { list-style:none; }
+    .sidebar-nav li a { display:flex; align-items:center; gap:12px; padding:11px 28px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:300; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); text-decoration:none; cursor:pointer; border-left:2px solid transparent; transition:color 180ms,background 180ms; }
+    .sidebar-nav li a:hover { color:rgba(234,226,212,0.75); background:rgba(234,226,212,0.03); }
+    .sidebar-nav li a.active { color:var(--bronze); border-left-color:var(--bronze); background:rgba(176,141,87,0.06); }
+    .sidebar-nav li a svg { width:15px; height:15px; flex-shrink:0; }
+    .sidebar-bottom { padding:20px 28px 0; border-top:1px solid rgba(234,226,212,0.06); flex-shrink: 0; margin-bottom: 20px; }
+    .sidebar-user { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .sidebar-avatar { width:36px; height:36px; border-radius:50%; background:rgba(176,141,87,0.15); border:1px solid rgba(176,141,87,0.35); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; color:var(--bronze); flex-shrink:0; }
+    .sidebar-user-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; color:rgba(234,226,212,0.85); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sidebar-user-plan { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; color:var(--bronze); }
+    .btn-logout { width:100%; padding:9px 16px; background:transparent; border:1px solid rgba(234,226,212,0.10); border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 200ms; }
+    .btn-logout:hover { border-color:rgba(234,226,212,0.25); color:rgba(234,226,212,0.65); }
+    .btn-preview { width:100%; padding:10px 16px; background:rgba(176,141,87,0.12); border:1px solid rgba(176,141,87,0.30); border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--bronze); cursor:pointer; transition:all 200ms; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; margin-bottom:10px; }
+    .btn-preview:hover { background:rgba(176,141,87,0.22); }
+
+    /* ══ MAIN ══ */
+    .dash-main { margin-left:220px; padding:48px 48px 80px; min-height:100vh; }
+    .dash-section { display:none; }
+    .dash-section.active { display:block; }
+
+    .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; }
+    .page-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.32em; text-transform:uppercase; color:var(--bronze); margin-bottom:6px; }
+    .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:clamp(28px,3vw,44px); letter-spacing:-0.01em; color:var(--parch); line-height:1; }
+
+    /* ══ CARDS COMMUNES ══ */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+    .stat-card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:12px; padding:24px 20px; position:relative; overflow:hidden; }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; width:40%; height:1px; background:var(--bronze); opacity:0.5; }
+    .stat-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.30em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+    .stat-value { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:36px; color:var(--parch); line-height:1; margin-bottom:6px; }
+    .stat-delta { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:rgba(234,226,212,0.28); }
+    .stat-delta.up { color:rgba(120,200,120,0.70); }
+
+    .card { background:rgba(234,226,212,0.05); border:1px solid rgba(234,226,212,0.12); border-radius:12px; padding:28px; margin-bottom:20px; }
+    .card-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(234,226,212,0.65); margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid rgba(234,226,212,0.10); }
+
+    .btn-bronze { padding:12px 24px; background:var(--bronze); border:none; border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink); cursor:pointer; text-decoration:none; transition:background 200ms; white-space:nowrap; display:inline-block; }
+    .btn-bronze:hover { background:#c9a26a; }
+    .btn-save { padding:12px 28px; background:var(--bronze); border:none; border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink); cursor:pointer; transition:background 200ms; }
+    .btn-save:hover { background:#c9a26a; }
+
+    /* ══ OVERVIEW ══ */
+    .completion-card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:12px; padding:28px; margin-bottom:24px; }
+    .completion-head { display:flex; align-items:center; gap:20px; margin-bottom:24px; }
+    .completion-ring { width:64px; height:64px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; position:relative; }
+    .completion-ring-bg { position:absolute; inset:0; border-radius:50%; background:conic-gradient(var(--bronze) 0% 20%,rgba(234,226,212,0.08) 20% 100%); }
+    .completion-ring-inner { position:relative; z-index:1; width:48px; height:48px; border-radius:50%; background:var(--surface); display:flex; align-items:center; justify-content:center; }
+    .completion-pct { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; color:var(--bronze); }
+    .completion-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; color:var(--parch); margin-bottom:4px; }
+    .completion-sub { font-family:'Barlow',sans-serif; font-weight:300; font-size:13px; color:var(--muted); }
+    .task-list { display:flex; flex-direction:column; gap:12px; }
+    .task-row { display:flex; align-items:center; gap:12px; }
+    .task-check { width:18px; height:18px; border-radius:50%; border:1px solid rgba(234,226,212,0.15); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .task-check.done { background:rgba(176,141,87,0.20); border-color:rgba(176,141,87,0.40); }
+    .task-check.done::after { content:'✓'; font-size:10px; color:var(--bronze); }
+    .task-text { font-family:'Barlow',sans-serif; font-weight:300; font-size:13px; color:rgba(234,226,212,0.55); }
+    .task-text.done { color:rgba(234,226,212,0.25); text-decoration:line-through; }
+    .task-btn { margin-left:auto; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.18em; text-transform:uppercase; color:var(--bronze); background:none; border:none; cursor:pointer; padding:0; }
+    .task-btn:hover { text-decoration:underline; }
+    .plan-card { background:rgba(176,141,87,0.06); border:1px solid rgba(176,141,87,0.20); border-radius:12px; padding:28px; display:flex; justify-content:space-between; align-items:center; gap:24px; }
+    .plan-badge { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.36em; text-transform:uppercase; color:var(--bronze); background:rgba(176,141,87,0.15); border:1px solid rgba(176,141,87,0.30); border-radius:4px; padding:4px 10px; display:inline-block; margin-bottom:10px; }
+    .plan-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:22px; color:var(--parch); margin-bottom:6px; }
+    .plan-desc { font-family:'Barlow',sans-serif; font-weight:300; font-size:13px; color:var(--muted); max-width:380px; }
+
+    /* ══ PROFIL ══ */
+    .profil-grid { display:grid; grid-template-columns:1fr 300px; gap:24px; }
+    .split-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .form-label { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; color:rgba(234,226,212,0.75); }
+    .form-input, .form-textarea { background:rgba(234,226,212,0.08); border:1px solid rgba(234,226,212,0.22); border-radius:6px; padding:12px 16px; font-family:'Barlow',sans-serif; font-weight:300; font-size:14px; color:var(--parch); outline:none; transition:border-color 200ms, background 200ms; width:100%; }
+    .form-input::placeholder, .form-textarea::placeholder { color:rgba(234,226,212,0.38); }
+    .form-input:focus, .form-textarea:focus { border-color:rgba(176,141,87,0.65); background:rgba(234,226,212,0.11); }
+    select.form-input { background:#161412; color:var(--parch); cursor:pointer; }
+    select.form-input option { background:#161412; color:var(--parch); }
+    .form-textarea { resize:vertical; min-height:100px; }
+    .tag-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .tag { padding:6px 14px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; cursor:pointer; transition:all 200ms; border:1px solid rgba(234,226,212,0.12); color:var(--muted); }
+    .tag.selected { border-color:var(--bronze); color:var(--bronze); background:rgba(176,141,87,0.10); }
+    .photo-zone { border:1px dashed rgba(176,141,87,0.30); border-radius:10px; padding:24px 16px; text-align:center; cursor:pointer; transition:all 200ms; margin-bottom:14px; }
+    .photo-zone:hover { border-color:rgba(176,141,87,0.60); background:rgba(176,141,87,0.04); }
+    .photo-preview { width:72px; height:72px; border-radius:50%; object-fit:cover; margin:0 auto 12px; display:block; background:rgba(176,141,87,0.15); border:2px solid rgba(176,141,87,0.30); }
+    .swatch-grid { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; }
+    .swatch { width:32px; height:32px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform 180ms,border-color 180ms; flex-shrink:0; }
+    .swatch:hover { transform:scale(1.15); }
+    .swatch.active { border-color:#EAE2D4; transform:scale(1.12); }
+    .layout-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .layout-card { border:1px solid rgba(234,226,212,0.08); border-radius:8px; padding:12px 10px; cursor:pointer; transition:all 200ms; }
+    .layout-card:hover { border-color:rgba(176,141,87,0.35); background:rgba(176,141,87,0.04); }
+    .layout-card.active { border-color:rgba(176,141,87,0.55); background:rgba(176,141,87,0.08); }
+    .layout-thumb { height:72px; background:rgba(234,226,212,0.03); border-radius:4px; padding:5px; display:flex; flex-direction:column; gap:2px; overflow:hidden; margin-bottom:8px; }
+    .lt-hero { border-radius:2px; background:var(--thumb-accent, rgba(176,141,87,0.55)); transition: background 180ms ease; }
+    .lt-tall { flex:3; } .lt-mid { flex:2.2; } .lt-short { flex:1.2; }
+    .lt-body { display:flex; gap:2px; flex:1.8; }
+    .lt-col { flex:1; background:rgba(234,226,212,0.10); border-radius:2px; }
+    .lt-col.wide { flex:2; }
+    .lt-full { flex:1; background:rgba(234,226,212,0.10); border-radius:2px; }
+    .lt-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; flex:2; }
+    .lt-cell { background:rgba(234,226,212,0.10); border-radius:2px; }
+    .lt-lines { display:flex; flex-direction:column; gap:2px; flex:1.5; }
+    .lt-line { background:rgba(234,226,212,0.10); border-radius:2px; flex:1; }
+    .lt-line.accent { background:var(--thumb-accent, rgba(176,141,87,0.45)); flex:0.6; }
+    .lt-4col { display:flex; gap:2px; flex:2.5; }
+    .layout-name { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); display:block; text-align:center; }
+    .layout-card.active .layout-name { color:var(--bronze); }
+    .photo-hint { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:300; letter-spacing:0.14em; color:var(--muted); }
+
+    /* ══ ANALYTICS ══ */
+    .analytics-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+    .chart-card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:12px; padding:28px; margin-bottom:20px; }
+    .chart-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:28px; }
+    .bar-chart { display:flex; align-items:flex-end; gap:8px; height:140px; }
+    .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .bar { width:100%; border-radius:3px 3px 0 0; background:rgba(176,141,87,0.20); transition:background 200ms; }
+    .bar:hover { background:rgba(176,141,87,0.50); }
+    .bar.hi { background:var(--bronze); }
+    .bar-month { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:300; letter-spacing:0.14em; color:rgba(234,226,212,0.25); text-transform:uppercase; }
+    .table-card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:12px; overflow:hidden; }
+    .table-head { display:grid; grid-template-columns:2fr 1fr 1fr; padding:14px 24px; font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid rgba(234,226,212,0.06); }
+    .table-row { display:grid; grid-template-columns:2fr 1fr 1fr; padding:14px 24px; border-bottom:1px solid rgba(234,226,212,0.04); }
+    .table-row:last-child { border-bottom:none; }
+    .tc { font-family:'Barlow',sans-serif; font-weight:300; font-size:13px; color:rgba(234,226,212,0.70); }
+    .tc.n { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:15px; color:var(--parch); }
+
+    /* ══ AFFILIATION ══ */
+    .affil-intro { background:rgba(176,141,87,0.05); border:1px solid rgba(176,141,87,0.15); border-radius:12px; padding:20px 24px; margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+    .affil-intro p { font-family:'Barlow',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:rgba(234,226,212,0.55); }
+    .affil-intro p strong { color:var(--parch); font-weight:400; }
+    .affil-add { display:grid; grid-template-columns:1fr 1fr auto; gap:12px; margin-bottom:0; align-items:end; }
+    .btn-add { padding:12px 18px; background:rgba(176,141,87,0.15); border:1px solid rgba(176,141,87,0.30); border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--bronze); cursor:pointer; transition:all 200ms; white-space:nowrap; height:44px; }
+    .btn-add:hover { background:rgba(176,141,87,0.25); }
+    .affil-list { display:flex; flex-direction:column; gap:10px; }
+    .affil-item { display:flex; align-items:center; gap:14px; background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:8px; padding:14px 18px; }
+    .affil-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; color:var(--parch); flex:1; }
+    .affil-url { font-family:'Barlow',sans-serif; font-weight:300; font-size:12px; color:var(--muted); flex:2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .affil-clicks { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:18px; color:var(--bronze); text-align:right; min-width:44px; }
+    .affil-clicks small { display:block; font-size:9px; font-weight:300; color:rgba(234,226,212,0.25); letter-spacing:0.14em; }
+    .affil-del { width:28px; height:28px; border-radius:50%; background:transparent; border:1px solid rgba(234,226,212,0.10); cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 200ms; flex-shrink:0; }
+    .affil-del:hover { border-color:rgba(220,80,60,0.40); color:rgba(220,80,60,0.70); }
+
+    /* ══ HUB AFFILIATION ══ */
+    .affil-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+    .affil-sum-card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:10px; padding:18px 20px; position:relative; overflow:hidden; }
+    .affil-sum-card::before { content:''; position:absolute; top:0; left:0; width:30%; height:1px; background:var(--bronze); opacity:0.5; }
+    .partner-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:10px; }
+    @media (min-width:1200px) { .partner-grid { grid-template-columns:repeat(3,1fr); } }
+    .partner-card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.08); border-radius:12px; padding:20px; transition:border-color 200ms,background 200ms; position:relative; overflow:hidden; }
+    .partner-card:hover { border-color:rgba(176,141,87,0.25); box-shadow:0 4px 12px rgba(176,141,87,0.05); }
+    .partner-card.connected { border-color:rgba(120,200,120,0.3); background:rgba(120,200,120,0.02); }
+    .partner-card.connecting { pointer-events:none; opacity:0.7; }
+    .partner-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; min-height:32px; }
+    .partner-brand { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:22px; letter-spacing:0.02em; color:var(--parch); }
+    .partner-cat { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+    .btn-connect { background:var(--bronze); color:#0A0A0A; border:none; padding:8px 16px; border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; cursor:pointer; transition:all 150ms; white-space:nowrap; }
+    .btn-connect:hover { transform:translateY(-1px); box-shadow:0 2px 8px rgba(176,141,87,0.4); }
+    .partner-status { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:rgba(120,200,120,0.9); text-transform:uppercase; letter-spacing:0.1em; display:none; align-items:center; gap:4px; }
+    .partner-status::before { content:'●'; color:rgba(120,200,120,1); }
+    .partner-card.connected .btn-connect { display:none; }
+    .partner-card.connected .partner-status { display:flex; }
+    .partner-stats { display:flex; justify-content:space-between; gap:24px; margin-bottom:16px; border-top:1px solid rgba(234,226,212,0.05); padding-top:14px; display:none; }
+    .partner-card.connected .partner-stats { display:flex; animation:fadeIn 0.4s ease forwards; }
+    .p-val { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:20px; color:var(--parch); line-height:1; margin-bottom:4px; }
+    .p-lbl { font-family:'Barlow Condensed',sans-serif; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.15em; }
+    .btn-add-mini { width:100%; background:transparent; border:1px dashed rgba(176,141,87,0.4); color:var(--bronze); padding:10px; border-radius:6px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; cursor:pointer; display:none; transition:all 200ms; }
+    .partner-card.connected .btn-add-mini { display:block; }
+    .btn-add-mini:hover { background:rgba(176,141,87,0.08); border-style:solid; }
+    .add-partner { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; border:1px dashed rgba(234,226,212,0.15); min-height:160px; transition:border-color 200ms,color 200ms; }
+    .add-partner:hover { border-color:var(--bronze); color:var(--bronze); }
+    .add-icon { font-size:32px; font-weight:300; margin-bottom:8px; color:inherit; }
+    .affil-copy { width:28px; height:28px; border-radius:4px; background:transparent; border:1px solid rgba(234,226,212,0.10); cursor:pointer; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; transition:all 200ms; flex-shrink:0; }
+    .affil-copy:hover { border-color:rgba(176,141,87,0.45); color:var(--bronze); }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+
+    /* ══ PASS ══ */
+    .pass-wrap { display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; }
+    .pass-card-event { background:linear-gradient(145deg,#1a1610 0%,#0d0c0a 100%); border:1px solid rgba(176,141,87,0.25); border-radius:18px; padding:32px; position:relative; overflow:hidden; }
+    .pass-card-event::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(176,141,87,0.12) 0%,transparent 70%); }
+    .pass-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+    .pass-brand { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:18px; letter-spacing:0.06em; color:var(--parch); }
+    .pass-badge { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.36em; text-transform:uppercase; color:var(--bronze); background:rgba(176,141,87,0.15); border:1px solid rgba(176,141,87,0.30); border-radius:4px; padding:5px 10px; }
+    .qr-wrap { width:110px; height:110px; margin:0 auto 24px; background:var(--parch); border-radius:8px; padding:9px; display:grid; grid-template-columns:repeat(9,1fr); gap:1.5px; }
+    .qr-cell { border-radius:1px; }
+    .qr-cell.b { background:var(--ink); }
+    .pass-name { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:24px; color:var(--parch); margin-bottom:4px; }
+    .pass-id { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:300; letter-spacing:0.30em; color:var(--muted); margin-bottom:20px; }
+    .pass-perks { display:flex; flex-direction:column; gap:8px; margin-bottom:24px; }
+    .pass-perk { display:flex; align-items:center; gap:10px; font-family:'Barlow',sans-serif; font-weight:300; font-size:13px; color:rgba(234,226,212,0.60); }
+    .pass-perk::before { content:'✦'; color:var(--bronze); font-size:8px; flex-shrink:0; }
+    .barcode { display:flex; gap:2px; height:30px; align-items:flex-end; margin-top:16px; padding-top:16px; border-top:1px solid rgba(176,141,87,0.15); }
+    .barcode b { display:block; background:rgba(176,141,87,0.45); border-radius:1px 1px 0 0; }
+    .events-list { display:flex; flex-direction:column; gap:12px; }
+    .event-item { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:10px; padding:16px 18px; }
+    .event-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:15px; color:var(--parch); margin-bottom:4px; }
+    .event-date { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:300; letter-spacing:0.20em; color:var(--muted); margin-bottom:10px; }
+    .event-tag { display:inline-block; font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; padding:4px 10px; border-radius:4px; }
+    .event-tag.free { color:rgba(120,200,120,0.80); background:rgba(120,200,120,0.10); border:1px solid rgba(120,200,120,0.20); }
+    .event-tag.disc { color:var(--bronze); background:rgba(176,141,87,0.10); border:1px solid rgba(176,141,87,0.20); }
+    .event-tag.lock { color:var(--muted); background:rgba(234,226,212,0.04); border:1px solid rgba(234,226,212,0.08); }
+
+    /* ══ TOAST ══ */
+    .toast { display:none; position:fixed; bottom:28px; right:28px; background:rgba(176,141,87,0.15); border:1px solid rgba(176,141,87,0.40); border-radius:8px; padding:12px 20px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:400; letter-spacing:0.14em; color:var(--bronze); z-index:999; }
+    .toast.on { display:block; }
+
+    /* ══ BUILDER ══ */
+    .builder-grid { display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+    .section-order-list { display:flex; flex-direction:column; gap:8px; }
+    .sec-row { display:flex; align-items:center; gap:14px; background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.07); border-radius:8px; padding:14px 18px; transition:border-color 200ms; }
+    .sec-row:hover { border-color:rgba(176,141,87,0.20); }
+    .sec-num { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.24em; color:var(--bronze); min-width:24px; }
+    .sec-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.06em; color:var(--parch); flex:1; }
+    .sec-btns { display:flex; gap:6px; }
+    .sec-btn { width:28px; height:28px; border-radius:4px; background:transparent; border:1px solid rgba(234,226,212,0.10); color:var(--muted); cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:all 180ms; }
+    .sec-btn:hover:not(:disabled) { border-color:rgba(176,141,87,0.45); color:var(--bronze); background:rgba(176,141,87,0.08); }
+    .sec-btn:disabled { opacity:0.20; cursor:default; }
+    .builder-preview-link { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:15px; background:rgba(176,141,87,0.10); border:1px solid rgba(176,141,87,0.30); border-radius:10px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; color:var(--bronze); text-decoration:none; transition:all 200ms; margin-bottom:12px; }
+    .builder-preview-link:hover { background:rgba(176,141,87,0.22); border-color:rgba(176,141,87,0.55); }
+    .swatch-grid-lg { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .swatch-lg { width:100%; aspect-ratio:1; border-radius:8px; cursor:pointer; border:2px solid transparent; transition:transform 180ms,border-color 180ms,box-shadow 180ms; }
+    .swatch-lg:hover { transform:scale(1.06); }
+    .swatch-lg.active { border-color:#EAE2D4; box-shadow:0 0 0 3px rgba(176,141,87,0.25); }
+
+    /* ══ IA MODULE ══ */
+    .ai-loading-overlay { position:absolute; inset:0; background:rgba(10,10,10,0.8); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; border-radius:12px; z-index:10; }
+    .ai-spinner { width:30px; height:30px; border:2px solid rgba(176,141,87,0.2); border-top-color:var(--bronze); border-radius:50%; animation:spin 1s linear infinite; }
+    .ai-status { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--bronze); text-align:center; animation:pulse 1.5s ease-in-out infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+    /* ══ MODAL DE REUSSITE ══ */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:9999; display:none; align-items:center; justify-content:center; }
+    .modal-content { background:#0A0A0A; border:1px solid rgba(176,141,87,0.4); border-radius:16px; padding:40px; width:100%; max-width:480px; text-align:center; position:relative; }
+    .modal-content.on { display:flex; flex-direction:column; gap:20px; }
+    .modal-badge { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; color:#0A0A0A; background:var(--bronze); border-radius:4px; padding:4px 12px; display:inline-block; margin-bottom:12px; }
+
+    /* ══ PLATFORM CARDS (portefeuille EUR/USD) ══ */
+    .pf-platform-card {
+      display:flex; flex-direction:column; gap:4px;
+      padding:16px 18px; background:rgba(234,226,212,0.04);
+      border:1px solid rgba(234,226,212,0.10); text-decoration:none;
+      transition:border-color 200ms, background 200ms;
+    }
+    .pf-platform-card:hover { border-color:rgba(176,141,87,0.35); background:rgba(176,141,87,0.05); }
+    .pf-platform-name { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--parch); }
+    .pf-platform-desc { font-family:'Barlow',sans-serif; font-size:11px; font-weight:300; color:var(--muted); line-height:1.5; }
+    .pf-platform-cta { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--bronze); margin-top:4px; }
+
+    /* ══ CURRENCY PICKER ══ */
+    .kcy-btn { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; padding:5px 10px; background:transparent; border:1px solid rgba(234,226,212,0.14); color:var(--muted); cursor:pointer; transition:all 180ms; }
+    .kcy-btn:hover { border-color:rgba(234,226,212,0.30); color:rgba(234,226,212,0.70); }
+    .kcy-btn.active { background:var(--bronze); color:var(--ink); border-color:var(--bronze); }
+
+    /* ══ CASTING TABS ══ */
+    .cand-tab {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.22em; text-transform:uppercase;
+      padding:8px 18px; background:transparent;
+      border:1px solid rgba(234,226,212,0.12); color:var(--muted);
+      cursor:pointer; transition:all 180ms;
+    }
+    .cand-tab:hover { border-color:rgba(234,226,212,0.25); color:rgba(234,226,212,0.70); }
+    .cand-tab.active { background:var(--bronze); color:var(--ink); border-color:var(--bronze); }
+
+    [class*="barcode"] b {
+      transform-origin: bottom;
+      animation: kafora-equalizer 1.5s ease-in-out infinite;
+    }
+    [class*="barcode"] b:nth-child(odd) { animation-delay: 0.2s; animation-duration: 1.3s; }
+    [class*="barcode"] b:nth-child(3n) { animation-delay: 0.5s; animation-duration: 1.8s; }
+    [class*="barcode"] b:nth-child(4n) { animation-delay: 0.1s; animation-duration: 1.1s; }
+    [class*="barcode"] b:nth-child(5n) { animation-delay: 0.4s; animation-duration: 1.6s; }
+
+    @keyframes kafora-equalizer {
+      0%, 100% { transform: scaleY(0.4); }
+      50%      { transform: scaleY(1); }
+    }
+
+    /* Candidature row */
+    .cand-row {
+      display:grid; grid-template-columns:1fr auto auto; gap:16px; align-items:center;
+      padding:18px 20px; border-bottom:1px solid rgba(234,226,212,0.06);
+      background:var(--surface);
+    }
+    .cand-row:last-child { border-bottom:none; }
+    .cand-mission { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--parch); margin-bottom:4px; }
+    .cand-meta { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:300; letter-spacing:0.14em; color:var(--muted); }
+    .cand-statut {
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:0.22em; text-transform:uppercase; padding:4px 10px;
+    }
+    .cand-statut.attente { background:rgba(176,141,87,0.12); color:var(--bronze); }
+    .cand-statut.acceptee { background:rgba(80,180,100,0.12); color:rgba(80,180,100,0.90); }
+    .cand-statut.refusee { background:rgba(200,80,80,0.12); color:rgba(200,80,80,0.80); }
+    .cand-statut.cours { background:rgba(100,150,220,0.12); color:rgba(100,150,220,0.90); }
+    .cand-statut.terminee { background:rgba(234,226,212,0.08); color:var(--muted); }
+    .cand-empty { text-align:center; padding:60px 0; font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(234,226,212,0.20); }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width:1100px) { .stats-grid{grid-template-columns:repeat(2,1fr);} .profil-grid,.split-grid,.pass-wrap,.builder-grid{grid-template-columns:1fr;} .analytics-stats{grid-template-columns:repeat(2,1fr);} }
+    @media (max-width:768px) { .sidebar{display:none;} .dash-main{margin-left:0;padding:28px 20px 60px;} .stats-grid,.form-row,.affil-add{grid-template-columns:1fr;} }
+
+    /* ══ ENHANCEMENTS ÉDITORIAUX ══════════════════════════════ */
+
+    /* Sidebar grain overlay */
+    .sidebar {
+      /* Keep it fixed, just add overflow */
+      overflow: hidden;
+    }
+    .sidebar::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .sidebar > * { position: relative; z-index: 1; }
+
+    /* Sidebar barcode deco at bottom */
+    .sidebar-barcode {
+      display: flex; gap: 1.5px; align-items: flex-end;
+      height: 16px; opacity: 0.10;
+      padding: 0 28px; margin-bottom: 16px; flex-shrink: 0;
+    }
+    .sidebar-barcode b { display: block; width: 1.5px; background: var(--parch); }
+
+    /* Stat card hover + grain */
+    .stat-card {
+      transition: border-color 300ms, transform 300ms cubic-bezier(0.34,1.25,0.64,1);
+    }
+    .stat-card:hover {
+      border-color: rgba(176,141,87,0.20);
+      transform: translateY(-2px);
+    }
+    .stat-card:hover .stat-value { color: var(--bronze); }
+    .stat-value { transition: color 300ms; }
+
+    /* Card hover */
+    .card {
+      transition: border-color 300ms;
+    }
+    .card:hover {
+      border-color: rgba(176,141,87,0.18);
+    }
+
+    /* Page header golden rule */
+    .page-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .page-eyebrow::before {
+      content: ''; display: block;
+      width: 24px; height: 1px; background: var(--bronze); flex-shrink: 0;
+    }
+
+    /* Dash main subtle grain */
+    .dash-main {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">Kafora</a>
+  <div class="sidebar-menu">
+    <span class="sidebar-label">Menu</span>
+    <ul class="sidebar-nav">
+      <li><a href="#" class="active" data-s="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Vue d'ensemble</a></li>
+      <li><a href="#" data-s="profil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil</a></li>
+      <li><a href="#" data-s="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analytics</a></li>
+      <li><a href="#" data-s="affiliation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Affiliation</a></li>
+      <li><a href="#" data-s="pass">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Pass événementiel</a></li>
+      <li><a href="galerie.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>La Galerie</a></li>
+      <li><a href="#" data-s="builder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="12" width="8" height="9" rx="1"/><rect x="3" y="15" width="8" height="6" rx="1"/></svg>Espace Builder</a></li>
+    </ul>
+    <span class="sidebar-label">Casting</span>
+    <ul class="sidebar-nav">
+      <li><a href="#" data-s="casting-profil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Profil Casting</a></li>
+      <li><a href="#" data-s="candidatures">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Candidatures</a></li>
+      <li><a href="#" data-s="bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>Bookings</a></li>
+      <li><a href="#" data-s="messages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</a></li>
+      <li><a href="#" data-s="portefeuille">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M6 7V5a2 2 0 0 1 4 0v2"/></svg>Portefeuille</a></li>
+    </ul>
+    <span class="sidebar-label">Compte</span>
+    <ul class="sidebar-nav">
+      <li><a href="premium.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Passer Premium</a></li>
+    </ul>
+  </div>
+  <div class="sidebar-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b></div>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">K</div>
+      <div>
+        <div class="sidebar-user-name" id="sidebarName">Créateur</div>
+        <div class="sidebar-user-plan">Gratuit</div>
+      </div>
+    </div>
+    <button onclick="openMyProfile()" class="btn-preview">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Voir mon profil
+    </button>
+    <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+  </div>
+  <div id="db-status-indicator" style="padding:10px 28px 20px;border-top:1px solid rgba(176,141,87,0.08);margin-top:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="db-status-dot" style="width:6px;height:6px;border-radius:50%;background:rgba(176,141,87,0.4);flex-shrink:0;"></span>
+      <span id="db-status-text" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.20em;text-transform:uppercase;color:rgba(234,226,212,0.25);">Local</span>
+    </div>
+  </div>
+</aside>
+
+<main class="dash-main">
+
+  <!-- VUE D'ENSEMBLE -->
+  <section class="dash-section active" id="s-overview">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Tableau de bord</p><h1 class="page-title" id="dashTitle">Bienvenue.</h1></div>
+      <a href="premium.html" class="btn-bronze">Passer Premium ↗</a>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><p class="stat-label">Vues du profil</p><p class="stat-value">—</p><p class="stat-delta">Bientôt disponible</p></div>
+      <div class="stat-card"><p class="stat-label">Clics affiliés</p><p class="stat-value" id="ovClicks">0</p><p class="stat-delta up">Total cumulé</p></div>
+      <div class="stat-card"><p class="stat-label">Revenus affiliation</p><p class="stat-value">0 €</p><p class="stat-delta">Actif avec Premium</p></div>
+      <div class="stat-card"><p class="stat-label">Liens affiliés</p><p class="stat-value" id="ovLinks">0</p><p class="stat-delta">Ajoutés</p></div>
+    </div>
+    <div class="completion-card">
+      <div class="completion-head">
+        <div class="completion-ring">
+          <div class="completion-ring-bg" id="ringBg"></div>
+          <div class="completion-ring-inner"><span class="completion-pct" id="ringPct">20%</span></div>
+        </div>
+        <div>
+          <p class="completion-title">Complète ton profil</p>
+          <p class="completion-sub">Plus ton profil est complet, plus tu apparais dans l'annuaire.</p>
+        </div>
+      </div>
+      <div class="task-list">
+        <div class="task-row"><div class="task-check done"></div><span class="task-text done">Créer un compte</span></div>
+        <div class="task-row" id="tPhoto"><div class="task-check" id="ckPhoto"></div><span class="task-text" id="txPhoto">Ajouter une photo de profil</span><button class="task-btn" onclick="nav('profil')">Ajouter →</button></div>
+        <div class="task-row" id="tBio"><div class="task-check" id="ckBio"></div><span class="task-text" id="txBio">Rédiger ta biographie</span><button class="task-btn" onclick="nav('profil')">Rédiger →</button></div>
+        <div class="task-row" id="tDisc"><div class="task-check" id="ckDisc"></div><span class="task-text" id="txDisc">Choisir ta discipline</span><button class="task-btn" onclick="nav('profil')">Choisir →</button></div>
+        <div class="task-row" id="tLink"><div class="task-check" id="ckLink"></div><span class="task-text" id="txLink">Ajouter un lien affilié</span><button class="task-btn" onclick="nav('affiliation')">Ajouter →</button></div>
+      </div>
+    </div>
+    <div class="plan-card">
+      <div><span class="plan-badge">Gratuit</span><p class="plan-title">Kafora Free</p><p class="plan-desc">Passe Premium pour débloquer les revenus d'affiliation, les analytics avancées et la mise en avant homepage.</p></div>
+      <a href="premium.html" class="btn-bronze">Upgrade →</a>
+    </div>
+  </section>
+
+  <!-- MON PROFIL -->
+  <section class="dash-section" id="s-profil">
+    <div class="page-header"><div><p class="page-eyebrow">Mon compte</p><h1 class="page-title">Mon profil</h1></div></div>
+    <div class="profil-grid">
+      <div>
+        <div class="card">
+          <p class="card-title">Informations personnelles</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="pfFn" type="text" placeholder="Amara" /></div>
+            <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="pfLn" type="text" placeholder="Diallo" /></div>
+          </div>
+          <div class="form-group"><label class="form-label">Biographie</label><textarea class="form-textarea" id="pfBio" placeholder="Décris ton univers créatif…"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Ville</label><input class="form-input" id="pfCity" type="text" placeholder="Paris" /></div>
+            <div class="form-group"><label class="form-label">Pays</label><input class="form-input" id="pfCountry" type="text" placeholder="France" /></div>
+          </div>
+        </div>
+        <div class="card">
+          <p class="card-title">Discipline</p>
+          <div class="tag-grid">
+            <span class="tag" data-v="Mode">Mode</span>
+            <span class="tag" data-v="Modèle">Modèle</span>
+            <span class="tag" data-v="Photographie">Photographie</span>
+            <span class="tag" data-v="Vidéo">Vidéo</span>
+            <span class="tag" data-v="Cinéma">Cinéma</span>
+            <span class="tag" data-v="Musique">Musique</span>
+            <span class="tag" data-v="Danse">Danse</span>
+            <span class="tag" data-v="Art Contemporain">Art Contemporain</span>
+            <span class="tag" data-v="Sculpture">Sculpture</span>
+            <span class="tag" data-v="Objets d'art">Objets d'art</span>
+            <span class="tag" data-v="Design">Design</span>
+            <span class="tag" data-v="Design d'intérieur">Design d'intérieur</span>
+            <span class="tag" data-v="Architecture">Architecture</span>
+            <span class="tag" data-v="Illustration">Illustration</span>
+            <span class="tag" data-v="Littérature">Littérature</span>
+            <span class="tag" data-v="Entreprise créative">Entreprise créative</span>
+          </div>
+        </div>
+        <div class="card">
+          <p class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Expériences & Événements</span>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11px; text-transform:none; letter-spacing:normal; color:var(--muted);">
+              <input type="checkbox" id="pfExpModeCard" style="accent-color:var(--bronze);" onchange="saveProfile()" />
+              Afficher en mode "Cards" (Grille)
+            </label>
+          </p>
+          <div id="pfExpList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;"></div>
+          
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Lieu / Marque</label><input class="form-input" id="pfExpBrand" type="text" placeholder="Ex: MOB Hotel, Le Louvre" /></div>
+            <div class="form-group"><label class="form-label">Profil Connecté (Kafora ID)</label><input class="form-input" id="pfExpLinked" type="text" placeholder="Ex: kofi, amara (Optionnel)" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Période</label><input class="form-input" id="pfExpYear" type="text" placeholder="Ex: Nov 2023 - Présent" /></div>
+            <div class="form-group"><label class="form-label">Titre / Rôle</label><input class="form-input" id="pfExpRole" type="text" placeholder="Ex: Exposition temporaire" /></div>
+          </div>
+          <div class="form-group"><label class="form-label">Description détaillée</label><textarea class="form-textarea" id="pfExpDesc" placeholder="Décris en quelques lignes ta mission ou l'événement..." style="min-height:70px"></textarea></div>
+          
+          <div class="form-group">
+            <label class="form-label">Médias associés (Optionnel)</label>
+            <div id="pfExpMediaList" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"></div>
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="pfExpMediaUrl" type="text" placeholder="Lien image (https://...)" style="flex:1" />
+              <button class="btn-bronze" onclick="addExpMediaTemp()" style="white-space:nowrap;padding:0 16px">+ Média</button>
+            </div>
+          </div>
+
+          <button class="btn-bronze" onclick="addExperience()" style="background:transparent;border:1px solid rgba(176,141,87,0.4);color:var(--bronze);width:100%;margin-top:12px;">+ Enregistrer l'expérience</button>
+        </div>
+        <div class="card">
+          <p class="card-title">Réseaux sociaux</p>
+          <div class="form-group"><label class="form-label">Instagram</label><input class="form-input" id="pfIg" type="text" placeholder="@tonpseudo" /></div>
+          <div class="form-group"><label class="form-label">TikTok</label><input class="form-input" id="pfTt" type="text" placeholder="@tonpseudo" /></div>
+          <div class="form-group" style="margin-bottom:0"><label class="form-label">Site web</label><input class="form-input" id="pfWeb" type="text" placeholder="https://..." /></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:0;">
+          <button class="btn-save" onclick="saveProfile()">Enregistrer le profil</button>
+          <button class="btn-bronze" onclick="openPressKitDeck()">Voir mon Press Kit →</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <p class="card-title">Photo de profil</p>
+          <div class="photo-zone" onclick="document.getElementById('photoFile').click()">
+            <img class="photo-preview" id="photoPreview" src="" alt="" style="display:none" />
+            <p class="photo-hint">Cliquer pour choisir une image</p>
+          </div>
+          <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="handlePhoto(this)" />
+          <div class="form-group" style="margin-bottom:0"><label class="form-label">Ou coller une URL</label><input class="form-input" id="pfPhoto" type="text" placeholder="https://..." oninput="previewUrl(this.value)" /></div>
+        </div>
+        <div class="card" style="text-align:center;padding:24px 20px">
+          <p class="card-title" style="text-align:left">Aperçu</p>
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(176,141,87,0.15);border:2px solid rgba(176,141,87,0.30);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;overflow:hidden;" id="pvAvatar">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#B08D57;" id="pvInit">K</span>
+          </div>
+          <p style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;color:#EAE2D4;margin-bottom:4px;" id="pvName">Ton Nom</p>
+          <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.22em;color:#8C8478;" id="pvDisc">Discipline · Ville</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANALYTICS -->
+  <section class="dash-section" id="s-analytics">
+    <div class="page-header"><div><p class="page-eyebrow">Statistiques</p><h1 class="page-title">Analytics</h1></div></div>
+    <div class="analytics-stats">
+      <div class="stat-card"><p class="stat-label">Vues profil</p><p class="stat-value">—</p><p class="stat-delta">Bientôt disponible</p></div>
+      <div class="stat-card"><p class="stat-label">Clics affiliés</p><p class="stat-value" id="aClicks">0</p><p class="stat-delta up">Total</p></div>
+      <div class="stat-card"><p class="stat-label">Taux de clic</p><p class="stat-value">—</p><p class="stat-delta">Premium requis</p></div>
+    </div>
+    <div class="chart-card">
+      <p class="chart-title">Clics affiliés — 6 derniers mois</p>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+    <div class="table-card">
+      <div class="table-head"><span>Lien</span><span>Clics</span><span>Statut</span></div>
+      <div id="aTable"></div>
+    </div>
+  </section>
+
+  <!-- AFFILIATION HUB -->
+  <section class="dash-section" id="s-affiliation">
+    <div class="page-header"><div><p class="page-eyebrow">Monétisation</p><h1 class="page-title">Hub d'Affiliation</h1></div></div>
+
+    <!-- Synthèse globale -->
+    <div class="affil-summary">
+      <div class="affil-sum-card">
+        <p class="stat-label">Clics totaux</p>
+        <p class="stat-value" id="sumClicks">0</p>
+        <p class="stat-delta up">Tous partenaires</p>
+      </div>
+      <div class="affil-sum-card">
+        <p class="stat-label">Revenus estimés</p>
+        <p class="stat-value" id="sumRevenue">0 €</p>
+        <p class="stat-delta">Partenaires connectés</p>
+      </div>
+      <div class="affil-sum-card">
+        <p class="stat-label">Liens actifs</p>
+        <p class="stat-value" id="linkCount">0</p>
+        <p class="stat-delta">Générés</p>
+      </div>
+    </div>
+
+    <!-- Partenaires -->
+    <div class="card" style="margin-bottom:24px;">
+      <p class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Comptes Partenaires — Synchronisation 1 clic</span>
+        <span class="plan-badge" style="margin:0;">Nouveau</span>
+      </p>
+      <div class="partner-grid">
+
+        <div class="partner-card" id="part-asos">
+          <div class="partner-head">
+            <span class="partner-brand">ASOS</span>
+            <button class="btn-connect" onclick="connectPartner('asos','ASOS')">Connecter</button>
+            <span class="partner-status">Synchronisé</span>
+          </div>
+          <p class="partner-cat">Mode · Prêt-à-porter</p>
+          <div class="partner-stats">
+            <div><p class="p-val" id="stat-asos-click">0</p><p class="p-lbl">Clics</p></div>
+            <div><p class="p-val" id="stat-asos-rev">0 €</p><p class="p-lbl">Revenus</p></div>
+          </div>
+          <button class="btn-add-mini" onclick="openLinkModal('ASOS','asos')">+ Générer un lien traqué</button>
+        </div>
+
+        <div class="partner-card" id="part-sephora">
+          <div class="partner-head">
+            <span class="partner-brand">SEPHORA</span>
+            <button class="btn-connect" onclick="connectPartner('sephora','Sephora')">Connecter</button>
+            <span class="partner-status">Synchronisé</span>
+          </div>
+          <p class="partner-cat">Beauté · Cosmétiques</p>
+          <div class="partner-stats">
+            <div><p class="p-val" id="stat-sephora-click">0</p><p class="p-lbl">Clics</p></div>
+            <div><p class="p-val" id="stat-sephora-rev">0 €</p><p class="p-lbl">Revenus</p></div>
+          </div>
+          <button class="btn-add-mini" onclick="openLinkModal('Sephora','sephora')">+ Générer un lien traqué</button>
+        </div>
+
+        <div class="partner-card" id="part-farfetch">
+          <div class="partner-head">
+            <span class="partner-brand">FARFETCH</span>
+            <button class="btn-connect" onclick="connectPartner('farfetch','Farfetch')">Connecter</button>
+            <span class="partner-status">Synchronisé</span>
+          </div>
+          <p class="partner-cat">Luxe · Designer</p>
+          <div class="partner-stats">
+            <div><p class="p-val" id="stat-farfetch-click">0</p><p class="p-lbl">Clics</p></div>
+            <div><p class="p-val" id="stat-farfetch-rev">0 €</p><p class="p-lbl">Revenus</p></div>
+          </div>
+          <button class="btn-add-mini" onclick="openLinkModal('Farfetch','farfetch')">+ Générer un lien traqué</button>
+        </div>
+
+        <div class="partner-card" id="part-nike">
+          <div class="partner-head">
+            <span class="partner-brand">NIKE</span>
+            <button class="btn-connect" onclick="connectPartner('nike','Nike')">Connecter</button>
+            <span class="partner-status">Synchronisé</span>
+          </div>
+          <p class="partner-cat">Sport · Lifestyle</p>
+          <div class="partner-stats">
+            <div><p class="p-val" id="stat-nike-click">0</p><p class="p-lbl">Clics</p></div>
+            <div><p class="p-val" id="stat-nike-rev">0 €</p><p class="p-lbl">Revenus</p></div>
+          </div>
+          <button class="btn-add-mini" onclick="openLinkModal('Nike','nike')">+ Générer un lien traqué</button>
+        </div>
+
+        <div class="partner-card" id="part-zara">
+          <div class="partner-head">
+            <span class="partner-brand">ZARA</span>
+            <button class="btn-connect" onclick="connectPartner('zara','Zara')">Connecter</button>
+            <span class="partner-status">Synchronisé</span>
+          </div>
+          <p class="partner-cat">Mode · Fast-fashion</p>
+          <div class="partner-stats">
+            <div><p class="p-val" id="stat-zara-click">0</p><p class="p-lbl">Clics</p></div>
+            <div><p class="p-val" id="stat-zara-rev">0 €</p><p class="p-lbl">Revenus</p></div>
+          </div>
+          <button class="btn-add-mini" onclick="openLinkModal('Zara','zara')">+ Générer un lien traqué</button>
+        </div>
+
+        <div class="partner-card add-partner" onclick="showToast('Bientôt : catalogue complet de 400+ partenaires.')">
+          <span class="add-icon">+</span>
+          <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(234,226,212,0.4);">400+ partenaires<br>disponibles</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outils Recommandés -->
+    <div class="card" style="margin-bottom:24px;">
+      <p class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Outils pour développer votre activité</span>
+        <span class="plan-badge" style="margin:0; background:rgba(120,200,120,0.15); color:rgba(120,200,120,0.9); border-color:rgba(120,200,120,0.3);">Recommandé</span>
+      </p>
+      
+      <div class="partner-grid">
+        <!-- Calendly -->
+        <div class="partner-card">
+          <div class="partner-head">
+            <span class="partner-brand">CALENDLY</span>
+            <button class="btn-connect" onclick="window.open('https://kafora.com/affiliate/calendly', '_blank')">Découvrir</button>
+          </div>
+          <p class="partner-cat">Booking · Simplicité : Facile · Budget : Gratuit</p>
+          <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(234,226,212,0.6);line-height:1.4;margin-bottom:12px;">Gérez vos rendez-vous et vos shootings professionnels automatiquement.</div>
+        </div>
+
+        <!-- Notion -->
+        <div class="partner-card">
+          <div class="partner-head">
+            <span class="partner-brand">NOTION</span>
+            <button class="btn-connect" onclick="window.open('https://kafora.com/affiliate/notion', '_blank')">Découvrir</button>
+          </div>
+          <p class="partner-cat">Organisation · Simplicité : Moyen · Budget : Gratuit</p>
+          <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(234,226,212,0.6);line-height:1.4;margin-bottom:12px;">Organisez vos moodboards, contrats et projets avec l’outil de référence des créatifs.</div>
+        </div>
+
+        <!-- Gumroad -->
+        <div class="partner-card">
+          <div class="partner-head">
+            <span class="partner-brand">GUMROAD</span>
+            <button class="btn-connect" onclick="window.open('https://kafora.com/affiliate/gumroad', '_blank')">Découvrir</button>
+          </div>
+          <p class="partner-cat">Vente Digitale · Simplicité : Facile · Budget : % sur Vente</p>
+          <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(234,226,212,0.6);line-height:1.4;margin-bottom:12px;">Vendez vos presets photo, designs ou modèles 3D en quelques clics sans site e-commerce.</div>
+        </div>
+
+        <!-- Printful -->
+        <div class="partner-card">
+          <div class="partner-head">
+            <span class="partner-brand">PRINTFUL</span>
+            <button class="btn-connect" onclick="window.open('https://kafora.com/affiliate/printful', '_blank')">Découvrir</button>
+          </div>
+          <p class="partner-cat">Merchandising · Simplicité : Moyen · Budget : Zéro (POD)</p>
+          <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(234,226,212,0.6);line-height:1.4;margin-bottom:12px;">Créez et vendez vos vêtements imprimés (Print On Demand) sans gérer de logistique.</div>
+        </div>
+
+        <!-- Stripe -->
+        <div class="partner-card">
+          <div class="partner-head">
+            <span class="partner-brand">STRIPE</span>
+            <button class="btn-connect" onclick="window.open('https://kafora.com/affiliate/stripe', '_blank')">Découvrir</button>
+          </div>
+          <p class="partner-cat">Paiements · Simplicité : Moyen · Budget : Commission</p>
+          <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(234,226,212,0.6);line-height:1.4;margin-bottom:12px;">Envoyez des liens de paiements et facturez vos clients de manière 100% sécurisée.</div>
+        </div>
+
+        <!-- Shopify -->
+        <div class="partner-card">
+          <div class="partner-head">
+            <span class="partner-brand">SHOPIFY</span>
+            <button class="btn-connect" onclick="window.open('https://kafora.com/affiliate/shopify', '_blank')">Découvrir</button>
+          </div>
+          <p class="partner-cat">Boutique Pro · Simplicité : Avancé · Budget : $$$</p>
+          <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(234,226,212,0.6);line-height:1.4;margin-bottom:12px;">Lancez une véritable marque en ligne avec le moteur e-commerce numéro 1 au monde.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liens générés -->
+    <div class="card">
+      <p class="card-title">Mes liens traqués</p>
+      <div class="affil-list" id="afList"></div>
+    </div>
+  </section>
+
+  <!-- PASS -->
+  <section class="dash-section" id="s-pass">
+    <div class="page-header"><div><p class="page-eyebrow">Accès événements</p><h1 class="page-title">Pass Kafora</h1></div></div>
+    <div class="pass-wrap">
+      <div class="pass-card-event">
+        <div class="pass-header"><span class="pass-brand">Kafora</span><span class="pass-badge">Membre Free</span></div>
+        <div class="qr-wrap" id="qrWrap"></div>
+        <p class="pass-name" id="passName">—</p>
+        <p class="pass-id" id="passId">ID · KAF-000000</p>
+        <div class="pass-perks">
+          <p class="pass-perk">Accès aux événements partenaires Kafora</p>
+          <p class="pass-perk">Réductions exclusives membres</p>
+          <p class="pass-perk" style="opacity:0.35">Accès VIP — réservé Premium</p>
+        </div>
+        <div class="barcode" id="barcode"></div>
+      </div>
+      <div>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(234,226,212,0.35);margin-bottom:16px;">Événements accessibles</p>
+        <div class="events-list">
+          <div class="event-item"><p class="event-name">Kafora × Africa Parade</p><p class="event-date">14 Juin 2025 · Paris</p><span class="event-tag disc">-20% membres</span></div>
+          <div class="event-item"><p class="event-name">Kafora Night — Dakar Edition</p><p class="event-date">22 Juillet 2025 · Dakar</p><span class="event-tag free">Entrée gratuite</span></div>
+          <div class="event-item"><p class="event-name">Vernissage Kofi Mensah</p><p class="event-date">5 Août 2025 · Accra</p><span class="event-tag disc">-15% membres</span></div>
+          <div class="event-item"><p class="event-name">Kafora x Kering — Soirée VIP</p><p class="event-date">18 Sept. 2025 · Paris</p><span class="event-tag lock">Premium uniquement</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESPACE BUILDER -->
+  <section class="dash-section" id="s-builder">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Personnalisation</p><h1 class="page-title">Espace Builder</h1></div>
+    </div>
+    <div class="builder-grid">
+
+      <!-- Colonne gauche -->
+      <div>
+        <div class="card">
+          <p class="card-title">Mise en page</p>
+          <div class="layout-cards" id="layoutCards">
+            <div class="layout-card active" data-layout="editorial">
+              <div class="layout-thumb">
+                <div class="lt-hero lt-tall"></div>
+                <div class="lt-body"><div class="lt-col"></div><div class="lt-col"></div><div class="lt-col"></div></div>
+                <div class="lt-lines"><div class="lt-line accent"></div><div class="lt-line"></div></div>
+              </div>
+              <span class="layout-name">Éditorial</span>
+            </div>
+            <div class="layout-card" data-layout="magazine">
+              <div class="layout-thumb">
+                <div class="lt-hero lt-mid"></div>
+                <div class="lt-body">
+                  <div class="lt-col wide"></div>
+                  <div class="lt-lines"><div class="lt-line accent"></div><div class="lt-line"></div><div class="lt-line"></div></div>
+                </div>
+              </div>
+              <span class="layout-name">Magazine</span>
+            </div>
+            <div class="layout-card" data-layout="minimal">
+              <div class="layout-thumb">
+                <div class="lt-lines" style="flex:0.8"><div class="lt-line accent"></div><div class="lt-line" style="flex:1.5"></div></div>
+                <div class="lt-full"></div>
+                <div class="lt-body"><div class="lt-col"></div><div class="lt-col"></div><div class="lt-col"></div></div>
+              </div>
+              <span class="layout-name">Minimal</span>
+            </div>
+            <div class="layout-card" data-layout="galerie">
+              <div class="layout-thumb">
+                <div class="lt-hero lt-short"></div>
+                <div class="lt-grid"><div class="lt-cell"></div><div class="lt-cell"></div><div class="lt-cell"></div><div class="lt-cell"></div></div>
+              </div>
+              <span class="layout-name">Galerie</span>
+            </div>
+            <div class="layout-card" data-layout="artistic">
+              <div class="layout-thumb" style="border:1px solid rgba(176,141,87,0.3)">
+                <div class="lt-lines" style="flex:1;"><div class="lt-line accent"></div><div class="lt-line"></div></div>
+                <div class="lt-hero" style="flex:4; background:#B08D57; mix-blend-mode:difference;"></div>
+                <div class="lt-lines" style="flex:1; align-items:flex-end;"><div class="lt-line"></div></div>
+              </div>
+              <span class="layout-name" style="color:#B08D57">WebExp (Nouveau)</span>
+            </div>
+            <div class="layout-card" data-layout="minimal">
+              <div class="layout-thumb" style="border:1px solid rgba(176,141,87,0.3); background:#050505; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                <div style="font-family:'Barlow Condensed',sans-serif; color:white; font-size:18px; font-weight:900;">B.</div>
+                <div style="width:16px; height:2px; background:#B08D57; margin-top:4px;"></div>
+              </div>
+              <span class="layout-name" style="color:#B08D57">Minimal Black</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="card-title">Ordre des sections</p>
+          <div class="section-order-list" id="sectionOrderList"></div>
+        </div>
+
+        <div class="card" style="position:relative; overflow:hidden;" id="aiCard">
+          <div class="ai-loading-overlay" id="aiLoader">
+            <div class="ai-spinner"></div>
+            <div class="ai-status" id="aiStatusText">Analyse du DOM...</div>
+          </div>
+          <p class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Portfolio externe (Import)</span>
+            <span class="plan-badge" style="margin:0; font-size:8px;">Beta IA</span>
+          </p>
+          <div class="form-group">
+            <label class="form-label">Code source personnalisé (HTML/CSS)</label>
+            <textarea class="form-textarea" id="pfExtPort" placeholder="Colle le code de ton portfolio externe ici...
+
+<div class='mon-portfolio'>
+  <h1>Mon oeuvre</h1>...
+</div>" style="font-family:monospace; font-size:12px; min-height:180px; white-space:pre-wrap;"></textarea>
+          </div>
+          <button class="btn-bronze" style="width:100%; padding:14px; display:flex; gap:10px; align-items:center; justify-content:center;" onclick="simulateAIAgent()">
+            <span>✨</span>
+            Scanner & Adapter (Agent Kafora)
+          </button>
+        </div>
+      </div>
+
+      <!-- Colonne droite -->
+      <div>
+        <div class="card">
+          <p class="card-title">Typographie (Police)</p>
+          <div class="form-group" style="margin-bottom:0">
+            <select class="form-input" id="pfFont" style="cursor:pointer" onchange="updatePreview()">
+              <option value="'Barlow', sans-serif">Barlow (Classique / Neutre)</option>
+              <option value="'Playfair Display', serif">Playfair Display (Luxe / Éditorial)</option>
+              <option value="'Inter', sans-serif">Inter (Moderne / Tech)</option>
+              <option value="'Space Grotesk', sans-serif">Space Grotesk (Avant-Garde)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="card-title">Palette de couleurs</p>
+          <div class="swatch-grid-lg" id="swatchGrid"></div>
+        </div>
+        <button class="builder-preview-link" onclick="saveAndPreview()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Voir mon profil public
+        </button>
+        <button class="btn-save" style="width:100%" onclick="saveProfile()">Enregistrer les choix</button>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+</main>
+
+<div class="toast" id="toast">✓ Profil enregistré</div>
+
+<div class="modal-overlay" id="aiModal">
+  <div class="modal-content">
+    <div><span class="modal-badge">Agent IA Kafora</span></div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;line-height:1;margin-bottom:8px;">Portfolio Adapté avec Succès</h2>
+    <p style="font-family:'Barlow',sans-serif;font-weight:300;font-size:14px;color:rgba(234,226,212,0.7);margin-bottom:24px;">Ton code a été analysé de manière sécurisée. Nous y avons injecté tes variables d'identité (Nom, Discipline, Boutons de suivi) pour qu'il s'intègre parfaitement à ton Hub Kafora.</p>
+    <div style="background:rgba(120,200,120,0.1); border:1px solid rgba(120,200,120,0.3); border-radius:8px; padding:12px; margin-bottom:24px;">
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(120,200,120,0.9);letter-spacing:0.1em;text-transform:uppercase;">+3 balises {{nom}} remplacées</p>
+    </div>
+    <div style="display:flex; gap:12px; justify-content:center;">
+      <button class="btn-bronze" onclick="closeAiModal()">Continuer l'édition</button>
+      <button class="btn-save" onclick="saveAndPreview(); closeAiModal()" style="background:transparent; border:1px solid #B08D57; color:#B08D57;">Voir mon Profil</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Connexion Partenaire -->
+<div class="modal-overlay" id="connectModal">
+  <div class="modal-content" style="max-width:440px;text-align:left;">
+    <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.32em;text-transform:uppercase;color:var(--bronze);margin-bottom:8px;">Programme Affilié</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;margin-bottom:10px;">Connecter <span id="cmBrand" style="color:var(--bronze)"></span></h2>
+    <p style="font-family:'Barlow',sans-serif;font-size:13px;font-weight:300;color:rgba(234,226,212,0.55);line-height:1.65;margin-bottom:20px;" id="cmStep1Text">On t'a ouvert la page d'inscription au programme affilié. Crée ton compte, puis reviens ici avec ton <strong style="color:var(--parch)">ID affilié</strong> pour activer le suivi des revenus en temps réel sur Kafora.</p>
+    <div style="background:rgba(176,141,87,0.06);border:1px solid rgba(176,141,87,0.20);border-radius:8px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;">
+      <span style="font-size:18px;margin-top:1px;">🔐</span>
+      <p style="font-family:'Barlow',sans-serif;font-size:12px;font-weight:300;color:rgba(234,226,212,0.50);line-height:1.6;">Kafora ne demande qu'un <strong style="color:rgba(234,226,212,0.75)">accès en lecture</strong> — on lit tes clics et commissions, jamais tes données personnelles ni ton solde.</p>
+    </div>
+    <div id="cmIdWrap" style="display:none;margin-bottom:20px;">
+      <label style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;">Ton ID affilié</label>
+      <input class="form-input" id="cmAffId" type="text" placeholder="Ex : ASOS-KAFORA-2025..." style="width:100%;" />
+    </div>
+    <div style="display:flex;gap:10px;" id="cmBtns1">
+      <button class="btn-save" onclick="closeConnectModal()" style="background:transparent;border:1px solid rgba(234,226,212,0.15);color:rgba(234,226,212,0.5);flex:1;">Annuler</button>
+      <button class="btn-bronze" onclick="showConnectIdInput()" style="flex:2;">J'ai mon ID affilié →</button>
+    </div>
+    <div style="display:none;gap:10px;" id="cmBtns2">
+      <button class="btn-save" onclick="closeConnectModal()" style="background:transparent;border:1px solid rgba(234,226,212,0.15);color:rgba(234,226,212,0.5);flex:1;">Annuler</button>
+      <button class="btn-bronze" onclick="confirmConnect()" style="flex:2;">Lier mon compte →</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ══ PROFIL CASTING ══ -->
+  <section class="dash-section" id="s-casting-profil">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Casting</p><h1 class="page-title">Profil Casting</h1></div>
+      <button class="btn-save" onclick="saveCastingProfil()">Enregistrer →</button>
+    </div>
+    <div class="split-grid">
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <p class="card-title">Disponibilité & Tarif</p>
+          <div class="form-group" style="margin-bottom:18px">
+            <label class="form-label">Statut de disponibilité</label>
+            <div style="display:flex;align-items:center;gap:14px;margin-top:6px">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                <input type="checkbox" id="cpDispo" style="accent-color:var(--bronze);width:16px;height:16px" />
+                <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:300;letter-spacing:0.10em;color:rgba(234,226,212,0.75)">Disponible pour des missions</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" id="cpTarifLabel">Tarif journalier (FCFA)</label>
+              <input class="form-input" id="cpTarif" type="number" placeholder="Ex: 25000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Taille (cm)</label>
+              <input class="form-input" id="cpTaille" type="number" placeholder="Ex: 175" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Poids (kg)</label>
+              <input class="form-input" id="cpPoids" type="number" placeholder="Ex: 65" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pointure</label>
+              <input class="form-input" id="cpPointure" type="number" placeholder="Ex: 40" />
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <p class="card-title">Catégorie & Niche</p>
+          <div class="form-group">
+            <label class="form-label">Catégorie principale</label>
+            <select class="form-input" id="cpCategorie">
+              <option value="">Choisir...</option>
+              <option>Acteur</option>
+              <option>Influenceur</option>
+              <option>Créateur de contenu</option>
+              <option>Mannequin</option>
+              <option>Figurant</option>
+              <option>Modèle Photo</option>
+              <option>Égérie</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Niches (cochez tout ce qui vous correspond)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" value="Mode" class="cp-niche" style="accent-color:var(--bronze)"/><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.70)">Mode</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" value="Beauté" class="cp-niche" style="accent-color:var(--bronze)"/><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.70)">Beauté</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" value="Nourriture" class="cp-niche" style="accent-color:var(--bronze)"/><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.70)">Nourriture</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" value="Découverte" class="cp-niche" style="accent-color:var(--bronze)"/><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.70)">Découverte</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" value="Sport" class="cp-niche" style="accent-color:var(--bronze)"/><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.70)">Sport</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" value="Tech" class="cp-niche" style="accent-color:var(--bronze)"/><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.70)">Tech</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Langues parlées</label>
+            <input class="form-input" id="cpLangues" type="text" placeholder="Ex: Français, Anglais, Fon" />
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <p class="card-title">Vidéos de présentation</p>
+          <div class="form-group">
+            <label class="form-label">Vidéo de présentation (URL)</label>
+            <input class="form-input" id="cpVideoPres" type="text" placeholder="https://youtube.com/watch?v=..." />
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.14em;color:rgba(234,226,212,0.25);margin-top:6px">Format MP4, MOV, AVI — max 50MB — Durée max 2 min</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Vidéo d'acting (URL)</label>
+            <input class="form-input" id="cpVideoAct" type="text" placeholder="https://youtube.com/watch?v=..." />
+          </div>
+        </div>
+        <div class="card">
+          <p class="card-title">Album photos (max 4)</p>
+          <div id="cpAlbumList" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"></div>
+          <div class="form-group">
+            <label class="form-label">Ajouter une photo (URL)</label>
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="cpPhotoUrl" type="text" placeholder="https://..." style="flex:1" />
+              <button class="btn-bronze" onclick="addCastingPhoto()" style="white-space:nowrap;padding:0 16px">+ Ajouter</button>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(234,226,212,0.06)">
+            <a href="casting.html" target="_blank" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--bronze);text-decoration:none">Voir le directory casting →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CANDIDATURES ══ -->
+  <section class="dash-section" id="s-candidatures">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Casting</p><h1 class="page-title">Mes candidatures</h1></div>
+      <a href="missions.html" target="_blank" class="btn-bronze" style="text-decoration:none;padding:10px 20px;font-size:10px;letter-spacing:0.22em">Voir les missions →</a>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap" id="candTabs">
+      <button class="cand-tab active" data-tab="all" onclick="filterCandidatures('all',this)">Tout</button>
+      <button class="cand-tab" data-tab="En attente" onclick="filterCandidatures('En attente',this)">En attente</button>
+      <button class="cand-tab" data-tab="Acceptée" onclick="filterCandidatures('Acceptée',this)">Acceptées</button>
+      <button class="cand-tab" data-tab="En cours" onclick="filterCandidatures('En cours',this)">En cours</button>
+      <button class="cand-tab" data-tab="Terminée" onclick="filterCandidatures('Terminée',this)">Terminées</button>
+      <button class="cand-tab" data-tab="Refusée" onclick="filterCandidatures('Refusée',this)">Refusées</button>
+    </div>
+    <div class="table-card">
+      <div class="table-head" style="grid-template-columns:1fr auto auto; gap:16px;">
+        <span>Mission & Détails</span>
+        <span style="text-align:right">Statut</span>
+        <span style="text-align:right">Action</span>
+      </div>
+      <div id="candidaturesList"></div>
+    </div>
+  </section>
+
+  <!-- ══ BOOKINGS ══ -->
+  <section class="dash-section" id="s-bookings">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Casting</p><h1 class="page-title">Mes bookings</h1></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap">
+      <button class="cand-tab active" onclick="filterBookings('all',this)">Tout</button>
+      <button class="cand-tab" onclick="filterBookings('En attente',this)">En attente</button>
+      <button class="cand-tab" onclick="filterBookings('Actif',this)">Actifs</button>
+      <button class="cand-tab" onclick="filterBookings('Terminé',this)">Terminés</button>
+      <button class="cand-tab" onclick="filterBookings('Annulé',this)">Annulés</button>
+    </div>
+    <div class="table-card">
+      <div class="table-head" style="grid-template-columns:1fr auto auto; gap:16px;">
+        <span>Mission</span>
+        <span style="text-align:right">Statut</span>
+        <span style="text-align:right">Action</span>
+      </div>
+      <div id="bookingsList"></div>
+    </div>
+  </section>
+
+  <!-- ══ MESSAGES ══ -->
+  <section class="dash-section" id="s-messages">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Casting</p><h1 class="page-title">Messages</h1></div>
+    </div>
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:0;border:1px solid rgba(234,226,212,0.08);min-height:400px">
+      <div style="border-right:1px solid rgba(234,226,212,0.08);padding:16px" id="convList">
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:rgba(234,226,212,0.25);padding:8px 0 16px">Conversations</p>
+        <div id="convItems"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px;text-align:center" id="msgPane">
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(234,226,212,0.20);margin-bottom:8px">Sélectionnez une conversation</p>
+        <p style="font-family:'Barlow',sans-serif;font-size:12px;font-weight:300;color:rgba(234,226,212,0.20)">Les discussions apparaissent ici lorsqu'une candidature est acceptée.</p>
+        <a href="missions.html" target="_blank" style="margin-top:24px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--bronze);text-decoration:none">Parcourir les missions →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PORTEFEUILLE ══ -->
+  <section class="dash-section" id="s-portefeuille">
+    <div class="page-header">
+      <div><p class="page-eyebrow">Casting</p><h1 class="page-title">Portefeuille</h1></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:var(--muted)">Devise</span>
+        <div id="pfCurrencyPicker" style="display:flex;gap:4px"></div>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:28px">
+      <div class="stat-card">
+        <p class="stat-label">Solde disponible</p>
+        <p class="stat-value" id="pfSolde">0 XOF</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Fonds en attente</p>
+        <p class="stat-value" id="pfAttente">0</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Total encaissé</p>
+        <p class="stat-value" id="pfTotal">0</p>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px" id="pfWithdrawCard">
+      <!-- Contenu injecté dynamiquement selon la devise par renderWithdrawPanel() -->
+    </div>
+    <div class="card">
+      <p class="card-title">Historique des transactions</p>
+      <div id="pfHistorique"></div>
+    </div>
+  </section>
+
+<!-- Modal Affiliation -->
+<div class="modal-overlay" id="linkModal">
+  <div class="modal-content" style="max-width:420px;text-align:left;">
+    <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.32em;text-transform:uppercase;color:var(--bronze);margin-bottom:8px;">Génération de lien traqué</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;margin-bottom:20px;">Nouveau lien <span id="lmBrand" style="color:var(--bronze)"></span></h2>
+    <div class="form-group">
+      <label class="form-label">Nom de l'article ou collection</label>
+      <input class="form-input" id="afName" type="text" placeholder="Ex : Robe Satin Noir ASOS..." onkeydown="if(event.key==='Enter')addLink()" />
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label class="form-label">URL originale du produit</label>
+      <input class="form-input" id="afUrl" type="text" placeholder="https://www.asos.com/fr/..." onkeydown="if(event.key==='Enter')addLink()" />
+    </div>
+    <div style="background:rgba(176,141,87,0.06);border:1px solid rgba(176,141,87,0.15);border-radius:8px;padding:12px 14px;margin-bottom:24px;">
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Ton lien traqué sera :</p>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(120,200,120,0.8);" id="lmPreview">kafora.track/…</p>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button class="btn-save" onclick="closeLinkModal()" style="background:transparent;border:1px solid rgba(234,226,212,0.15);color:rgba(234,226,212,0.5);flex:1;">Annuler</button>
+      <button class="btn-bronze" onclick="addLink()" style="flex:2;">Générer le lien →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Variables globales
+let selectedLayout = 'editorial';
+let selectedAccent = '#B08D57';
+const ACCENTS = [
+  { color:'#B08D57', label:'Bronze Kafora' },
+  { color:'#C0623A', label:'Terracotta'    },
+  { color:'#6B8E7B', label:'Vert Sauge'    },
+  { color:'#7E6B9A', label:'Prune'         },
+  { color:'#3A7DB5', label:'Bleu Océan'    },
+  { color:'#C44569', label:'Rose Bordeaux' },
+  { color:'#2C7A5A', label:'Vert Émeraude' },
+  { color:'#8C7355', label:'Sépia Chaud'   },
+];
+const DEFAULT_SECTION_ORDER = ['bio', 'portfolio', 'experiences', 'boutique'];
+const SECTION_LABELS = { bio:'Biographie', portfolio:'Portfolio', experiences:'Expériences', boutique:'Boutique' };
+
+// ── AUTH ──
+(function(){
+  function toLogin(){ localStorage.removeItem('kafora-user'); window.location.replace('connexion.html'); }
+  const raw = localStorage.getItem('kafora-user');
+  if(!raw){ toLogin(); return; }
+  let u;
+  try{ u = JSON.parse(raw); if(!u||typeof u!=='object') throw 0; }
+  catch(e){ toLogin(); return; }
+  const fn = u.firstName||(u.email?u.email.split('@')[0]:'Créateur');
+  const ln = u.lastName||'';
+  const ini= (fn[0]||'K').toUpperCase();
+  document.getElementById('sidebarAvatar').textContent = ini;
+  document.getElementById('sidebarName').textContent   = fn+(ln?' '+ln:'');
+  document.getElementById('dashTitle').textContent     = 'Bienvenue, '+fn+'.';
+  loadProfile(u); refreshAll(); buildPass(fn,ln);
+  // Indicateur statut Firebase
+  setTimeout(function() {
+    const status = kaforaDbStatus();
+    const dot  = document.getElementById('db-status-dot');
+    const text = document.getElementById('db-status-text');
+    if (!dot || !text) return;
+    if (status.ready) {
+      dot.style.background = 'rgba(120,200,120,0.85)';
+      text.textContent     = 'Firebase ✓';
+      text.style.color     = 'rgba(120,200,120,0.55)';
+    }
+  }, 600);
+})();
+
+function logout(){ localStorage.removeItem('kafora-user'); localStorage.removeItem('kafora-pass-id'); window.location.replace('connexion.html'); }
+
+// ── NAV ──
+function nav(name){
+  document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('[data-s]').forEach(a=>a.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  const a=document.querySelector('[data-s="'+name+'"]');
+  if(a) a.classList.add('active');
+  if (name === 'casting-profil')  loadCastingProfil();
+  if (name === 'candidatures')    renderCandidatures('all');
+  if (name === 'bookings')        renderBookings('all');
+  if (name === 'messages')        loadMessages();
+  if (name === 'portefeuille')    loadPortefeuille();
+}
+document.querySelectorAll('[data-s]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();nav(a.dataset.s);}));
+
+// ── CASTING PROFIL ──
+function loadCastingProfil() {
+  const sym = { XOF:'FCFA', EUR:'EUR (€)', USD:'USD ($)' }[kaforaCurrency()] || 'FCFA';
+  const label = document.getElementById('cpTarifLabel');
+  if (label) label.textContent = `Tarif journalier (${sym})`;
+  const cp = JSON.parse(localStorage.getItem('kafora-casting') || '{}');
+  if (cp.dispo)       document.getElementById('cpDispo').checked = true;
+  if (cp.tarif)       document.getElementById('cpTarif').value   = cp.tarif;
+  if (cp.taille)      document.getElementById('cpTaille').value  = cp.taille;
+  if (cp.poids)       document.getElementById('cpPoids').value   = cp.poids;
+  if (cp.pointure)    document.getElementById('cpPointure').value= cp.pointure;
+  if (cp.categorie)   document.getElementById('cpCategorie').value = cp.categorie;
+  if (cp.langues)     document.getElementById('cpLangues').value  = cp.langues;
+  if (cp.videoPres)   document.getElementById('cpVideoPres').value= cp.videoPres;
+  if (cp.videoAct)    document.getElementById('cpVideoAct').value = cp.videoAct;
+  if (cp.niches)      cp.niches.forEach(n => { const cb = document.querySelector(`.cp-niche[value="${n}"]`); if(cb) cb.checked = true; });
+  renderCastingAlbum(cp.photos || []);
+}
+
+function saveCastingProfil() {
+  const niches = Array.from(document.querySelectorAll('.cp-niche:checked')).map(cb => cb.value);
+  const cp = {
+    dispo:      document.getElementById('cpDispo').checked,
+    tarif:      parseInt(document.getElementById('cpTarif').value) || 0,
+    taille:     parseInt(document.getElementById('cpTaille').value) || 0,
+    poids:      parseInt(document.getElementById('cpPoids').value) || 0,
+    pointure:   parseInt(document.getElementById('cpPointure').value) || 0,
+    categorie:  document.getElementById('cpCategorie').value,
+    langues:    document.getElementById('cpLangues').value,
+    videoPres:  document.getElementById('cpVideoPres').value,
+    videoAct:   document.getElementById('cpVideoAct').value,
+    niches,
+    photos: JSON.parse(localStorage.getItem('kafora-casting') || '{}').photos || []
+  };
+  localStorage.setItem('kafora-casting', JSON.stringify(cp));
+  showToast('✓ Profil casting enregistré !');
+}
+
+function addCastingPhoto() {
+  const url = document.getElementById('cpPhotoUrl').value.trim();
+  if (!url) return;
+  const cp = JSON.parse(localStorage.getItem('kafora-casting') || '{}');
+  const photos = cp.photos || [];
+  if (photos.length >= 4) { showToast('Maximum 4 photos.'); return; }
+  photos.push(url);
+  cp.photos = photos;
+  localStorage.setItem('kafora-casting', JSON.stringify(cp));
+  document.getElementById('cpPhotoUrl').value = '';
+  renderCastingAlbum(photos);
+}
+
+function renderCastingAlbum(photos) {
+  const list = document.getElementById('cpAlbumList');
+  if (!photos.length) { list.innerHTML = `<p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.14em;color:rgba(234,226,212,0.20);grid-column:1/-1">Aucune photo ajoutée.</p>`; return; }
+  list.innerHTML = photos.map((p,i) => `<div style="position:relative;aspect-ratio:1;overflow:hidden;background:#1a1a1a">
+    <img src="${p}" style="width:100%;height:100%;object-fit:cover" loading="lazy" />
+    <button onclick="removeCastingPhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(10,10,10,0.70);border:none;color:#EAE2D4;font-size:12px;cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center">✕</button>
+  </div>`).join('');
+}
+
+function removeCastingPhoto(idx) {
+  const cp = JSON.parse(localStorage.getItem('kafora-casting') || '{}');
+  const photos = cp.photos || [];
+  photos.splice(idx, 1);
+  cp.photos = photos;
+  localStorage.setItem('kafora-casting', JSON.stringify(cp));
+  renderCastingAlbum(photos);
+}
+
+// ── CANDIDATURES ──
+function renderCandidatures(filter) {
+  const all = JSON.parse(localStorage.getItem('kafora-candidatures') || '[]');
+  const list = filter === 'all' ? all : all.filter(c => c.statut === filter);
+  const el = document.getElementById('candidaturesList');
+  if (!list.length) {
+    el.innerHTML = `<div class="cand-empty">Aucune candidature${filter !== 'all' ? ' dans cette catégorie' : ''}.<br><a href="missions.html" target="_blank" style="color:var(--bronze);text-decoration:none;margin-top:12px;display:inline-block">Parcourir les missions →</a></div>`;
+    return;
+  }
+  el.innerHTML = `<div style="border:1px solid rgba(234,226,212,0.08)">` + list.map(c => {
+    const statClass = {
+      'En attente':'attente','Acceptée':'acceptee','Refusée':'refusee',
+      'En cours':'cours','Terminée':'terminee'
+    }[c.statut] || 'attente';
+    return `<div class="cand-row">
+      <div>
+        <div class="cand-mission">${c.missionTitre}</div>
+        <div class="cand-meta">${c.producteur} · ${new Date(c.at).toLocaleDateString('fr-FR')}</div>
+      </div>
+      <span class="cand-statut ${statClass}">${c.statut}</span>
+      <a href="mission-detail.html?id=${c.missionId}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze);text-decoration:none">Voir →</a>
+    </div>`;
+  }).join('') + `</div>`;
+}
+
+function filterCandidatures(filter, btn) {
+  document.querySelectorAll('#candTabs .cand-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCandidatures(filter);
+}
+
+// ── BOOKINGS ──
+function renderBookings(filter) {
+  const cands = JSON.parse(localStorage.getItem('kafora-candidatures') || '[]');
+  const bookings = cands.filter(c => c.statut === 'Acceptée' || c.statut === 'En cours' || c.statut === 'Terminée');
+  const list = filter === 'all' ? bookings : bookings.filter(b => b.statut === filter);
+  const el = document.getElementById('bookingsList');
+  if (!list.length) {
+    el.innerHTML = `<div class="cand-empty">Pas encore de booking.<br><a href="missions.html" target="_blank" style="color:var(--bronze);text-decoration:none;margin-top:12px;display:inline-block">Compléter votre profil pour attirer les producteurs →</a></div>`;
+    return;
+  }
+  el.innerHTML = `<div style="border:1px solid rgba(234,226,212,0.08)">` + list.map(b => {
+    const statClass = { 'En attente':'attente','Actif':'cours','Terminé':'terminee','Annulé':'refusee' }[b.statut] || 'attente';
+    return `<div class="cand-row">
+      <div>
+        <div class="cand-mission">${b.missionTitre}</div>
+        <div class="cand-meta">${b.producteur} · ${new Date(b.at).toLocaleDateString('fr-FR')}</div>
+      </div>
+      <span class="cand-statut ${statClass}">${b.statut}</span>
+      <a href="mission-detail.html?id=${b.missionId}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze);text-decoration:none">Détails →</a>
+    </div>`;
+  }).join('') + `</div>`;
+}
+
+function filterBookings(filter, btn) {
+  document.querySelectorAll('#s-bookings .cand-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderBookings(filter);
+}
+
+// ── PORTEFEUILLE ──
+function renderWithdrawPanel(currency) {
+  const card = document.getElementById('pfWithdrawCard');
+  if (!card) return;
+
+  if (currency === 'XOF') {
+    // ── FCFA : Mobile Money direct ──
+    card.innerHTML = `
+      <p class="card-title">Retrait Mobile Money</p>
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;background:rgba(80,180,100,0.12);color:rgba(80,180,100,0.90);padding:4px 12px">MTN MoMo</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;background:rgba(80,180,100,0.12);color:rgba(80,180,100,0.90);padding:4px 12px">Moov Flooz</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;background:rgba(80,180,100,0.12);color:rgba(80,180,100,0.90);padding:4px 12px">Orange Money</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Montant (FCFA)</label>
+          <input class="form-input" id="pfMontant" type="number" placeholder="Ex: 50 000" />
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Opérateur</label>
+          <select class="form-input" id="pfOperateur">
+            <option value="">Choisir...</option>
+            <option>MTN MoMo</option>
+            <option>Moov Flooz</option>
+            <option>Orange Money</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Numéro Mobile Money</label>
+        <input class="form-input" id="pfNumero" type="text" placeholder="Ex: +229 96 00 00 00" />
+      </div>
+      <button class="btn-bronze" onclick="demanderRetrait()">Demander un retrait →</button>
+      <p style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.30);margin-top:12px">Traitement sous 24–72h. Montant minimum : 5 000 FCFA.</p>`;
+  } else {
+    // ── EUR / USD : plateformes partenaires ──
+    const sym = currency === 'EUR' ? '€' : '$';
+    const curLabel = currency === 'EUR' ? 'Euro (EUR)' : 'Dollar (USD)';
+    card.innerHTML = `
+      <p class="card-title">Encaissement ${curLabel}</p>
+      <div style="background:rgba(176,141,87,0.06);border:1px solid rgba(176,141,87,0.20);padding:18px 20px;margin-bottom:24px">
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:var(--bronze);margin-bottom:8px">Pourquoi via plateforme partenaire ?</p>
+        <p style="font-family:'Barlow',sans-serif;font-size:13px;font-weight:300;color:rgba(234,226,212,0.60);line-height:1.7">L'encaissement direct en ${curLabel} implique des réglementations financières complexes (PSD2, KYC, conformité fiscale internationale) que Kafora ne prend pas en charge à ce stade. Nous avons choisi de vous orienter vers des plateformes déjà certifiées pour protéger vos gains dès le lancement.<br><br><strong style="color:rgba(234,226,212,0.80)">Dès que Kafora atteint sa maturité financière, l'encaissement direct en ${sym} sera disponible ici.</strong></p>
+      </div>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:var(--ash);margin-bottom:16px">Plateformes recommandées pour encaisser en ${curLabel}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+        <a href="https://gumroad.com" target="_blank" rel="noopener" class="pf-platform-card">
+          <span class="pf-platform-name">Gumroad</span>
+          <span class="pf-platform-desc">Vente de produits digitaux · 0% de frais d'abonnement</span>
+          <span class="pf-platform-cta">Créer un compte →</span>
+        </a>
+        <a href="https://lemonsqueezy.com" target="_blank" rel="noopener" class="pf-platform-card">
+          <span class="pf-platform-name">Lemon Squeezy</span>
+          <span class="pf-platform-desc">Marchand de référence · Gère la TVA automatiquement</span>
+          <span class="pf-platform-cta">Créer un compte →</span>
+        </a>
+        <a href="https://ko-fi.com" target="_blank" rel="noopener" class="pf-platform-card">
+          <span class="pf-platform-name">Ko-fi</span>
+          <span class="pf-platform-desc">Donations et commissions · Idéal créateurs</span>
+          <span class="pf-platform-cta">Créer un compte →</span>
+        </a>
+        <a href="https://stripe.com" target="_blank" rel="noopener" class="pf-platform-card">
+          <span class="pf-platform-name">Stripe</span>
+          <span class="pf-platform-desc">Paiements pro · Disponible dans +40 pays africains</span>
+          <span class="pf-platform-cta">Créer un compte →</span>
+        </a>
+      </div>
+      <div style="border-top:1px solid rgba(234,226,212,0.06);padding-top:16px">
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:rgba(234,226,212,0.25)">Encaissement direct en ${curLabel} — Bientôt sur Kafora</p>
+      </div>`;
+  }
+}
+
+function demanderRetrait() {
+  const montant = document.getElementById('pfMontant')?.value;
+  const operateur = document.getElementById('pfOperateur')?.value;
+  const numero = document.getElementById('pfNumero')?.value;
+  if (!montant || !operateur || !numero) { showToast('Veuillez remplir tous les champs.'); return; }
+  if (parseInt(montant) < 5000) { showToast('Montant minimum : 5 000 FCFA.'); return; }
+  showToast('✓ Demande de retrait envoyée. Traitement sous 24–72h.');
+  const pf = JSON.parse(localStorage.getItem('kafora-portefeuille') || '{}');
+  const hist = pf.historique || [];
+  hist.unshift({ type:'retrait', montant:parseInt(montant), operateur, numero, statut:'En attente', at:Date.now() });
+  pf.historique = hist;
+  localStorage.setItem('kafora-portefeuille', JSON.stringify(pf));
+  renderHistorique(hist);
+}
+
+function renderHistorique(hist) {
+  const el = document.getElementById('pfHistorique');
+  if (!el) return;
+  if (!hist || !hist.length) {
+    el.innerHTML = `<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(234,226,212,0.20);text-align:center;padding:40px 0">Aucune transaction pour le moment.</p>`;
+    return;
+  }
+  el.innerHTML = hist.slice(0, 20).map(h => {
+    const date = new Date(h.at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+    const sign = h.type === 'retrait' ? '−' : '+';
+    const color = h.type === 'retrait' ? 'rgba(200,80,80,0.80)' : 'rgba(80,180,100,0.90)';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(234,226,212,0.06)">
+      <div>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--parch)">${h.type === 'retrait' ? 'Retrait ' + (h.operateur||'') : 'Mission encaissée'}</p>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:300;letter-spacing:0.10em;color:var(--muted)">${date} · <span style="color:${h.statut==='En attente'?'var(--bronze)':'rgba(80,180,100,0.80)'}">${h.statut||'Confirmé'}</span></p>
+      </div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${color}">${sign}${kaforaFormat(h.montant||0)}</span>
+    </div>`;
+  }).join('');
+}
+
+function loadPortefeuille() {
+  const pf = JSON.parse(localStorage.getItem('kafora-portefeuille') || '{}');
+  document.getElementById('pfSolde').textContent   = kaforaFormat(pf.solde   || 0);
+  document.getElementById('pfAttente').textContent = kaforaFormat(pf.attente  || 0);
+  document.getElementById('pfTotal').textContent   = kaforaFormat(pf.total    || 0);
+  kaforaCurrencyPicker('pfCurrencyPicker', loadPortefeuille);
+  renderWithdrawPanel(kaforaCurrency());
+  renderHistorique(pf.historique || []);
+}
+
+// ── MESSAGES ──
+function loadMessages() {
+  const cands = JSON.parse(localStorage.getItem('kafora-candidatures') || '[]');
+  const accepted = cands.filter(c => c.statut === 'Acceptée' || c.statut === 'En cours');
+  const el = document.getElementById('convItems');
+  if (!accepted.length) {
+    el.innerHTML = `<p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.14em;color:rgba(234,226,212,0.20);padding:12px 0">Les discussions apparaîtront ici lorsqu'une candidature sera acceptée.</p>`;
+    return;
+  }
+  el.innerHTML = accepted.map(c => `<div style="padding:12px 0;border-bottom:1px solid rgba(234,226,212,0.06);cursor:pointer">
+    <p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--parch)">${c.missionTitre}</p>
+    <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:300;color:var(--muted)">${c.producteur}</p>
+  </div>`).join('');
+}
+
+// ── SECTION ORDER (builder) ──
+function initSectionOrder() {
+  const raw = localStorage.getItem('kafora-profil');
+  const profil = raw ? JSON.parse(raw) : {};
+  const order = (profil.sectionOrder && profil.sectionOrder.length) ? profil.sectionOrder : DEFAULT_SECTION_ORDER.slice();
+  renderSectionOrder(order);
+}
+
+function renderSectionOrder(order) {
+  const list = document.getElementById('sectionOrderList');
+  list.innerHTML = '';
+  order.forEach(function(sid, idx) {
+    const row = document.createElement('div');
+    row.className = 'sec-row';
+
+    const num = document.createElement('span');
+    num.className = 'sec-num';
+    num.textContent = String(idx + 1).padStart(2, '0');
+
+    const name = document.createElement('span');
+    name.className = 'sec-name';
+    name.textContent = SECTION_LABELS[sid] || sid;
+
+    const btns = document.createElement('div');
+    btns.className = 'sec-btns';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'sec-btn';
+    btnUp.innerHTML = '↑';
+    btnUp.title = 'Monter';
+    btnUp.disabled = (idx === 0);
+    btnUp.addEventListener('click', function() {
+      const o = order.slice();
+      [o[idx - 1], o[idx]] = [o[idx], o[idx - 1]];
+      saveSectionOrderLS(o);
+      renderSectionOrder(o);
+    });
+
+    const btnDn = document.createElement('button');
+    btnDn.className = 'sec-btn';
+    btnDn.innerHTML = '↓';
+    btnDn.title = 'Descendre';
+    btnDn.disabled = (idx === order.length - 1);
+    btnDn.addEventListener('click', function() {
+      const o = order.slice();
+      [o[idx + 1], o[idx]] = [o[idx], o[idx + 1]];
+      saveSectionOrderLS(o);
+      renderSectionOrder(o);
+    });
+
+    btns.appendChild(btnUp);
+    btns.appendChild(btnDn);
+    row.appendChild(num);
+    row.appendChild(name);
+    row.appendChild(btns);
+    list.appendChild(row);
+  });
+}
+
+function saveSectionOrderLS(order) {
+  const raw = localStorage.getItem('kafora-profil');
+  const profil = raw ? JSON.parse(raw) : {};
+  profil.sectionOrder = order;
+  localStorage.setItem('kafora-profil', JSON.stringify(profil));
+}
+
+// ── MISE EN PAGE ──
+
+function updateThumbColors(color) {
+  const c = color || selectedAccent || '#B08D57';
+  document.querySelectorAll('.layout-thumb').forEach(function(thumb) {
+    thumb.style.setProperty('--thumb-accent', c + 'CC');
+  });
+}
+
+function initLayouts(saved) {
+  selectedLayout = saved || 'editorial';
+  document.querySelectorAll('.layout-card').forEach(function(card) {
+    card.classList.toggle('active', card.dataset.layout === selectedLayout);
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.layout-card').forEach(function(c) { c.classList.remove('active'); });
+      this.classList.add('active');
+      selectedLayout = this.dataset.layout;
+    });
+  });
+  updateThumbColors();
+}
+
+// ── AMBIANCE — palette éditoriale ──
+
+function initSwatches(savedColor){
+  selectedAccent = savedColor || '#B08D57';
+  const grid = document.getElementById('swatchGrid');
+  grid.innerHTML = ACCENTS.map(function(a){
+    return '<div class="swatch-lg'+(a.color===selectedAccent?' active':'')+'" style="background:'+a.color+'" title="'+a.label+'" data-color="'+a.color+'"></div>';
+  }).join('');
+  grid.querySelectorAll('.swatch-lg').forEach(function(s){
+    s.addEventListener('click', function(){
+      grid.querySelectorAll('.swatch-lg').forEach(function(x){ x.classList.remove('active'); });
+      this.classList.add('active');
+      selectedAccent = this.dataset.color;
+      updateThumbColors(selectedAccent);
+      updatePreview();
+    });
+  });
+}
+
+// ── PROFIL ──
+function loadProfile(u){
+  const p=JSON.parse(localStorage.getItem('kafora-profil')||'{}');
+  document.getElementById('pfFn').value      = u.firstName||p.fn||'';
+  document.getElementById('pfLn').value      = u.lastName ||p.ln||'';
+  document.getElementById('pfBio').value     = p.bio||'';
+  document.getElementById('pfCity').value    = p.city||'';
+  document.getElementById('pfCountry').value = p.country||'';
+  document.getElementById('pfIg').value      = p.ig||'';
+  document.getElementById('pfTt').value      = p.tt||'';
+  document.getElementById('pfWeb').value     = p.web||'';
+  document.getElementById('pfPhoto').value   = p.photo||'';
+  document.getElementById('pfExtPort').value = p.customPort||'';
+  document.getElementById('pfExpModeCard').checked = (p.expLayout === 'cards');
+  
+  if (p.font) { document.getElementById('pfFont').value = p.font; }
+  
+  if(p.photo) previewUrl(p.photo);
+  if(p.discs) p.discs.forEach(d=>{const t=document.querySelector('[data-v="'+d+'"]');if(t)t.classList.add('selected');});
+  initSwatches(p.accentColor);
+  initLayouts(p.layout);
+  initSectionOrder();
+  renderExperiences();
+  updatePreview();
+}
+
+function saveProfile(){
+  const u=JSON.parse(localStorage.getItem('kafora-user')||'{}');
+  const existing=JSON.parse(localStorage.getItem('kafora-profil')||'{}');
+  const discs=[...document.querySelectorAll('.tag.selected')].map(t=>t.dataset.v);
+  const p=Object.assign({},existing,{
+    fn:document.getElementById('pfFn').value.trim(),
+    ln:document.getElementById('pfLn').value.trim(),
+    bio:document.getElementById('pfBio').value.trim(),
+    city:document.getElementById('pfCity').value.trim(),
+    country:document.getElementById('pfCountry').value.trim(),
+    ig:document.getElementById('pfIg').value.trim(),
+    tt:document.getElementById('pfTt').value.trim(),
+    web:document.getElementById('pfWeb').value.trim(),
+    photo:document.getElementById('pfPhoto').value.trim(),
+    customPort:document.getElementById('pfExtPort').value.trim(),
+    font:document.getElementById('pfFont').value,
+    expLayout:document.getElementById('pfExpModeCard').checked ? 'cards' : 'list',
+    discs,
+    accentColor:selectedAccent,
+    layout:selectedLayout
+  });
+  localStorage.setItem('kafora-profil',JSON.stringify(p));
+  u.firstName=p.fn; u.lastName=p.ln;
+  localStorage.setItem('kafora-user',JSON.stringify(u));
+  document.getElementById('sidebarName').textContent=(p.fn+(p.ln?' '+p.ln:''));
+  document.getElementById('sidebarAvatar').textContent=(p.fn[0]||'K').toUpperCase();
+  document.getElementById('dashTitle').textContent='Bienvenue, '+p.fn+'.';
+  refreshAll(); showToast();
+  // Sync Firebase si disponible
+  kaforaSaveProfile(p).then(function(r){ if(r.source==='firebase') showToast('✓ Profil synchronisé'); });
+}
+
+// ── PRESS KIT DECK ──
+function openPressKitDeck() {
+  const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+  if (!u.hasPressKit) {
+    if (confirm("Le Press Kit coûte 9€ (Paiement unique).\n\nSIMULATION : Veux-tu débloquer cette option pour ton compte ?")) {
+      u.hasPressKit = true;
+      localStorage.setItem('kafora-user', JSON.stringify(u));
+      showToast('✓ Press Kit débloqué !');
+      window.open('presskit_deck.html?creator=me', '_blank');
+    }
+    return;
+  }
+  window.open('presskit_deck.html?creator=me', '_blank');
+}
+
+// ── PRESS KIT PDF (legacy — conservé pour export PDF si besoin) ──
+async function generatePressKit() {
+  const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+  const u = JSON.parse(localStorage.getItem('kafora-user')   || '{}');
+  const links = JSON.parse(localStorage.getItem('kafora-links') || '[]');
+
+  if (!u.hasPressKit) {
+    return;
+  }
+
+  showToast('Génération du Press Kit en cours...', 'info');
+
+  const fn   = p.fn || u.firstName || 'Créateur';
+  const ln   = p.ln || u.lastName  || '';
+  const name = (fn + ' ' + ln).trim();
+  const disc = (p.discs && p.discs.length) ? p.discs.join(' · ') : 'Créateur';
+  const city = p.city || '—';
+  const country = p.country || '';
+  const location = city + (country ? ', ' + country : '');
+  const bio  = p.bio  || 'Aucune biographie renseignée.';
+  const ig   = p.ig   || '—';
+  const web  = p.web  || '—';
+  const exp  = p.experiences || [];
+  
+  const totalClicks = links.reduce(function(s,l){ return s+(l.clicks||0); }, 0);
+  const partners = JSON.parse(localStorage.getItem('kafora-partners')||'{}');
+  const partnerClicks = Object.values(partners).reduce(function(s,p){return s+(p.clicks||0);},0);
+  const totalAudience = totalClicks + partnerClicks;
+
+  // ── CHARGEMENT IMAGE ASYNC (AVEC MASQUE CIRCULAIRE) ──
+  let imgBase64 = null;
+  if (p.photo) {
+    try {
+      imgBase64 = await new Promise((resolve) => {
+        let img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+          const size = Math.min(img.width, img.height);
+          let canvas = document.createElement('canvas');
+          canvas.width = size; canvas.height = size;
+          let ctx = canvas.getContext('2d');
+          
+          ctx.beginPath();
+          ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2, true);
+          ctx.closePath();
+          ctx.clip();
+          
+          const dx = (size - img.width) / 2;
+          const dy = (size - img.height) / 2;
+          ctx.drawImage(img, dx, dy);
+          
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = () => resolve(null);
+        img.src = p.photo;
+      });
+    } catch (e) { console.warn('Erreur chargement photo', e); }
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210; const H = 297;
+  const mL = 20; const mR = 20; const mT = 20;
+  let y = mT;
+
+  // Fond sombre header
+  doc.setFillColor(10, 10, 10);
+  doc.rect(0, 0, W, 40, 'F');
+
+  // KAFORA header
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(176, 141, 87);
+  doc.text('KAFORA', mL, y + 6);
+
+  // Tagline header
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(140, 132, 120);
+  doc.text('DIRECTORY DE CRÉATEURS DE LA DIASPORA AFRICAINE', mL, y + 13);
+  
+  // Date et mention PRO
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+  doc.setFontSize(8);
+  doc.setTextColor(176, 141, 87);
+  doc.text('PRESS KIT', W - mR, y + 6, { align: 'right' });
+  doc.setFontSize(7);
+  doc.setTextColor(140, 132, 120);
+  doc.text(dateStr, W - mR, y + 11, { align: 'right' });
+
+  y = 52;
+
+  // Photo de Profil ou Avatar (Cercle)
+  const avSize = 32;
+  const avX = W - mR - avSize;
+  const avY = 40; // Collé sous le header, ce qui le fait finir vers Y=72
+  const avCenterX = avX + avSize / 2;
+  const avCenterY = avY + avSize / 2;
+  const avRadius = avSize / 2;
+
+  let hasDrawnImage = false;
+  if (imgBase64) {
+    try {
+      doc.addImage(imgBase64, 'PNG', avX, avY, avSize, avSize);
+      // Contour fin noir
+      doc.setDrawColor(20, 20, 20);
+      doc.setLineWidth(0.3);
+      doc.circle(avCenterX, avCenterY, avRadius, 'S');
+      hasDrawnImage = true;
+    } catch(e) { console.warn('Pbs avec image PDF', e); }
+  }
+
+  if (!hasDrawnImage) {
+    doc.setFillColor(245, 243, 239);
+    doc.setDrawColor(176, 141, 87); // Contour fin bronze
+    doc.setLineWidth(0.4);
+    doc.circle(avCenterX, avCenterY, avRadius, 'FD');
+    
+    const init = fn.charAt(0).toUpperCase();
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(36);
+    doc.setTextColor(176, 141, 87);
+    doc.text(init, avCenterX, avCenterY + 12, { align: 'center' });
+  }
+
+  // Nom créateur
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(30);
+  doc.setTextColor(10, 10, 10);
+  doc.text(name.toUpperCase(), mL, y + 8);
+  y += 16;
+
+  // Discipline + Ville
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(100, 100, 100);
+  doc.text(disc.toUpperCase() + '  —  ' + location.toUpperCase(), mL, y);
+  y += 6;
+
+  // Ligne séparatrice bronze
+  doc.setDrawColor(176, 141, 87);
+  doc.setLineWidth(0.6);
+  doc.line(mL, y, W - mR, y);
+  y += 12;
+
+  // Section Statistiques rapides
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(176, 141, 87);
+  doc.text('STATISTIQUES / AUDIENCE', mL, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Expériences : ' + exp.length, mL, y);
+  doc.text('Liens affiliés Actifs : ' + links.length, mL + 45, y);
+  doc.text('Engagement (clics globaux) : ' + (totalAudience > 0 ? totalAudience : 'NR'), mL + 105, y);
+  y += 10;
+
+  // Section Biographie
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(176, 141, 87);
+  doc.text('BIOGRAPHIE', mL, y);
+  y += 6;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  const bioLines = doc.splitTextToSize(bio, W - mL - mR);
+  doc.text(bioLines, mL, y);
+  y += bioLines.length * 5 + 8;
+
+  // Section Expériences
+  if (exp.length > 0) {
+    if (y > H - 60) { doc.addPage(); y = mT; }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(176, 141, 87);
+    doc.text('EXPÉRIENCES MARQUES & CAMPAGNES', mL, y);
+    y += 6;
+
+    exp.forEach(function(e) {
+      if (y > H - 30) { doc.addPage(); y = mT; }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(10, 10, 10);
+      doc.text((e.year || '—') + '  —  ' + (e.brand || '—'), mL, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      const roleLines = doc.splitTextToSize(e.role || '', W - mL - mR - 40);
+      doc.text(roleLines, mL + 40, y);
+      y += Math.max(roleLines.length * 5, 6) + 2;
+    });
+    y += 6;
+  }
+
+  // Section Contact & QR Code
+  if (y > H - 55) { doc.addPage(); y = mT; }
+  
+  // Fake QR Code box
+  doc.setDrawColor(176, 141, 87);
+  doc.setLineWidth(0.3);
+  doc.rect(W - mR - 30, y, 30, 30);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(176, 141, 87);
+  doc.text('SCAN FOR', W - mR - 15, y + 14, { align: 'center' });
+  doc.text('PORTFOLIO', W - mR - 15, y + 18, { align: 'center' });
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(176, 141, 87);
+  doc.text('CONTACT DIRECT', mL, y);
+  y += 6;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(30, 30, 30);
+  if (ig !== '—') { doc.text('Instagram : ' + ig, mL, y); y += 6; }
+  if (web !== '—') { doc.text('Site web : ' + web, mL, y); y += 6; }
+  if (ig === '—' && web === '—') { doc.text('E-mail pro : contact@' + (fn.toLowerCase()||'createur') + '.com', mL, y); y += 6; }
+
+  // Footer
+  doc.setFillColor(10, 10, 10);
+  doc.rect(0, H - 20, W, 20, 'F');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(140, 132, 120);
+  doc.text('kafora.com  ·  Connecting the Culture', W / 2, H - 8, { align: 'center' });
+
+  const safeName = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  doc.save('PressKit_Kafora_' + safeName + '.pdf');
+}
+
+function updatePreview(){
+  const fn=document.getElementById('pfFn').value||'Ton Nom';
+  const ln=document.getElementById('pfLn').value||'';
+  const city=document.getElementById('pfCity').value||'Ville';
+  const discs=[...document.querySelectorAll('.tag.selected')].map(t=>t.dataset.v).join(', ')||'Discipline';
+  document.getElementById('pvName').textContent=fn+(ln?' '+ln:'');
+  document.getElementById('pvDisc').textContent=discs+' · '+city;
+  document.getElementById('pvInit').textContent=(fn[0]||'K').toUpperCase();
+  document.getElementById('pvInit').style.color=selectedAccent;
+  document.getElementById('pvAvatar').style.borderColor=selectedAccent+'66';
+  document.getElementById('pvAvatar').style.background=selectedAccent+'22';
+  
+  const chosenFont = document.getElementById('pfFont').value;
+  document.getElementById('pvName').style.fontFamily = (chosenFont.includes('Playfair') || chosenFont.includes('Space') || chosenFont.includes('Inter')) ? chosenFont : "'Barlow Condensed', sans-serif";
+}
+['pfFn','pfLn','pfCity'].forEach(id=>document.getElementById(id).addEventListener('input',updatePreview));
+document.querySelectorAll('.tag').forEach(t=>t.addEventListener('click',()=>{t.classList.toggle('selected');updatePreview();}));
+
+function previewUrl(url){const img=document.getElementById('photoPreview');if(url){img.src=url;img.style.display='block';}else{img.src='';img.style.display='none';}}
+function handlePhoto(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{document.getElementById('pfPhoto').value=e.target.result;previewUrl(e.target.result);};r.readAsDataURL(f);}
+function showToast(msg){const t=document.getElementById('toast');if(msg) t.textContent = msg;else t.textContent = '✓ Profil enregistré';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+
+// ── EXPÉRIENCES ──
+let tempExpMedia = [];
+
+function addExpMediaTemp() {
+  const url = document.getElementById('pfExpMediaUrl').value.trim();
+  if (!url) return;
+  if (tempExpMedia.length >= 4) { showToast('Maximum 4 médias.'); return; }
+  tempExpMedia.push(url);
+  document.getElementById('pfExpMediaUrl').value = '';
+  renderExpMediaTemp();
+}
+
+function removeExpMediaTemp(idx) {
+  tempExpMedia.splice(idx, 1);
+  renderExpMediaTemp();
+}
+
+function renderExpMediaTemp() {
+  const list = document.getElementById('pfExpMediaList');
+  if (!tempExpMedia.length) { list.innerHTML = ''; return; }
+  list.innerHTML = tempExpMedia.map((m, idx) => `
+    <div style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#1a1a1a;border:1px solid rgba(234,226,212,0.1)">
+      <img src="${m}" style="width:100%;height:100%;object-fit:cover" />
+      <button onclick="removeExpMediaTemp(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(10,10,10,0.8);color:#EAE2D4;border:none;border-radius:4px;font-size:10px;padding:2px 6px;cursor:pointer">✕</button>
+    </div>
+  `).join('');
+}
+
+function renderExperiences() {
+  const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+  const exp = p.experiences || [];
+  const list = document.getElementById('pfExpList');
+  if (!list) return;
+  if (!exp.length) {
+    list.innerHTML = '';
+    return;
+  }
+  list.innerHTML = exp.map((e, idx) => {
+    let mediaHtml = '';
+    if (e.media && e.media.length) {
+      mediaHtml = `<div style="display:flex;gap:8px;margin-top:10px;overflow-x:auto;">` + 
+        e.media.map(m => `<img src="${m}" style="height:60px;width:auto;border-radius:4px;border:1px solid rgba(234,226,212,0.1);object-fit:cover" />`).join('') +
+        `</div>`;
+    }
+    let linkedHtml = e.linkedProfile ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;background:rgba(176,141,87,0.15);color:var(--bronze);padding:2px 6px;border-radius:4px;margin-left:8px;">🔗 ${e.linkedProfile}</span>` : '';
+    let descHtml = e.description ? `<p style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.55);margin-top:6px;line-height:1.5">${e.description}</p>` : '';
+    
+    return `
+    <div style="padding:16px;background:rgba(234,226,212,0.03);border:1px solid rgba(234,226,212,0.07);border-radius:8px;position:relative;">
+      <button onclick="deleteExperience(${idx})" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:rgba(220,80,60,0.6);cursor:pointer;font-size:14px;transition:color 150ms;" onmouseover="this.style.color='#f44'" onmouseout="this.style.color='rgba(220,80,60,0.6)'">✕</button>
+      <div>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--parch)">${e.brand}${linkedHtml}</p>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.1em;color:var(--bronze);margin-bottom:2px">${e.year}</p>
+        <p style="font-family:'Barlow',sans-serif;font-size:12px;font-weight:300;color:var(--muted)">${e.role}</p>
+        ${descHtml}
+        ${mediaHtml}
+      </div>
+    </div>
+  `}).join('');
+}
+
+function addExperience() {
+  const brand = document.getElementById('pfExpBrand').value.trim();
+  const linkedProfile = document.getElementById('pfExpLinked').value.trim();
+  const year = document.getElementById('pfExpYear').value.trim();
+  const role = document.getElementById('pfExpRole').value.trim();
+  const description = document.getElementById('pfExpDesc').value.trim();
+  
+  if (!brand || !year) {
+    showToast("Veuillez remplir au moins le lieu/marque et la période/tarif.");
+    return;
+  }
+  const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+  const exp = p.experiences || [];
+  exp.push({ brand, linkedProfile, year, role, description, media: [...tempExpMedia] });
+  p.experiences = exp;
+  localStorage.setItem('kafora-profil', JSON.stringify(p));
+  
+  document.getElementById('pfExpBrand').value = '';
+  document.getElementById('pfExpLinked').value = '';
+  document.getElementById('pfExpYear').value = '';
+  document.getElementById('pfExpRole').value = '';
+  document.getElementById('pfExpDesc').value = '';
+  tempExpMedia = [];
+  renderExpMediaTemp();
+  
+  renderExperiences();
+  showToast("✓ Expérience ajoutée");
+}
+
+function deleteExperience(idx) {
+  const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+  const exp = p.experiences || [];
+  exp.splice(idx, 1);
+  p.experiences = exp;
+  localStorage.setItem('kafora-profil', JSON.stringify(p));
+  renderExperiences();
+  showToast("Expérience supprimée");
+}
+
+
+// ── AGENT IA (Simulation) ──
+function simulateAIAgent() {
+  const code = document.getElementById('pfExtPort').value.trim();
+  if(!code) { alert('Merci de coller le code du portfolio ciblé.'); return; }
+  
+  const loader = document.getElementById('aiLoader');
+  const txt = document.getElementById('aiStatusText');
+  loader.style.display = 'flex';
+  
+  const steps = [
+    'Analyse du DOM...',
+    'Extraction des classes tailwind/css...',
+    'Sécurisation des iframes externes...',
+    'Mappage variables d\'identité ({{nom}})...',
+    'Application du filtre colorimique KAFORA...',
+    'Génération du snapshot final...'
+  ];
+  
+  let i = 0;
+  txt.textContent = steps[i];
+  
+  const inter = setInterval(() => {
+    i++;
+    if(i < steps.length) {
+      txt.textContent = steps[i];
+    } else {
+      clearInterval(inter);
+      loader.style.display = 'none';
+      
+      // Pseudo-adaptation du code : remplace les "{{nom}}" et autres par l'utilisateur connecté 
+      // et injecte un div enveloppant pour forcer le style si besoin
+      const fn = document.getElementById('pfFn').value || 'Créateur';
+      const city = document.getElementById('pfCity').value || 'Ville';
+      
+      let adaptedCode = code.replace(/{{nom}}/gi, fn).replace(/{{ville}}/gi, city);
+      // On l'emballe dans un Wrapper "IA" pour isoler le CSS (ou simuler qu'on le fait)
+      adaptedCode = `<!-- [KAFORA IA AGENT : WRAPPER SECURISE] -->\n<div class="kafora-custom-portfolio-wrap" style="--accent: \${selectedAccent};">\n\n` + adaptedCode + `\n\n</div>`;
+      
+      document.getElementById('pfExtPort').value = adaptedCode;
+      saveProfile();
+      
+      document.getElementById('aiModal').style.display = 'flex';
+    }
+  }, 600);
+}
+
+function closeAiModal() {
+  document.getElementById('aiModal').style.display = 'none';
+}
+
+// ── REFRESH ALL ──
+function refreshAll(){ updateCompletion(); renderLinks(); renderAnalytics(); }
+
+// ── COMPLÉTION ──
+function updateCompletion(){
+  const p=JSON.parse(localStorage.getItem('kafora-profil')||'{}');
+  const links=JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  const tasks=[{id:'Photo',done:!!p.photo},{id:'Bio',done:!!(p.bio&&p.bio.length>10)},{id:'Disc',done:!!(p.discs&&p.discs.length>0)},{id:'Link',done:links.length>0}];
+  const done=1+tasks.filter(t=>t.done).length;
+  const pct=Math.round(done/5*100);
+  document.getElementById('ringPct').textContent=pct+'%';
+  document.getElementById('ringBg').style.background='conic-gradient(#B08D57 0% '+pct+'%,rgba(234,226,212,0.08) '+pct+'% 100%)';
+  tasks.forEach(t=>{
+    const ck=document.getElementById('ck'+t.id);
+    const tx=document.getElementById('tx'+t.id);
+    const row=document.getElementById('t'+t.id);
+    if(!ck) return;
+    if(t.done){ck.classList.add('done');tx.classList.add('done');const btn=row.querySelector('.task-btn');if(btn)btn.style.display='none';}
+    else{ck.classList.remove('done');tx.classList.remove('done');const btn=row.querySelector('.task-btn');if(btn)btn.style.display='';}
+  });
+  document.getElementById('ovLinks').textContent=links.length;
+  const partners=JSON.parse(localStorage.getItem('kafora-partners')||'{}');
+  const partnerClicks=Object.values(partners).reduce(function(s,p){return s+(p.clicks||0);},0);
+  const linkClicks=links.reduce(function(s,l){return s+(l.clicks||0);},0);
+  document.getElementById('ovClicks').textContent=partnerClicks+linkClicks;
+}
+
+// ── AFFILIATION HUB ──
+let activePartner = '';
+let activePartnerId = '';
+
+function renderPartners() {
+  const partners = JSON.parse(localStorage.getItem('kafora-partners')||'{}');
+  let totalClicks = 0;
+  let totalRev = 0;
+  Object.keys(partners).forEach(function(id) {
+    const p = partners[id];
+    const card = document.getElementById('part-'+id);
+    if (card) {
+      card.classList.add('connected');
+      card.classList.remove('connecting');
+      const sClick = document.getElementById('stat-'+id+'-click');
+      const sRev   = document.getElementById('stat-'+id+'-rev');
+      if (sClick) sClick.textContent = p.clicks;
+      if (sRev)   sRev.textContent   = parseFloat(p.rev).toFixed(2) + ' €';
+      totalClicks += p.clicks || 0;
+      totalRev    += parseFloat(p.rev) || 0;
+    }
+  });
+  // Agrège aussi les clics depuis kafora-links
+  const links = JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  const linkClicks = links.reduce(function(s,l){ return s+(l.clicks||0); }, 0);
+  const el = document.getElementById('sumClicks');
+  const er = document.getElementById('sumRevenue');
+  if (el) el.textContent = totalClicks + linkClicks;
+  if (er) er.textContent = totalRev.toFixed(2) + ' €';
+}
+
+// ── URLs programmes affiliés partenaires ──
+const PARTNER_AFFILIATE_URLS = {
+  asos:     'https://www.awin.com/gb/advertiser/asos',
+  sephora:  'https://www.sephora.fr/affiliate/',
+  farfetch: 'https://www.farfetch.com/fr/affiliates/',
+  nike:     'https://www.nike.com/fr/help/a/become-an-affiliate',
+  zara:     'https://affiliate.zara.com/',
+};
+
+let connectingPartnerId   = '';
+let connectingPartnerName = '';
+
+function connectPartner(id, name) {
+  const card = document.getElementById('part-'+id);
+  if (!card || card.classList.contains('connected') || card.classList.contains('connecting')) return;
+  connectingPartnerId   = id;
+  connectingPartnerName = name;
+  // Ouvre la page d'inscription au programme affilié
+  const url = PARTNER_AFFILIATE_URLS[id];
+  if (url) window.open(url, '_blank', 'noopener');
+  // Affiche le modal de liaison
+  document.getElementById('cmBrand').textContent = name;
+  document.getElementById('cmIdWrap').style.display  = 'none';
+  document.getElementById('cmBtns1').style.display   = 'flex';
+  document.getElementById('cmBtns2').style.display   = 'none';
+  document.getElementById('cmAffId').value           = '';
+  document.getElementById('connectModal').style.display = 'flex';
+}
+
+function showConnectIdInput() {
+  document.getElementById('cmIdWrap').style.display = 'block';
+  document.getElementById('cmBtns1').style.display  = 'none';
+  document.getElementById('cmBtns2').style.display  = 'flex';
+  document.getElementById('cmAffId').focus();
+}
+
+function closeConnectModal() {
+  document.getElementById('connectModal').style.display = 'none';
+  connectingPartnerId = ''; connectingPartnerName = '';
+}
+
+function confirmConnect() {
+  const affId = document.getElementById('cmAffId').value.trim();
+  if (!affId) { document.getElementById('cmAffId').style.borderColor = 'rgba(200,80,80,0.6)'; return; }
+  const partners = JSON.parse(localStorage.getItem('kafora-partners')||'{}');
+  if (!partners[connectingPartnerId]) {
+    partners[connectingPartnerId] = { name: connectingPartnerName, clicks: 0, rev: '0.00', affId: affId };
+  } else {
+    partners[connectingPartnerId].affId = affId;
+  }
+  localStorage.setItem('kafora-partners', JSON.stringify(partners));
+  closeConnectModal();
+  renderPartners();
+  renderLinks();
+  showToast('✓ Compte ' + connectingPartnerName + ' lié — accès lecture activé');
+}
+
+function openLinkModal(partnerName, partnerId) {
+  activePartner   = partnerName || '';
+  activePartnerId = partnerId   || '';
+  document.getElementById('lmBrand').textContent = partnerName || 'Libre';
+  document.getElementById('afUrl').value   = '';
+  document.getElementById('afName').value  = '';
+  document.getElementById('lmPreview').textContent = 'kafora.track/' + (partnerId ? partnerId+'-' : '') + 'xxxxxxx';
+  document.getElementById('linkModal').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('afName').focus(); }, 80);
+}
+
+function closeLinkModal() {
+  document.getElementById('linkModal').style.display = 'none';
+}
+
+// Fermeture modale en cliquant l'overlay
+document.getElementById('linkModal').addEventListener('click', function(e) {
+  if (e.target === this) closeLinkModal();
+});
+document.getElementById('aiModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAiModal();
+});
+
+function renderLinks() {
+  renderPartners();
+  const links = JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  const lc = document.getElementById('linkCount');
+  if (lc) lc.textContent = links.length;
+  const list = document.getElementById('afList');
+  if (!list) return;
+  if (links.length === 0) {
+    list.innerHTML = '<p style="font-family:\'Barlow\',sans-serif;font-weight:300;font-size:13px;color:rgba(234,226,212,0.28);text-align:center;padding:24px 0">Connecte un partenaire puis génère ton premier lien traqué.</p>';
+    return;
+  }
+  list.innerHTML = links.map(function(l, i) {
+    const badge = l.partner
+      ? `<span style="font-size:9px;color:var(--bronze);border:1px solid var(--bronze);padding:2px 6px;border-radius:3px;letter-spacing:0.1em;font-family:'Barlow Condensed',sans-serif;font-weight:700;">${l.partner}</span>`
+      : '';
+    return `
+    <div class="affil-item">
+      <span class="affil-name" style="display:flex;align-items:center;gap:8px;">${l.name}${badge}</span>
+      <span class="affil-url" style="color:rgba(120,200,120,0.75);cursor:pointer;font-family:'Barlow Condensed',sans-serif;" onclick="simulateClick(${i})" title="Cliquer pour simuler un clic">↗ ${l.url}</span>
+      <span class="affil-clicks">${l.clicks||0}<small>clics</small></span>
+      <button class="affil-copy" onclick="copyLink('${l.url}')" title="Copier le lien">⧉</button>
+      <button class="affil-del"  onclick="delLink(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function addLink() {
+  const name = document.getElementById('afName').value.trim();
+  const rawUrl = document.getElementById('afUrl').value.trim();
+  if (!name || !rawUrl) {
+    showToast('Nom et URL requis.');
+    return;
+  }
+  const slug = Math.random().toString(36).substr(2, 7);
+  const url  = 'kafora.track/' + (activePartnerId ? activePartnerId + '-' : '') + slug;
+  const links = JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  links.push({ name, url, originalUrl: rawUrl, partner: activePartner, partnerId: activePartnerId, clicks: 0, at: Date.now() });
+  localStorage.setItem('kafora-links', JSON.stringify(links));
+  kaforaSaveLinks(links);
+  closeLinkModal();
+  refreshAll();
+  showToast('✓ Lien généré : ' + url);
+}
+
+function simulateClick(i) {
+  const links = JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  if (!links[i]) return;
+  links[i].clicks = (links[i].clicks || 0) + 1;
+  localStorage.setItem('kafora-links', JSON.stringify(links));
+  renderLinks();
+}
+
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(function() {
+    showToast('✓ Lien copié !');
+  }).catch(function() {
+    showToast('Copie: ' + url);
+  });
+}
+
+function delLink(i) {
+  const links = JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  links.splice(i, 1);
+  localStorage.setItem('kafora-links', JSON.stringify(links));
+  refreshAll();
+}
+
+// ── ANALYTICS ──
+function renderAnalytics(){
+  const links=JSON.parse(localStorage.getItem('kafora-links')||'[]');
+  const total=links.reduce((s,l)=>s+(l.clicks||0),0);
+  document.getElementById('aClicks').textContent=total;
+  const months=['Jan','Fév','Mar','Avr','Mai','Jun'];
+  const data=[0,0,0,0,0,total];
+  const mx=Math.max(...data,1);
+  document.getElementById('barChart').innerHTML=months.map((m,i)=>`<div class="bar-col"><div class="bar ${i===5?'hi':''}" style="height:${Math.max(4,Math.round(data[i]/mx*100))}%"></div><span class="bar-month">${m}</span></div>`).join('');
+  const tbl=document.getElementById('aTable');
+  if(!links.length){tbl.innerHTML='<div class="table-row"><span class="tc" style="grid-column:1/-1;text-align:center;color:rgba(234,226,212,0.25)">Aucune donnée — ajoute des liens affiliés</span></div>';return;}
+  tbl.innerHTML=links.map(l=>`<div class="table-row"><span class="tc">${l.name}</span><span class="tc n">${l.clicks||0}</span><span class="tc" style="color:rgba(120,200,120,0.60)">↑ actif</span></div>`).join('');
+}
+
+// ── PASS ──
+function buildPass(fn,ln){
+  const name=fn+(ln?' '+ln:'');
+  let id=localStorage.getItem('kafora-pass-id');
+  if(!id){ id='KAF-'+Math.random().toString(36).substr(2,6).toUpperCase(); localStorage.setItem('kafora-pass-id',id); }
+  document.getElementById('passName').textContent=name||'Créateur Kafora';
+  document.getElementById('passId').textContent='ID · '+id;
+  const pat=[1,1,1,0,1,0,1,1,1,1,0,1,0,0,0,1,0,1,1,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,0,1,0,1,1,1];
+  document.getElementById('qrWrap').innerHTML=pat.map(v=>`<div class="qr-cell ${v?'b':''}"></div>`).join('');
+  const bh=[60,90,70,100,50,80,65,95,75,55,85,70,100,60,80,90,65,75,55,85,70,100,60];
+  document.getElementById('barcode').innerHTML=bh.map(h=>`<b style="height:${h}%;width:${h>80?3:h>65?2:1}px"></b>`).join('');
+}
+
+// ── BUILDER PREVIEW ──
+function openMyProfile() {
+  const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+  if (p.layout === 'artistic') {
+    window.open('portfolio_artistic.html?creator=me', '_blank');
+  } else if (p.layout === 'minimal') {
+    window.open('portfolio_minimal.html?creator=me', '_blank');
+  } else {
+    window.open('profil.html?creator=me', '_blank');
+  }
+}
+
+function saveAndPreview() {
+  saveProfile();
+  openMyProfile();
+}
+
+</script>
+</body>
+</html>

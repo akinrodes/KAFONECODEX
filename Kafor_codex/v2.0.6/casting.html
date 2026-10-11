@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Casting · Trouver des Faces</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <script src="kafora-currency.js"></script>
+  <style>
+    /* ── Currency picker ── */
+    .kcy-wrap { display:flex; align-items:center; gap:6px; }
+    .kcy-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; color:var(--ash,#8C8478); }
+    .kcy-btn { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; padding:5px 10px; background:transparent; border:1px solid rgba(234,226,212,0.14); color:rgba(234,226,212,0.40); cursor:pointer; transition:all 180ms; }
+    .kcy-btn:hover { border-color:rgba(234,226,212,0.30); color:rgba(234,226,212,0.70); }
+    .kcy-btn.active { background:var(--bronze,#B08D57); color:#0A0A0A; border-color:var(--bronze,#B08D57); }
+  </style>
+  <style>
+    :root {
+      --ink:    #0A0A0A;
+      --parch:  #EAE2D4;
+      --bronze: #B08D57;
+      --ash:    #8C8478;
+      --border: rgba(234,226,212,0.08);
+      --surface:#111010;
+    }
+    body.light-theme {
+      --ink: #EAE2D4; --parch: #0A0A0A;
+      --surface: #D8CEBA; --border: rgba(10,10,10,0.10);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--ink); color:var(--parch); font-family:'Barlow',sans-serif; }
+
+    /* ── NAV ── */
+    #navbar {
+      position:fixed; top:0; left:0; right:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:22px 48px;
+      background:rgba(10,10,10,0.92);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(12px);
+    }
+    .nav-logo { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:20px; letter-spacing:0.06em; color:var(--parch); text-decoration:none; }
+    .nav-logo:hover { color:var(--bronze); }
+    .nav-links { display:flex; gap:32px; list-style:none; }
+    .nav-links a { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:300; letter-spacing:0.22em; text-transform:uppercase; color:rgba(234,226,212,0.55); text-decoration:none; transition:color 200ms; }
+    .nav-links a:hover, .nav-links a.active { color:var(--bronze); }
+    .nav-right { display:flex; gap:12px; align-items:center; }
+    .btn-nav { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; padding:9px 20px; border:1px solid var(--bronze); background:transparent; color:var(--bronze); text-decoration:none; cursor:pointer; transition:all 200ms; }
+    .btn-nav:hover { background:var(--bronze); color:var(--ink); }
+    .btn-nav-fill { background:var(--bronze); color:var(--ink); border-color:var(--bronze); }
+    .btn-nav-fill:hover { background:#c9a468; }
+
+    /* ── HERO ── */
+    .casting-hero {
+      padding:160px 48px 64px;
+      border-bottom:1px solid var(--border);
+    }
+    .hero-overline {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:0.44em; text-transform:uppercase; color:var(--bronze);
+      margin-bottom:20px;
+    }
+    .hero-title {
+      font-family:'Barlow Condensed',sans-serif; font-weight:900;
+      font-size:clamp(52px,6vw,96px); line-height:0.92;
+      text-transform:uppercase; color:var(--parch);
+      margin-bottom:20px;
+    }
+    .hero-title span { color:var(--bronze); }
+    .hero-sub {
+      font-family:'Barlow',sans-serif; font-size:15px; font-weight:300;
+      color:rgba(234,226,212,0.55); line-height:1.7; max-width:520px;
+    }
+    .hero-count {
+      margin-top:32px;
+      font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:400;
+      letter-spacing:0.14em; text-transform:uppercase; color:var(--ash);
+    }
+    .hero-count strong { color:var(--parch); font-size:28px; font-weight:900; vertical-align:middle; margin-right:8px; }
+
+    /* ── FILTRES ── */
+    .filters-bar {
+      padding:28px 48px;
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;
+    }
+    .filter-group { display:flex; flex-direction:column; gap:6px; }
+    .filter-label {
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:0.32em; text-transform:uppercase; color:var(--ash);
+    }
+    .filter-input, .filter-select {
+      background:rgba(234,226,212,0.04); border:1px solid rgba(234,226,212,0.12);
+      color:var(--parch); padding:10px 14px;
+      font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:300;
+      letter-spacing:0.10em; outline:none; min-width:160px;
+      transition:border-color 200ms;
+    }
+    .filter-input:focus, .filter-select:focus { border-color:var(--bronze); }
+    .filter-select option { background:#1a1a1a; }
+    .filter-group-search { flex:1; min-width:200px; }
+    .filter-group-search .filter-input { width:100%; }
+    .btn-filter-reset {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.22em; text-transform:uppercase; color:var(--ash);
+      background:transparent; border:1px solid rgba(234,226,212,0.12);
+      padding:10px 18px; cursor:pointer; transition:all 200ms; align-self:flex-end;
+    }
+    .btn-filter-reset:hover { border-color:rgba(234,226,212,0.30); color:var(--parch); }
+    .filters-result-count {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:400;
+      letter-spacing:0.14em; color:var(--ash); align-self:center; margin-left:auto;
+    }
+    .filters-result-count strong { color:var(--parch); }
+
+    /* ── GRID ── */
+    .casting-main { padding:40px 48px 80px; }
+    .casting-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+      gap:20px;
+    }
+
+    /* ── TALENT CARD ── */
+    .talent-card {
+      background:var(--surface);
+      border:1px solid var(--border);
+      overflow:hidden;
+      cursor:pointer;
+      transition:border-color 300ms, transform 300ms cubic-bezier(0.34,1.25,0.64,1);
+      text-decoration:none;
+      display:block;
+      position:relative;
+    }
+    .talent-card:hover { border-color:rgba(176,141,87,0.35); transform:translateY(-4px); }
+    .talent-card-photo {
+      width:100%; aspect-ratio:3/4; overflow:hidden; background:#1a1a1a;
+      position:relative;
+    }
+    .talent-card-photo img {
+      width:100%; height:100%; object-fit:cover; object-position:center top;
+      transition:transform 500ms cubic-bezier(0.34,1.25,0.64,1);
+      filter:grayscale(15%);
+    }
+    .talent-card:hover .talent-card-photo img { transform:scale(1.04); }
+    .talent-card-photo-placeholder {
+      width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Barlow Condensed',sans-serif; font-size:48px; font-weight:900;
+      color:rgba(176,141,87,0.20);
+    }
+    .dispo-badge {
+      position:absolute; top:12px; left:12px;
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:0.28em; text-transform:uppercase;
+      padding:4px 10px;
+    }
+    .dispo-badge.disponible { background:rgba(80,180,100,0.90); color:#fff; }
+    .dispo-badge.indisponible { background:rgba(120,120,120,0.70); color:#fff; }
+    .talent-card-body { padding:16px 18px 18px; }
+    .talent-card-name {
+      font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.06em; color:var(--parch);
+      margin-bottom:4px;
+    }
+    .talent-card-cat {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400;
+      letter-spacing:0.22em; text-transform:uppercase; color:var(--bronze);
+      margin-bottom:8px;
+    }
+    .talent-card-meta {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:10px; padding-top:10px; border-top:1px solid var(--border);
+    }
+    .talent-card-city {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:300;
+      letter-spacing:0.14em; text-transform:uppercase; color:var(--ash);
+    }
+    .talent-card-tarif {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      color:var(--parch); letter-spacing:0.06em;
+    }
+    .talent-card-niches { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+    .niche-pill {
+      font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:400;
+      letter-spacing:0.24em; text-transform:uppercase;
+      border:1px solid rgba(234,226,212,0.14); color:var(--ash);
+      padding:3px 8px;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column:1/-1; text-align:center; padding:80px 0;
+      font-family:'Barlow Condensed',sans-serif; font-size:14px;
+      letter-spacing:0.14em; text-transform:uppercase; color:rgba(234,226,212,0.20);
+    }
+
+    /* ── FOOTER ── */
+    .casting-footer { padding:24px 48px; border-top:1px solid var(--border); text-align:center; }
+    .casting-footer p { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:rgba(234,226,212,0.18); }
+
+    @media (max-width:768px) {
+      #navbar { padding:18px 20px; }
+      .nav-links { display:none; }
+      .casting-hero, .filters-bar, .casting-main { padding-left:20px; padding-right:20px; }
+      .casting-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+    }
+
+    /* ══ ENHANCEMENTS ÉDITORIAUX ══════════════════════════════ */
+
+    /* Hero grain & gradients */
+    .casting-hero {
+      position:relative; overflow:hidden;
+      background: radial-gradient(ellipse 60% 40% at 15% 60%, rgba(176,141,87,0.07) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 50% at 85% 20%, rgba(176,141,87,0.04) 0%, transparent 65%),
+                  #0A0A0A;
+    }
+    .casting-hero::before {
+      content:'';
+      position:absolute; inset:0; z-index:0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      mix-blend-mode:screen; pointer-events:none;
+    }
+    .casting-hero > * { position:relative; z-index:1; }
+
+    /* Ghost number behind hero title */
+    .hero-ghost {
+      position:absolute;
+      right:-20px; top:50%; transform:translateY(-50%);
+      font-family:'Barlow Condensed',sans-serif; font-weight:900;
+      font-size:clamp(120px,18vw,240px); line-height:1;
+      color:rgba(176,141,87,0.04);
+      letter-spacing:-0.04em;
+      pointer-events:none; user-select:none;
+      z-index:0;
+    }
+
+    /* Talent card grain overlay */
+    .talent-card::after {
+      content:'';
+      position:absolute; inset:0; z-index:4;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+      mix-blend-mode:screen; pointer-events:none;
+    }
+
+    /* Talent card hover bronze glow */
+    .talent-card:hover {
+      box-shadow:0 20px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(176,141,87,0.20);
+    }
+
+    /* Niche pill hover */
+    .niche-pill {
+      transition:border-color 200ms, color 200ms;
+    }
+    .talent-card:hover .niche-pill {
+      border-color:rgba(176,141,87,0.25);
+      color:rgba(234,226,212,0.75);
+    }
+
+    /* Talent card body barcode deco */
+    .talent-card-barcode {
+      display:flex; gap:1.5px; align-items:flex-end;
+      height:14px; opacity:0.12; margin-top:8px;
+    }
+    .talent-card-barcode b {
+      display:block; width:1.5px; background:var(--parch);
+    }
+
+    /* Section num in casting-main */
+    .casting-main-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:24px; padding-bottom:16px;
+      border-bottom:1px solid rgba(176,141,87,0.12);
+    }
+    .casting-main-num {
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:0.40em; text-transform:uppercase;
+      color:rgba(176,141,87,0.35);
+      display:flex; align-items:center; gap:10px;
+    }
+    .casting-main-num::after {
+      content:''; display:block; width:36px; height:1px;
+      background:rgba(176,141,87,0.35);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">Kafora</a>
+  <ul class="nav-links">
+    <li><a href="createurs.html">Créateurs</a></li>
+    <li><a href="casting.html" class="active">Casting</a></li>
+    <li><a href="missions.html">Missions</a></li>
+    <li><a href="evenements.html">Événements</a></li>
+    <li><a href="marques.html">Marques</a></li>
+    <li><a href="premium.html">Premium</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" aria-label="Changer le thème" onclick="toggleTheme()">
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a href="missions.html" class="btn-nav">Publier une mission</a>
+    <a href="connexion.html" class="btn-nav btn-nav-fill">Se connecter</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="casting-hero">
+  <div class="hero-ghost">1571</div>
+  <p class="hero-overline">Kafora · Casting</p>
+  <h1 class="hero-title">Trouvez votre<br>prochain <span>talent</span></h1>
+  <p class="hero-sub">Accédez au vivier de créateurs de la diaspora africaine pour tous vos projets audiovisuels, éditoriaux et publicitaires.</p>
+  <div class="hero-count">
+    <strong id="totalCount">1 571</strong> talents disponibles
+  </div>
+</section>
+
+<!-- ══ FILTRES ══ -->
+<div class="filters-bar">
+  <div class="filter-group filter-group-search">
+    <span class="filter-label">Rechercher</span>
+    <input type="text" class="filter-input" id="searchInput" placeholder="Nom, spécialité..." oninput="applyFilters()" />
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Ville</span>
+    <select class="filter-select" id="filterVille" onchange="applyFilters()">
+      <option value="">Toutes les villes</option>
+      <option>Cotonou</option>
+      <option>Paris</option>
+      <option>Accra</option>
+      <option>Dakar</option>
+      <option>Londres</option>
+      <option>Abidjan</option>
+      <option>Lagos</option>
+      <option>Lomé</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Catégorie</span>
+    <select class="filter-select" id="filterCat" onchange="applyFilters()">
+      <option value="">Toutes catégories</option>
+      <option>Acteur</option>
+      <option>Influenceur</option>
+      <option>Créateur de contenu</option>
+      <option>Mannequin</option>
+      <option>Figurant</option>
+      <option>Modèle Photo</option>
+      <option>Égérie</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Niche</span>
+    <select class="filter-select" id="filterNiche" onchange="applyFilters()">
+      <option value="">Toutes niches</option>
+      <option>Mode</option>
+      <option>Beauté</option>
+      <option>Nourriture</option>
+      <option>Découverte</option>
+      <option>Sport</option>
+      <option>Tech</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Disponibilité</span>
+    <select class="filter-select" id="filterDispo" onchange="applyFilters()">
+      <option value="">Tous</option>
+      <option value="true">Disponible</option>
+      <option value="false">Indisponible</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Devise</span>
+    <div class="kcy-wrap" id="currencyPicker"></div>
+  </div>
+  <button class="btn-filter-reset" onclick="resetFilters()">Réinitialiser</button>
+  <span class="filters-result-count"><strong id="resultCount">20</strong> résultats</span>
+</div>
+
+<!-- ══ GRID ══ -->
+<main class="casting-main">
+  <div class="casting-main-header">
+    <span class="casting-main-num">01 — Annuaire Casting</span>
+  </div>
+  <div class="casting-grid" id="castingGrid"></div>
+</main>
+
+<footer class="casting-footer">
+  <p>Kafora Casting · Diaspora Africaine · © 2026 Kafora. Tous droits réservés.</p>
+</footer>
+
+<script>
+// ── DONNÉES TALENTS ──
+const TALENTS = [
+  { id:'amara',    name:'Amara Diallo',   cat:'Égérie',              niche:'Mode',        city:'Paris',    dispo:true,  tarif:80000,  photo:'', langues:['Français','Anglais'] },
+  { id:'kofi',     name:'Kofi Mensah',    cat:'Créateur de contenu', niche:'Découverte',  city:'Accra',    dispo:true,  tarif:60000,  photo:'', langues:['Anglais','Français'] },
+  { id:'nia',      name:'Nia Osei',       cat:'Modèle Photo',        niche:'Mode',        city:'Londres',  dispo:true,  tarif:95000,  photo:'', langues:['Anglais'] },
+  { id:'lea',      name:'Léa Traoré',     cat:'Influenceur',         niche:'Beauté',      city:'Dakar',    dispo:false, tarif:45000,  photo:'', langues:['Français','Wolof'] },
+  { id:'tessalimi',name:'Tessalimi',      cat:'Mannequin',           niche:'Mode',        city:'Cotonou',  dispo:true,  tarif:15000,  photo:'', langues:['Français','Fon'] },
+  { id:'abiola',   name:'Abiola',         cat:'Acteur',              niche:'Beauté',      city:'Cotonou',  dispo:true,  tarif:20000,  photo:'', langues:['Français'] },
+  { id:'aichath',  name:'Aïchath',        cat:'Modèle Photo',        niche:'Mode',        city:'Cotonou',  dispo:true,  tarif:18000,  photo:'', langues:['Français','Dendi'] },
+  { id:'danou',    name:'Danou',          cat:'Acteur',              niche:'Découverte',  city:'Cotonou',  dispo:true,  tarif:12000,  photo:'', langues:['Français'] },
+  { id:'safi',     name:'Safi Konaté',    cat:'Égérie',              niche:'Beauté',      city:'Abidjan',  dispo:true,  tarif:35000,  photo:'', langues:['Français','Dioula'] },
+  { id:'momo',     name:'Mohamed Diallo', cat:'Figurant',            niche:'Sport',       city:'Dakar',    dispo:true,  tarif:8000,   photo:'', langues:['Français','Wolof'] },
+  { id:'grace',    name:'Grace Asante',   cat:'Influenceur',         niche:'Nourriture',  city:'Accra',    dispo:false, tarif:40000,  photo:'', langues:['Anglais','Twi'] },
+  { id:'kenzo',    name:'Kenzo Bah',      cat:'Créateur de contenu', niche:'Tech',        city:'Paris',    dispo:true,  tarif:55000,  photo:'', langues:['Français','Anglais'] },
+  { id:'rosette',  name:'Rosette N.',     cat:'Acteur',              niche:'Découverte',  city:'Lomé',     dispo:true,  tarif:14000,  photo:'', langues:['Français','Éwé'] },
+  { id:'fernand',  name:'Fernand Akou',   cat:'Figurant',            niche:'Sport',       city:'Cotonou',  dispo:true,  tarif:9000,   photo:'', langues:['Français','Fon'] },
+  { id:'milena',   name:'Milena Souza',   cat:'Influenceur',         niche:'Mode',        city:'Paris',    dispo:true,  tarif:42000,  photo:'', langues:['Français','Portugais'] },
+  { id:'nega',     name:'Néga',           cat:'Créateur de contenu', niche:'Découverte',  city:'Cotonou',  dispo:true,  tarif:22000,  photo:'', langues:['Français'] },
+  { id:'thibus',   name:'Thibus',         cat:'Acteur',              niche:'Sport',       city:'Cotonou',  dispo:false, tarif:16000,  photo:'', langues:['Français','Fon'] },
+  { id:'adja',     name:'Adja Diallo',    cat:'Mannequin',           niche:'Mode',        city:'Dakar',    dispo:true,  tarif:28000,  photo:'', langues:['Français','Wolof'] },
+  { id:'ibrahim',  name:'Ibrahim Touré',  cat:'Modèle Photo',        niche:'Mode',        city:'Abidjan',  dispo:true,  tarif:25000,  photo:'', langues:['Français','Dioula'] },
+  { id:'chioma',   name:'Chioma Obi',     cat:'Égérie',              niche:'Beauté',      city:'Lagos',    dispo:true,  tarif:70000,  photo:'', langues:['Anglais','Yoruba'] },
+];
+
+const TOTAL = 1571;
+
+function formatTarif(t) {
+  return kaforaFormat(t);
+}
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function renderCard(t) {
+  const photoHTML = t.photo
+    ? `<img src="${t.photo}" alt="${t.name}" loading="lazy" />`
+    : `<div class="talent-card-photo-placeholder">${initials(t.name)}</div>`;
+  const nichesHTML = `<span class="niche-pill">${t.niche}</span>`;
+  return `<a class="talent-card" href="profil.html?creator=${t.id}">
+    <div class="talent-card-photo">
+      ${photoHTML}
+      <span class="dispo-badge ${t.dispo ? 'disponible' : 'indisponible'}">${t.dispo ? 'Disponible' : 'Occupé'}</span>
+    </div>
+    <div class="talent-card-body">
+      <div class="talent-card-name">${t.name}</div>
+      <div class="talent-card-cat">${t.cat}</div>
+      <div class="talent-card-niches">${nichesHTML}</div>
+      <div class="talent-card-meta">
+        <span class="talent-card-city">${t.city}</span>
+        <span class="talent-card-tarif">${formatTarif(t.tarif)}<span style="font-weight:300;font-size:9px;color:var(--ash)">/jour</span></span>
+      </div>
+    </div>
+  </a>`;
+}
+
+function applyFilters() {
+  const q     = document.getElementById('searchInput').value.toLowerCase().trim();
+  const ville = document.getElementById('filterVille').value;
+  const cat   = document.getElementById('filterCat').value;
+  const niche = document.getElementById('filterNiche').value;
+  const dispo = document.getElementById('filterDispo').value;
+
+  const filtered = TALENTS.filter(t => {
+    if (q && !t.name.toLowerCase().includes(q) && !t.cat.toLowerCase().includes(q) && !t.niche.toLowerCase().includes(q)) return false;
+    if (ville && t.city !== ville) return false;
+    if (cat   && t.cat  !== cat)   return false;
+    if (niche && t.niche !== niche) return false;
+    if (dispo !== '' && String(t.dispo) !== dispo) return false;
+    return true;
+  });
+
+  const grid = document.getElementById('castingGrid');
+  const hasFilters = q || ville || cat || niche || dispo;
+  const displayTotal = hasFilters ? filtered.length : TOTAL;
+
+  document.getElementById('resultCount').textContent = displayTotal.toLocaleString('fr-FR');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state">Aucun talent trouvé pour ces critères.</div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(renderCard).join('');
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterVille').value = '';
+  document.getElementById('filterCat').value   = '';
+  document.getElementById('filterNiche').value = '';
+  document.getElementById('filterDispo').value = '';
+  applyFilters();
+}
+
+// ── INIT ──
+function refreshCurrencyAndFilters() { applyFilters(); }
+kaforaCurrencyPicker('currencyPicker', refreshCurrencyAndFilters);
+applyFilters();
+document.getElementById('totalCount').textContent = TOTAL.toLocaleString('fr-FR');
+
+// ── THEME ──
+if (localStorage.getItem('kafora-theme') === 'light') document.body.classList.add('light-theme');
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Sélection partagée</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0A0A0A; --parch: #EAE2D4; --bronze: #B08D57;
+      --ash: #8C8478; --surface: #0d0c0a;
+      --border: rgba(176,141,87,0.10); --muted: rgba(234,226,212,0.35);
+    }
+    body { background: var(--ink); color: var(--parch); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    /* ══ NAV ══ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,10,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 18px;
+      letter-spacing: 0.12em; color: var(--bronze); text-decoration: none;
+    }
+    .nav-badge {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.30em; text-transform: uppercase;
+      color: var(--ink); background: var(--bronze); padding: 3px 10px;
+    }
+
+    /* ══ HERO ══ */
+    .share-hero {
+      padding: 120px 48px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .share-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 400;
+      letter-spacing: 0.36em; text-transform: uppercase; color: var(--bronze);
+      margin-bottom: 16px;
+    }
+    .share-title {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: clamp(32px, 4vw, 56px); color: var(--parch);
+      line-height: 1.0; margin-bottom: 12px;
+    }
+    .share-meta {
+      font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.6;
+    }
+    .share-meta strong { color: rgba(234,226,212,0.65); font-weight: 400; }
+
+    /* ══ GRID ══ */
+    .share-grid {
+      padding: 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    /* ══ CREATOR CARD ══ */
+    .sc-card {
+      background: rgba(234,226,212,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 220ms, transform 220ms;
+    }
+    .sc-card:hover { border-color: rgba(176,141,87,0.30); transform: translateY(-2px); }
+    .sc-card-img {
+      width: 100%; height: 200px; object-fit: cover;
+      background: rgba(234,226,212,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900;
+      color: rgba(176,141,87,0.30);
+    }
+    .sc-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .sc-card-body { padding: 20px; }
+    .sc-card-name {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px;
+      color: var(--parch); margin-bottom: 4px;
+    }
+    .sc-card-disc {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 400;
+      letter-spacing: 0.28em; text-transform: uppercase; color: var(--bronze);
+      margin-bottom: 10px;
+    }
+    .sc-card-meta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .sc-card-meta-item {
+      font-size: 11px; color: var(--muted);
+    }
+    .sc-card-meta-item strong {
+      font-weight: 400; color: rgba(234,226,212,0.65);
+    }
+    .sc-card-tags {
+      margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .sc-tag {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--bronze); background: rgba(176,141,87,0.10);
+      border: 1px solid rgba(176,141,87,0.20); padding: 3px 8px; border-radius: 3px;
+    }
+    .sc-verified {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--bronze); margin-top: 10px;
+    }
+
+    /* ══ EMPTY / ERROR ══ */
+    .share-empty {
+      padding: 120px 48px; text-align: center;
+    }
+    .share-empty-icon { font-size: 48px; margin-bottom: 24px; color: var(--muted); }
+    .share-empty-title {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 28px;
+      color: var(--parch); margin-bottom: 12px;
+    }
+    .share-empty-text { font-size: 14px; color: var(--muted); font-weight: 300; max-width: 400px; margin: 0 auto; line-height: 1.7; }
+
+    /* ══ FOOTER ══ */
+    .share-footer {
+      padding: 40px 48px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      flex-wrap: wrap;
+    }
+    .share-footer-text {
+      font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.6;
+    }
+    .share-footer-cta {
+      display: inline-block;
+      padding: 10px 28px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ink); background: var(--bronze); text-decoration: none;
+      transition: opacity 180ms;
+    }
+    .share-footer-cta:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">KAFORA</a>
+  <span class="nav-badge">Sélection partagée</span>
+</nav>
+
+<!-- ══ CONTENU ══ -->
+<div id="pageContent"></div>
+
+<script>
+// ── Données créateurs (miroir du dashboard) ─────────────────
+const CREATORS = [
+  { id:'amara', name:'Amara Diallo',    disc:'Mode',           city:'Paris',    country:'France',         followers:'48k', verified:true,  photo:'' },
+  { id:'kofi',  name:'Kofi Mensah',     disc:'Art Contemporain',city:'Accra',   country:'Ghana',          followers:'32k', verified:true,  photo:'' },
+  { id:'lea',   name:'Léa Traoré',      disc:'Musique',        city:'Dakar',    country:'Sénégal',        followers:'21k', verified:false, photo:'' },
+  { id:'nia',   name:'Nia Osei',        disc:'Photographie',   city:'Londres',  country:'Royaume-Uni',    followers:'67k', verified:true,  photo:'' },
+  { id:'malik', name:'Malik Touré',     disc:'Cinéma',         city:'Abidjan',  country:'Côte d\'Ivoire', followers:'15k', verified:false, photo:'' },
+  { id:'zara',  name:'Zara Nkosi',      disc:'Danse',          city:'Johannesburg',country:'Afrique du Sud',followers:'29k',verified:true, photo:'' },
+  { id:'issa',  name:'Issa Koné',       disc:'Architecture',   city:'Bamako',   country:'Mali',           followers:'8k',  verified:false, photo:'' },
+  { id:'aisha', name:'Aïsha Mbaye',     disc:'Design',         city:'Bruxelles',country:'Belgique',       followers:'44k', verified:true,  photo:'' },
+  { id:'omar',  name:'Omar Dieng',      disc:'Sculpture',      city:'Montréal', country:'Canada',         followers:'12k', verified:false, photo:'' },
+  { id:'fatou', name:'Fatou Sow',       disc:'Photographie',   city:'Paris',    country:'France',         followers:'38k', verified:true,  photo:'' },
+  { id:'kwame', name:'Kwame Asante',    disc:'Mode',           city:'Londres',  country:'Royaume-Uni',    followers:'55k', verified:true,  photo:'' },
+  { id:'imani', name:'Imani Dlamini',   disc:'Modelling',      city:'Cape Town',country:'Afrique du Sud', followers:'82k', verified:true,  photo:'' },
+];
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+}
+
+// ── Décode le paramètre ?d= ─────────────────────────────────
+function decodeShareData() {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('d');
+  if (!raw) return null;
+  try {
+    return JSON.parse(decodeURIComponent(escape(atob(raw))));
+  } catch(e) {
+    return null;
+  }
+}
+
+// ── Rendu ───────────────────────────────────────────────────
+function render() {
+  const data = decodeShareData();
+  const container = document.getElementById('pageContent');
+
+  if (!data || !Array.isArray(data.ids) || data.ids.length === 0) {
+    container.innerHTML = `
+      <div class="share-empty">
+        <div class="share-empty-icon">⊘</div>
+        <div class="share-empty-title">Lien invalide ou expiré</div>
+        <div class="share-empty-text">Ce lien de sélection est invalide, incomplet ou a été généré avec des données incorrectes. Demandez un nouveau lien à l'équipe qui vous l'a partagé.</div>
+      </div>
+    `;
+    return;
+  }
+
+  const creators = data.ids.map(id => CREATORS.find(c => c.id === id)).filter(Boolean);
+  const sharedBy = data.brand ? escapeHtml(data.brand) : 'une marque partenaire';
+  const sharedAt = data.at ? new Date(data.at).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' }) : '';
+
+  // Tags personnalisés éventuellement inclus dans le payload
+  const tags = data.tags || {};
+
+  let heroHtml = `
+    <div class="share-hero">
+      <div class="share-eyebrow">Sélection exclusive</div>
+      <div class="share-title">
+        ${creators.length} créateur${creators.length > 1 ? 's' : ''}<br>présélectionné${creators.length > 1 ? 's' : ''}
+      </div>
+      <div class="share-meta">
+        Partagé par <strong>${sharedBy}</strong>
+        ${sharedAt ? ` · ${sharedAt}` : ''}
+        · Vue en lecture seule
+      </div>
+    </div>
+  `;
+
+  let cardsHtml = creators.map(c => {
+    const creatorTags = (tags[c.id] || []).map(t => `<span class="sc-tag">${escapeHtml(t)}</span>`).join('');
+    return `
+      <div class="sc-card">
+        <div class="sc-card-img">
+          ${c.photo ? `<img src="${escapeHtml(c.photo)}" alt="${escapeHtml(c.name)}" />` : initials(c.name)}
+        </div>
+        <div class="sc-card-body">
+          <div class="sc-card-name">${escapeHtml(c.name)}</div>
+          <div class="sc-card-disc">${escapeHtml(c.disc)}</div>
+          <div class="sc-card-meta">
+            <div class="sc-card-meta-item"><strong>${escapeHtml(c.city)}</strong></div>
+            <div class="sc-card-meta-item">${escapeHtml(c.followers)} abonnés</div>
+          </div>
+          ${c.verified ? '<div class="sc-verified">✦ Vérifié Kafora</div>' : ''}
+          ${creatorTags ? `<div class="sc-card-tags">${creatorTags}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  let footerHtml = `
+    <div class="share-footer">
+      <div class="share-footer-text">
+        Cette sélection a été constituée sur <strong style="color:rgba(234,226,212,0.65);">Kafora</strong>, le directory de référence<br>
+        des créateurs de la diaspora africaine.
+      </div>
+      <a href="index.html" class="share-footer-cta">Découvrir Kafora</a>
+    </div>
+  `;
+
+  container.innerHTML = heroHtml + `<div class="share-grid">${cardsHtml}</div>` + footerHtml;
+}
+
+render();
+</script>
+</body>
+</html>

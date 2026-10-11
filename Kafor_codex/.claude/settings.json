@@ -1,0 +1,57 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(v1.0.*/**)",
+      "Edit(v1.0.*/**)",
+      "Bash(cp -r *)",
+      "Bash(ls *)",
+      "Bash(grep -n \"window.location.href = ''dashboard.html''\" \"c:\\\\Users\\\\toto\\\\Desktop\\\\MECHHAPIZZAI\\\\RAP\\\\v1.0.26\\\\connexion.html\")",
+      "Bash(grep -n \"TODO\\\\|FIXME\\\\|BUG\\\\|XXX\" /c/Users/toto/Desktop/MECHHAPIZZAI/RAP/v1.0.26/*.html)",
+      "Bash(do)",
+      "Read(//c/Users/toto/Desktop/MECHHAPIZZAI/RAP/**)",
+      "Bash(echo \"$f\")",
+      "Bash(done)",
+      "Read(//dev/**)",
+      "Bash(grep -l \"supabase\" \"c:/Users/toto/Desktop/MECHHAPIZZAI/RAP/v1.0.30/\"*.html)",
+      "Read(//c/Users/toto/Desktop/MECHHAPIZZAI/RAP/v1.0.30/**)",
+      "Bash(python3 -c ':*)",
+      "Bash(python3 \"C:/Users/toto/Desktop/MECHHAPIZZAI/RAP/v2.0.6/write_globe.py\")"
+    ],
+    "deny": [
+      "Write(v1.0.0/**)",
+      "Write(v1.0.1/**)",
+      "Write(v1.0.3/**)",
+      "Write(v1.0.4/**)",
+      "Write(v1.0.5/**)",
+      "Write(v1.0.6/**)",
+      "Write(v1.0.7/**)",
+      "Write(v1.0.8/**)",
+      "Write(v1.0.9/**)",
+      "Write(v1.0.10/**)",
+      "Write(v1.0.11/**)"
+    ]
+  },
+  "project": {
+    "name": "Kafora",
+    "type": "frontend-saas",
+    "currentVersion": "v1.0.37",
+    "language": "fr",
+    "stack": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "designSystem": {
+      "fonts": [
+        "Barlow Condensed"
+      ],
+      "colors": {
+        "deepInk": "#0A0A0A",
+        "parchment": "#EAE2D4",
+        "goldenBronze": "#B08D57",
+        "warmAsh": "#8C8478"
+      }
+    }
+  }
+}

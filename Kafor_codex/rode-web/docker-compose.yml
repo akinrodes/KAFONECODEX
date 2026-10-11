@@ -1,0 +1,95 @@
+
+services:
+
+  # =============================================
+  # FRONTEND - Nuxt.js (Le Hub & l'Annuaire)
+  # =============================================
+  rode-frontend:
+    build:
+      context: ./rode-frontend
+      dockerfile: Dockerfile.dev
+    container_name: rode_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./rode-frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NUXT_PUBLIC_API_BASE_URL=http://localhost:3333
+    depends_on:
+      - rode-backend
+    networks:
+      - rode-network
+
+  # =============================================
+  # BACKEND - AdonisJS (L'API & la Logique Métier)
+  # =============================================
+  rode-backend:
+    build:
+      context: ./rode-backend
+      dockerfile: Dockerfile.dev
+    container_name: rode_backend
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./rode-backend:/app
+      - /app/node_modules
+    env_file:
+      - ./rode-backend/.env
+    depends_on:
+      rode-db:
+        condition: service_healthy
+    networks:
+      - rode-network
+
+  # =============================================
+  # DATABASE - MySQL (Développement Local)
+  # En Production: PlanetScale prend le relais
+  # =============================================
+  rode-db:
+    image: mariadb:10.11
+    platform: linux/amd64
+    container_name: rode_mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-roderootpwd}
+      MARIADB_DATABASE: ${DB_DATABASE:-rode_dev}
+      MARIADB_USER: ${DB_USER:-rode_user}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-rodesecretpwd}
+    volumes:
+      - rode-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-roderootpwd}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rode-network
+
+  # =============================================
+  # DB ADMIN - Adminer (Interface graphique BDD)
+  # Accès via http://localhost:8080
+  # =============================================
+  rode-adminer:
+    image: adminer
+    container_name: rode_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rode-db
+    networks:
+      - rode-network
+
+volumes:
+  rode-db-data:
+    driver: local
+
+networks:
+  rode-network:
+    driver: bridge

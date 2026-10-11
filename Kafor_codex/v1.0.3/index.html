@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Discover The Culture</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    body { overflow: hidden; height: 100vh; }
+
+    /* ══ LAYOUT SPLIT ══════════════════════════════════════ */
+    .hero-split {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* ── LEFT PANEL – papier parcheminé ── */
+    .hero-left {
+      width: 38%;
+      flex-shrink: 0;
+      position: relative;
+      background-color: #D8CEBA;
+      background-image:
+        radial-gradient(ellipse at 0% 0%,   rgba(0,0,0,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 40%,  rgba(245,235,215,0.5) 0%, transparent 65%);
+      overflow: hidden;
+    }
+
+    /* Grain papier */
+    .hero-left::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* Vieillissement bords */
+    .hero-left::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        linear-gradient(to right, rgba(100,80,40,0.08) 0%, transparent 30%),
+        linear-gradient(to bottom, rgba(80,60,30,0.1) 0%, transparent 20%),
+        linear-gradient(to top,    rgba(80,60,30,0.12) 0%, transparent 30%);
+      pointer-events: none;
+    }
+
+    /* ── GHOST SLIDE NUMBER ── */
+    .ghost-num {
+      position: absolute;
+      bottom: 120px;
+      left: -8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(160px, 22vw, 280px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: rgba(180,160,120,0.18);
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 600ms ease;
+    }
+
+    /* ── HERO COPY ── */
+    .hero-copy {
+      position: absolute;
+      bottom: 80px;
+      left: 40px;
+      right: 32px;
+      z-index: 2;
+    }
+    .hero-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(52px, 6.5vw, 100px);
+      line-height: 0.88;
+      letter-spacing: -0.025em;
+      color: #0A0A0A;
+      margin-bottom: 20px;
+    }
+    .hero-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .hero-sub-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.10em;
+      color: #6b5e4a;
+    }
+    .print-tag {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .print-tag span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #8C8478;
+    }
+    .print-underline {
+      display: block;
+      width: 120px;
+      height: 1px;
+      background: #B08D57;
+    }
+
+    /* ── BOTTOM BAR LEFT ── */
+    .hero-bottom {
+      position: absolute;
+      bottom: 32px;
+      left: 40px;
+      right: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2;
+    }
+    .scroll-arrow-btn {
+      color: #6b5e4a;
+      display: flex;
+      animation: nudge 2.2s infinite;
+      background: none; border: none; cursor: pointer; padding: 0;
+    }
+    @keyframes nudge {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(5px); }
+    }
+    .slide-indicators-left {
+      display: flex;
+      gap: 18px;
+    }
+    .s-dot-dark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.10em;
+      color: #B0A090;
+      cursor: pointer;
+      background: none; border: none; padding: 0;
+      transition: color 200ms;
+    }
+    .s-dot-dark.active { color: #0A0A0A; font-weight: 700; }
+
+    /* ── RIGHT PANEL – photo ── */
+    .hero-right {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #0A0A0A;
+    }
+    .hero-img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0;
+      transition: opacity 1000ms ease;
+    }
+    .hero-img.active { opacity: 1; }
+
+    /* Fade gauche : fondu photo → parchment */
+    .hero-fade-left {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 140px;
+      background: linear-gradient(to right, #D8CEBA 0%, transparent 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ── NAV (full width, absolu par-dessus) ── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 26px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+    }
+    .nav-left-group {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .nav-icon-dark {
+      color: rgba(10,10,10,0.5);
+      cursor: pointer;
+      transition: color 200ms;
+      display: flex;
+    }
+    .nav-icon-dark:hover { color: #B08D57; }
+    .nav-logo-dark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: #0A0A0A;
+      text-decoration: none;
+    }
+    .nav-logo-dark:hover { color: #B08D57; }
+    .nav-links-split {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links-split a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    /* Left side of nav (over parchment) */
+    .nav-links-split.light-side a { color: rgba(10,10,10,0.55); }
+    .nav-links-split.light-side a:hover,
+    .nav-links-split.light-side a.active { color: #B08D57; }
+    /* Right side of nav (over photo) */
+    .nav-links-split.dark-side a { color: rgba(255,255,255,0.75); }
+    .nav-links-split.dark-side a:hover,
+    .nav-links-split.dark-side a.active { color: #B08D57; }
+    .nav-icon-right {
+      color: rgba(255,255,255,0.75);
+      cursor: pointer;
+      transition: color 200ms;
+      display: flex;
+    }
+    .nav-icon-right:hover { color: #B08D57; }
+
+    /* ── SOCIAL RAIL (right panel) ── */
+    .social-rail-split {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+    }
+    .social-rail-split-inner {
+      display: flex;
+      gap: 26px;
+      transform: rotate(90deg);
+    }
+    .social-rail-split a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 200ms;
+    }
+    .social-rail-split a:hover { color: #B08D57; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .hero-split { flex-direction: column; }
+      .hero-left { width: 100%; height: 50vh; }
+      .hero-right { height: 50vh; }
+      .hero-copy { left: 24px; right: 16px; bottom: 60px; }
+      .hero-headline { font-size: clamp(40px, 10vw, 64px); }
+      .ghost-num { font-size: 28vw; bottom: 80px; }
+      #navbar { padding: 18px 20px; }
+      .nav-links-split { display: none; }
+      .social-rail-split { display: none; }
+      .hero-fade-left { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <div class="nav-left-group">
+      <span class="nav-icon-dark">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </span>
+      <a href="index.html" class="nav-logo-dark">Kafora</a>
+    </div>
+
+    <ul class="nav-links-split dark-side">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+
+    <a href="premium.html" class="nav-icon-right">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    </a>
+  </nav>
+
+  <!-- SPLIT HERO -->
+  <div class="hero-split">
+
+    <!-- ← GAUCHE : parchment + texte -->
+    <div class="hero-left">
+
+      <div class="ghost-num" id="ghostNum">01</div>
+
+      <div class="hero-copy">
+        <h1 class="hero-headline">Discover<br>The Culture</h1>
+        <div class="hero-sub">
+          <span class="hero-sub-title">Mode · Art · Musique</span>
+          <div class="print-tag">
+            <span>Saison 2025</span>
+            <span class="print-underline"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-bottom">
+        <button class="scroll-arrow-btn" aria-label="Explorer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </button>
+        <div class="slide-indicators-left">
+          <button class="s-dot-dark" data-slide="1">02</button>
+          <button class="s-dot-dark" data-slide="2">03</button>
+          <button class="s-dot-dark" data-slide="3">04</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- → DROITE : photo -->
+    <div class="hero-right">
+
+      <img class="hero-img active"
+           src="file:///E:/AfroPunk/86b4849f724e79786db3ccd0b418a93c.jpg"
+           alt="Kafora — Slide 1" />
+      <img class="hero-img"
+           src="file:///E:/AfroPunk/c78917647cdcb2262e3424b8ec875098.jpg"
+           alt="Kafora — Slide 2" />
+      <img class="hero-img"
+           src="file:///E:/AfroPunk/edbf6e221e7d36de896a033428cf7866.jpg"
+           alt="Kafora — Slide 3" />
+      <img class="hero-img"
+           src="file:///E:/AfroPunk/9d92497c5b2a8e5c2e28a56596a18fb0.jpg"
+           alt="Kafora — Slide 4" />
+
+      <!-- Fondu gauche parchment → photo -->
+      <div class="hero-fade-left"></div>
+
+      <!-- Social rail -->
+      <div class="social-rail-split">
+        <div class="social-rail-split-inner">
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="#">YouTube</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const imgs   = document.querySelectorAll('.hero-img');
+    const dots   = document.querySelectorAll('.s-dot-dark');
+    const ghost  = document.getElementById('ghostNum');
+    const labels = ['01','02','03','04'];
+    let cur = 0;
+
+    function goTo(i) {
+      imgs[cur].classList.remove('active');
+      cur = i;
+      imgs[cur].classList.add('active');
+      ghost.textContent = labels[cur];
+      // update dots (they show next slides, active dot = current)
+      dots.forEach((d, idx) => {
+        d.classList.toggle('active', +d.dataset.slide === cur);
+      });
+    }
+
+    dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.slide)));
+
+    // Auto-advance toutes les 5.5s
+    setInterval(() => goTo((cur + 1) % imgs.length), 5500);
+  </script>
+</body>
+</html>

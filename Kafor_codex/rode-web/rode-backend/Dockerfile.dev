@@ -1,0 +1,22 @@
+# Dockerfile.dev - RØDE Backend (AdonisJS) - Développement
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Installation des dépendances OS nécessaires (pour les modules natifs)
+RUN apk add --no-cache libc6-compat python3 make g++
+
+# Copie des fichiers de dépendances
+COPY package.json package-lock.json* ./
+
+# Installation des dépendances Node (avec tsx pour exécuter TypeScript)
+RUN npm install -g tsx@4.19.2
+RUN npm install --legacy-peer-deps
+
+# Copie du reste du code source
+COPY . .
+
+EXPOSE 3333
+
+# Mode développement AdonisJS avec hot-reload
+CMD ["npm", "run", "dev"]

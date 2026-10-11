@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Plans & Tarifs</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    /* ══ HERO ══ */
+    .pricing-hero {
+      padding: 160px 48px 80px;
+      background: #0A0A0A;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 30% 60%, rgba(176,141,87,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 75% 30%, rgba(176,141,87,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .pricing-hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: #B08D57; margin-bottom: 18px;
+    }
+    .pricing-hero-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(52px, 7vw, 100px);
+      letter-spacing: -0.02em; line-height: 0.92;
+      color: #EAE2D4; margin-bottom: 20px;
+    }
+    .pricing-hero-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.7;
+      color: #8C8478; max-width: 480px; margin: 0 auto;
+    }
+
+    /* ══ SECTION PLANS ══ */
+    .plans-section {
+      padding: 80px 48px 100px;
+      background: #0A0A0A;
+    }
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .plan-card {
+      background: #0d0c0a;
+      border: 1px solid rgba(176,141,87,0.12);
+      border-radius: 14px;
+      padding: 32px 24px;
+      display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+      transition: transform 300ms cubic-bezier(0.34,1.25,0.64,1), box-shadow 300ms ease;
+    }
+    .plan-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.35);
+    }
+    .plan-card.featured {
+      border-color: rgba(176,141,87,0.45);
+      background: #0f0e0b;
+    }
+    .plan-card.featured::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #B08D57, transparent);
+    }
+    .plan-popular {
+      position: absolute; top: 14px; right: 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: #0A0A0A; background: #B08D57;
+      padding: 3px 8px;
+    }
+    .plan-badge {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      padding: 4px 10px; margin-bottom: 16px;
+    }
+    .plan-badge.ash {
+      color: #8C8478;
+      border: 1px solid rgba(140,132,120,0.30);
+      background: rgba(140,132,120,0.06);
+    }
+    .plan-badge.bronze {
+      color: #B08D57;
+      border: 1px solid rgba(176,141,87,0.35);
+      background: rgba(176,141,87,0.08);
+    }
+    .plan-badge.green {
+      color: rgba(120,200,120,0.85);
+      border: 1px solid rgba(120,200,120,0.25);
+      background: rgba(120,200,120,0.06);
+    }
+    .plan-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 26px;
+      letter-spacing: -0.01em;
+      color: #EAE2D4; margin-bottom: 6px; line-height: 1;
+    }
+    .plan-price {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 44px;
+      letter-spacing: -0.02em; color: #EAE2D4;
+      line-height: 1; margin-bottom: 4px;
+    }
+    .plan-period {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: #8C8478; margin-bottom: 24px;
+    }
+    .plan-divider {
+      height: 1px;
+      background: rgba(176,141,87,0.10);
+      margin-bottom: 20px;
+    }
+    .plan-features {
+      list-style: none;
+      flex: 1;
+      display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 28px;
+    }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.5;
+      color: rgba(234,226,212,0.60);
+    }
+    .plan-features li .chk {
+      color: #B08D57; flex-shrink: 0; margin-top: 1px;
+      font-size: 10px; font-weight: 700;
+    }
+    .btn-plan {
+      display: block; width: 100%;
+      padding: 13px 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      text-align: center; cursor: pointer;
+      border-radius: 6px; transition: all 200ms;
+      text-decoration: none;
+    }
+    .btn-plan.outline {
+      background: transparent;
+      border: 1px solid rgba(234,226,212,0.15);
+      color: rgba(234,226,212,0.50);
+    }
+    .btn-plan.outline:hover {
+      border-color: rgba(234,226,212,0.35);
+      color: rgba(234,226,212,0.80);
+    }
+    .btn-plan.bronze-fill {
+      background: #B08D57; border: none;
+      color: #0A0A0A;
+    }
+    .btn-plan.bronze-fill:hover { background: #c9a26a; }
+    .btn-plan.green-fill {
+      background: rgba(120,200,120,0.12);
+      border: 1px solid rgba(120,200,120,0.25);
+      color: rgba(120,200,120,0.90);
+    }
+    .btn-plan.green-fill:hover {
+      background: rgba(120,200,120,0.20);
+    }
+
+    /* ══ SECTION MARQUES ══ */
+    .brands-section {
+      padding: 0 48px 100px;
+      background: #0A0A0A;
+    }
+    .brands-inner {
+      max-width: 1100px; margin: 0 auto;
+    }
+    .brands-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      color: #B08D57; margin-bottom: 20px;
+    }
+    .brand-card {
+      background: #0d0c0a;
+      border: 1px solid rgba(176,141,87,0.20);
+      border-radius: 14px;
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px; align-items: center;
+    }
+    .brand-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 36px;
+      letter-spacing: -0.01em;
+      color: #EAE2D4; margin-bottom: 6px;
+    }
+    .brand-card-price {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 24px;
+      color: #B08D57; margin-bottom: 20px;
+    }
+    .brand-features {
+      list-style: none;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px 32px;
+    }
+    .brand-features li {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 300;
+      letter-spacing: 0.06em;
+      color: rgba(234,226,212,0.60);
+    }
+    .brand-features li .chk { color: #B08D57; font-size: 10px; font-weight: 700; }
+
+    @media (max-width: 960px) {
+      .plans-grid { grid-template-columns: repeat(2, 1fr); }
+      .brand-card { grid-template-columns: 1fr; }
+      .brand-features { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .plans-section, .brands-section { padding-left: 20px; padding-right: 20px; }
+      .pricing-hero { padding: 130px 24px 60px; }
+      .plans-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══ ENHANCEMENTS ÉDITORIAUX ══════════════════════════════ */
+
+    /* Hero grain + ghost text */
+    .pricing-hero { position: relative; }
+    .pricing-hero::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .pricing-hero > * { position: relative; z-index: 1; }
+
+    /* Ghost price behind hero */
+    .pricing-ghost {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(120px, 20vw, 300px);
+      letter-spacing: -0.04em;
+      color: rgba(176,141,87,0.04);
+      pointer-events: none; user-select: none;
+      white-space: nowrap; z-index: 0;
+    }
+
+    /* Plan card grain overlay */
+    .plan-card { position: relative; overflow: hidden; }
+    .plan-card::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .plan-card > * { position: relative; z-index: 1; }
+
+    /* Plan card hover - bronze glow */
+    .plan-card:hover {
+      box-shadow: 0 32px 64px rgba(0,0,0,0.40), 0 0 0 1px rgba(176,141,87,0.20);
+    }
+    .plan-card.featured:hover {
+      box-shadow: 0 32px 64px rgba(0,0,0,0.40), 0 0 0 1px rgba(176,141,87,0.40);
+    }
+
+    /* Section numbering */
+    .plans-section-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: rgba(176,141,87,0.35);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px; max-width: 1100px; margin-left: auto; margin-right: auto;
+    }
+    .plans-section-num::after {
+      content: ''; display: block; width: 40px; height: 1px;
+      background: rgba(176,141,87,0.30);
+    }
+
+    /* Brand card grain */
+    .brand-card { position: relative; overflow: hidden; }
+    .brand-card::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .brand-card > * { position: relative; z-index: 1; }
+
+    /* Ticker between sections */
+    .premium-ticker {
+      overflow: hidden; padding: 10px 0;
+      background: rgba(176,141,87,0.04);
+      border-top: 1px solid rgba(176,141,87,0.10);
+      border-bottom: 1px solid rgba(176,141,87,0.10);
+    }
+    .premium-ticker-track {
+      display: flex; width: max-content;
+      animation: ticker-scroll 30s linear infinite;
+    }
+    .premium-ticker-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: rgba(176,141,87,0.30);
+      padding: 0 28px; white-space: nowrap;
+      display: flex; align-items: center; gap: 28px;
+    }
+    .premium-ticker-item::after { content: '◆'; font-size: 6px; opacity: 0.5; }
+    @keyframes ticker-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── Barcode décoratif en bas de chaque plan-card ── */
+    .plan-barcode {
+      display: flex; gap: 1px; align-items: flex-end;
+      height: 18px; opacity: 0.12; margin-bottom: 16px;
+      margin-top: auto;
+    }
+    .plan-barcode b { display: block; background: #B08D57; }
+
+    /* ── Brand card barcode ── */
+    .brand-barcode {
+      display: flex; gap: 1px; align-items: flex-end;
+      height: 24px; opacity: 0.15;
+      margin-bottom: 24px;
+    }
+    .brand-barcode b { display: block; background: #B08D57; }
+
+    /* ── Feat number as ghost behind card ── */
+    .plan-card:hover .plan-price {
+      background: linear-gradient(135deg, #EAE2D4 0%, #B08D57 55%, #EAE2D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Separateur bronze brand section ── */
+    .brands-eyebrow {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 32px;
+    }
+    .brands-eyebrow::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: #B08D57; flex-shrink: 0;
+    }
+    .brands-eyebrow span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.36em;
+      text-transform: uppercase; color: #B08D57;
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="casting.html">Casting</a></li>
+      <li><a href="missions.html">Missions</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html" class="active">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="connexion.html" class="nav-icon" title="Connexion"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="pricing-hero">
+    <div class="pricing-ghost">PREMIUM</div>
+    <p class="pricing-hero-eyebrow">Plans & Tarifs</p>
+    <h1 class="pricing-hero-headline">Ton profil.<br>Ton business.</h1>
+    <p class="pricing-hero-sub">Choisis le plan qui correspond à ton niveau d'ambition.</p>
+  </section>
+
+  <!-- ══ PLANS ══ -->
+  <section class="plans-section">
+    <div class="plans-section-num">01 — Plans Créateurs</div>
+    <div class="plans-grid">
+
+      <!-- GRATUIT -->
+      <div class="plan-card">
+        <span class="plan-badge ash">Gratuit</span>
+        <div class="plan-name">Free</div>
+        <div class="plan-price">0€</div>
+        <div class="plan-period">Pour toujours</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span>Profil public dans l'annuaire</li>
+          <li><span class="chk">✓</span>1 lien affilié</li>
+          <li><span class="chk">✓</span>Boutique — 3 items</li>
+          <li><span class="chk">✓</span>Portfolio — 6 photos</li>
+          <li><span class="chk">✓</span>Photo de profil</li>
+        </ul>
+        <div class="plan-barcode"><b style="width:1px;height:100%"></b><b style="width:2px;height:60%"></b><b style="width:1px;height:90%"></b><b style="width:3px;height:40%"></b><b style="width:1px;height:80%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:55%"></b><b style="width:1px;height:75%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:45%"></b><b style="width:3px;height:95%"></b><b style="width:1px;height:65%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:50%"></b><b style="width:1px;height:85%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:35%"></b><b style="width:3px;height:70%"></b></div>
+        <a href="inscription.html" class="btn-plan outline">Créer un compte →</a>
+      </div>
+
+      <!-- BOOST -->
+      <div class="plan-card">
+        <span class="plan-badge bronze">Boost</span>
+        <div class="plan-name">Boost</div>
+        <div class="plan-price">5€</div>
+        <div class="plan-period">par mois</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span>Tout le plan Gratuit</li>
+          <li><span class="chk">✓</span>Top résultats de recherche</li>
+          <li><span class="chk">✓</span>Badge "En vedette" sur ta carte</li>
+          <li><span class="chk">✓</span>Apparition en homepage Kafora</li>
+        <a href="#" class="btn-plan outline" onclick="simulatePurchase('boost', 5, 'Abonnement Boost')">Choisir ce plan →</a>
+      </div>
+
+      <!-- VÉRIFIÉ — LE PLUS POPULAIRE -->
+      <div class="plan-card featured">
+        <span class="plan-popular">Le plus populaire</span>
+        <span class="plan-badge bronze">Vérifié</span>
+        <div class="plan-name">Vérifié</div>
+        <div class="plan-price">19€</div>
+        <div class="plan-period">par an</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span>Tout le plan Boost</li>
+          <li><span class="chk">✓</span>Badge ✓ Vérifié sur ton profil</li>
+          <li><span class="chk">✓</span>Accès aux filtres marques</li>
+          <li><span class="chk">✓</span>Lien de contact visible publiquement</li>
+          <li><span class="chk">✓</span>Vérifié par l'équipe Kafora</li>
+        </ul>
+        <div class="plan-barcode"><b style="width:2px;height:100%"></b><b style="width:1px;height:55%"></b><b style="width:1px;height:80%"></b><b style="width:3px;height:40%"></b><b style="width:1px;height:100%"></b><b style="width:2px;height:65%"></b><b style="width:1px;height:90%"></b><b style="width:1px;height:35%"></b><b style="width:2px;height:75%"></b><b style="width:1px;height:100%"></b><b style="width:3px;height:50%"></b><b style="width:1px;height:85%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:45%"></b><b style="width:1px;height:70%"></b><b style="width:2px;height:100%"></b></div>
+        <a href="#" class="btn-plan bronze-fill" onclick="simulatePurchase('verified', 19, 'Badge Vérifié')">Choisir ce plan →</a>
+      </div>
+
+      <!-- PRESS KIT -->
+      <div class="plan-card">
+        <span class="plan-badge green">Press Kit</span>
+        <div class="plan-name">Press Kit</div>
+        <div class="plan-price">9€</div>
+        <div class="plan-period">paiement unique</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span>Export PDF de ton profil en 1 clic</li>
+          <li><span class="chk">✓</span>Mise en page éditorial professionnelle</li>
+          <li><span class="chk">✓</span>Envoyable aux agences et maisons</li>
+          <li><span class="chk">✓</span>Inclut bio, expériences, contacts</li>
+        </ul>
+        <a href="#" class="btn-plan green-fill" onclick="simulatePurchase('presskit', 9, 'Press Kit PDF')">Choisir ce plan →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ TICKER ══ -->
+  <div class="premium-ticker">
+    <div class="premium-ticker-track">
+      <span class="premium-ticker-item">Plan Gratuit</span>
+      <span class="premium-ticker-item">Boost 5€/mois</span>
+      <span class="premium-ticker-item">Press Kit 9€</span>
+      <span class="premium-ticker-item">Vérifié 19€/an</span>
+      <span class="premium-ticker-item">Accès Marque 99€/mois</span>
+      <span class="premium-ticker-item">Plan Gratuit</span>
+      <span class="premium-ticker-item">Boost 5€/mois</span>
+      <span class="premium-ticker-item">Press Kit 9€</span>
+      <span class="premium-ticker-item">Vérifié 19€/an</span>
+      <span class="premium-ticker-item">Accès Marque 99€/mois</span>
+    </div>
+  </div>
+
+  <!-- ══ POUR LES MARQUES ══ -->
+  <section class="brands-section">
+    <div class="brands-inner">
+      <div class="plans-section-num" style="margin-bottom:20px;">02 — Plan Marques B2B</div>
+      <div class="brands-eyebrow"><span>Pour les Marques</span></div>
+      <div class="brand-card">
+        <div>
+          <div class="brand-barcode"><b style="width:2px;height:100%"></b><b style="width:1px;height:60%"></b><b style="width:3px;height:100%"></b><b style="width:1px;height:45%"></b><b style="width:2px;height:85%"></b><b style="width:1px;height:100%"></b><b style="width:1px;height:55%"></b><b style="width:3px;height:75%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:40%"></b><b style="width:1px;height:90%"></b><b style="width:2px;height:65%"></b><b style="width:1px;height:100%"></b><b style="width:3px;height:50%"></b><b style="width:1px;height:80%"></b><b style="width:2px;height:100%"></b><b style="width:1px;height:35%"></b><b style="width:1px;height:70%"></b><b style="width:2px;height:95%"></b><b style="width:1px;height:100%"></b></div>
+          <div class="brand-card-name">Accès Marque</div>
+          <div class="brand-card-price">99€ / mois</div>
+          <ul class="brand-features">
+            <li><span class="chk">✓</span>Contacts complets des créateurs</li>
+            <li><span class="chk">✓</span>Filtres discipline, ville, plan</li>
+            <li><span class="chk">✓</span>Envoi de briefs en direct</li>
+            <li><span class="chk">✓</span>Accès aux créateurs Vérifiés en priorité</li>
+            <li><span class="chk">✓</span>Tableau de bord marque dédié</li>
+            <li><span class="chk">✓</span>Support Kafora prioritaire</li>
+          </ul>
+        </div>
+        <div style="flex-shrink:0;">
+          <a href="#" class="btn-plan bronze-fill" style="min-width:180px;" onclick="simulatePurchase('brand', 99, 'Accès Marque')">Démarrer →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="casting.html">Casting</a></li>
+      <li><a href="missions.html">Missions</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html">Marques</a></li>
+      <li><a href="marques.html">Marques</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+
+    function simulatePurchase(plan, price, name) {
+      if (confirm("Paiement simulé : " + name + " (" + price + "€).\n\nVeux-tu débloquer ce plan localement pour tester les fonctionnalités ?")) {
+        const userStr = localStorage.getItem('kafora-user');
+        let u = userStr ? JSON.parse(userStr) : {};
+        if (!u.email) u = { email: 'demo@kafora.com', firstName: 'Créateur' }; // Au cas où non connecté
+
+        if (plan === 'boost') u.kaforaBoost = true;
+        if (plan === 'verified') u.kaforaVerified = true;
+        if (plan === 'presskit') u.hasPressKit = true;
+        if (plan === 'brand') u.kaforaBrand = true;
+
+        localStorage.setItem('kafora-user', JSON.stringify(u));
+        alert('Succès ! Le plan "' + name + '" a été activé sur ton compte.');
+      }
+    }
+  </script>
+</body>
+</html>

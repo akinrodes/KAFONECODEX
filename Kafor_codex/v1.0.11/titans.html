@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Titans · Espace Recruteur</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    body { background: var(--ink); color: var(--parchment); }
+
+    /* ── HERO SPLIT ── */
+    .titans-hero {
+      position: relative; width: 100vw; height: 100vh;
+      overflow: hidden; display: flex;
+    }
+    .th-left {
+      width: 55%; position: relative; overflow: hidden;
+    }
+    .th-left img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      display: block;
+      filter: brightness(0.7);
+    }
+    .th-left-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, transparent 60%, var(--ink) 100%);
+    }
+    .th-right {
+      width: 45%;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 80px 60px 80px 40px;
+    }
+    .th-right .t-label { margin-bottom: 20px; }
+    .th-right .t-hero { font-size: clamp(52px,6vw,96px); color: var(--parchment); margin-bottom: 24px; }
+    .th-right p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 300; letter-spacing: 0.06em;
+      line-height: 1.6; color: rgba(234,226,212,0.55);
+      max-width: 360px; margin-bottom: 40px;
+    }
+    .th-scroll {
+      position: absolute; bottom: 36px; left: 48px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 0.20em;
+      text-transform: uppercase; color: var(--ash);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ── FEATURES ── */
+    .features-section { padding: 100px 48px; }
+    .features-header { margin-bottom: 64px; }
+    .features-header .t-title { color: var(--parchment); margin-bottom: 12px; }
+    .features-header p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 300;
+      letter-spacing: 0.08em; line-height: 1.7;
+      color: var(--ash); max-width: 560px;
+    }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: #1c1c1c;
+    }
+    .feat-card {
+      background: #0d0d0d; padding: 44px 36px;
+      position: relative; overflow: hidden;
+      transition: background 300ms;
+    }
+    .feat-card:hover { background: #111; }
+    .feat-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: transparent;
+      transition: background 300ms;
+    }
+    .feat-card:hover::before { background: var(--bronze); }
+    .feat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 40px; font-weight: 900;
+      letter-spacing: -0.02em; color: #1c1c1c;
+      margin-bottom: 24px; line-height: 1;
+    }
+    .feat-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 20px;
+      letter-spacing: 0.02em; text-transform: uppercase;
+      color: var(--parchment); margin-bottom: 14px;
+    }
+    .feat-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.7;
+      color: var(--ash);
+    }
+
+    /* ── FILTER DEMO ── */
+    .filter-demo { padding: 0 48px 100px; }
+    .fd-box {
+      border: 1px solid #1c1c1c; padding: 52px;
+      background: #080808;
+    }
+    .fd-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 28px;
+      letter-spacing: -0.01em; color: var(--parchment);
+      margin-bottom: 36px;
+    }
+    .fd-filters {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 36px;
+    }
+    .fd-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ash);
+      border: 1px solid #2a2a2a; padding: 8px 18px;
+      cursor: pointer; transition: all 200ms;
+    }
+    .fd-tag.on { border-color: var(--bronze); color: var(--bronze); }
+    .fd-result {
+      border-top: 1px solid #1c1c1c; padding-top: 28px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .fd-count {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 48px;
+      letter-spacing: -0.02em; color: var(--parchment); line-height: 1;
+    }
+    .fd-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); margin-top: 4px; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 100px 48px;
+      background: var(--bronze);
+      text-align: center;
+    }
+    .cta-section .t-title { color: var(--void); margin-bottom: 16px; }
+    .cta-section p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.7); max-width: 460px;
+      margin: 0 auto 40px;
+    }
+
+    @media (max-width: 900px) {
+      .titans-hero { flex-direction: column; height: auto; min-height: 100vh; }
+      .th-left { width: 100%; height: 50vh; }
+      .th-right { width: 100%; padding: 48px 24px; }
+      .features-section, .filter-demo { padding-left: 24px; padding-right: 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .fd-box { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html" class="active">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="premium.html" class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- HERO SPLIT -->
+  <section class="titans-hero">
+    <div class="th-left">
+      <img src="file:///E:/AfroPunk/356f83e624463718441e198751f18719.jpg" alt="Titans Kafora" />
+      <div class="th-left-over"></div>
+    </div>
+    <div class="th-right">
+      <span class="t-label">Espace Recruteur</span>
+      <h1 class="t-hero">Les<br>Titans</h1>
+      <p>Accédez au premier annuaire de créateurs afro-diasporiques au monde. Sourcing ultra-précis, données vérifiées, contacts directs.</p>
+      <a href="#acces" class="btn btn-bronze">Demander l'accès</a>
+    </div>
+    <div class="th-scroll">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      <span>Découvrir</span>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section">
+    <div class="features-header">
+      <h2 class="t-title">Ce que vous obtenez</h2>
+      <p>Un accès privé à la base de données la plus complète de créateurs de la diaspora africaine — vérifiés, curatés, actifs.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-num">01</div>
+        <div class="feat-title">Filtres Ultra-Granulaires</div>
+        <div class="feat-desc">Recherchez par discipline, localisation, taille d'audience, spécialité (ex. Haute Couture), disponibilité et bien plus.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">02</div>
+        <div class="feat-title">Profils Vérifiés</div>
+        <div class="feat-desc">Chaque créateur Premium est curaté manuellement par l'équipe Kafora. Portfolio, expériences et stats d'audience vérifiés.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">03</div>
+        <div class="feat-title">Analytics de Sourcing</div>
+        <div class="feat-desc">Dashboard privé : suivez vos recherches, sauvegardez des profils, mesurez l'impact de vos collaborations Kafora.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">04</div>
+        <div class="feat-title">Contact Direct</div>
+        <div class="feat-desc">Envoyez des briefs directement aux créateurs depuis votre dashboard. Pas d'intermédiaires, pas d'agences.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">05</div>
+        <div class="feat-title">Visibilité Premium</div>
+        <div class="feat-desc">Achetez des espaces de mise en avant sur le Hub Kafora pour toucher directement la communauté créative.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">06</div>
+        <div class="feat-title">Accès Événements</div>
+        <div class="feat-desc">Places VIP aux événements Kafora pour rencontrer les créateurs en personne et consolider vos partenariats.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTER DEMO -->
+  <section class="filter-demo" id="acces">
+    <div class="fd-box">
+      <div class="fd-title">Exemple de recherche Titans</div>
+      <div class="fd-filters">
+        <span class="fd-tag on">Mode</span>
+        <span class="fd-tag on">Paris</span>
+        <span class="fd-tag on">Haute Couture</span>
+        <span class="fd-tag">Instagram &gt;10k</span>
+        <span class="fd-tag on">Premium vérifié</span>
+        <span class="fd-tag">Disponible casting</span>
+        <span class="fd-tag">Vidéo / Reels</span>
+      </div>
+      <div class="fd-result">
+        <div>
+          <div class="fd-count">47</div>
+          <div class="fd-label">Créateurs correspondants</div>
+        </div>
+        <a href="#" class="btn btn-bronze">Accéder aux profils →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2 class="t-title">Rejoindre l'espace Titans</h2>
+    <p>Accès sur dossier uniquement. Réservé aux marques, agences et recruteurs sérieux.</p>
+    <a href="mailto:titans@rode.world" class="btn btn-primary">Soumettre votre dossier</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+    document.querySelectorAll('.fd-tag').forEach(t => {
+      t.addEventListener('click', function() { this.classList.toggle('on'); });
+    });
+  </script>
+</body>
+</html>

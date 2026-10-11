@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafora — Profile Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Barlow:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Barlow', 'sans-serif'], condensed: ['"Barlow Condensed"', 'sans-serif'] }, colors: { brand: { gold: '#B08D57', dark: '#0A0A0A', cream: '#EAE2D4' } } } }
+    }
+  </script>
+  <style>
+    body { background-color: theme('colors.brand.dark'); color: theme('colors.brand.cream'); overflow-x: hidden; cursor: none; }
+    a, button { cursor: none; }
+    .blind-mask { -webkit-mask-image: repeating-linear-gradient(to right, black 0px, black 6px, transparent 6px, transparent 12px); mask-image: repeating-linear-gradient(to right, black 0px, black 6px, transparent 6px, transparent 12px); }
+    @keyframes shift-mask { 0% { -webkit-mask-position: 0 0; mask-position: 0 0; } 100% { -webkit-mask-position: 12px 0; mask-position: 12px 0; } }
+    .blind-mask-animated { animation: shift-mask 10s linear infinite; }
+    #custom-cursor, #custom-cursor-dot { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 50; mix-blend-mode: difference; }
+    #custom-cursor { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #B08D57; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
+    #custom-cursor-dot { width: 8px; height: 8px; border-radius: 50%; background: #B08D57; transform: translate(-50%, -50%); }
+    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0A0A0A; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #B08D57; }
+    .reveal-up { opacity: 0; transform: translateY(50px); }
+  </style>
+</head>
+<body class="min-h-screen relative text-brand-cream selection:bg-brand-gold selection:text-black">
+  <!-- Custom Cursor -->
+  <div id="custom-cursor" class="hidden md:block"></div>
+  <div id="custom-cursor-dot" class="hidden md:block"></div>
+  <!-- Nav -->
+  <nav class="fixed top-0 left-0 w-full p-6 md:p-8 flex justify-between items-center z-40 mix-blend-difference">
+    <a href="createurs.html" class="text-2xl font-condensed font-black tracking-tighter uppercase cursor-pointer hover:text-brand-gold transition">Kafora<span class="text-brand-gold">.</span></a>
+    <button id="menu-btn" class="p-2 focus:outline-none hover:text-brand-gold transition-colors"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+  </nav>
+  <!-- Menu -->
+  <div id="menu-overlay" class="fixed inset-0 bg-brand-dark z-30 flex flex-col justify-center items-center invisible" style="clip-path: circle(0% at 100% 0);">
+    <ul class="text-center space-y-8 text-5xl md:text-8xl font-condensed font-black tracking-tighter uppercase">
+      <li class="menu-item opacity-0 translate-y-10"><a href="#home" class="hover:text-brand-gold transition-colors block">Home</a></li>
+      <li class="menu-item opacity-0 translate-y-10"><a href="#work" class="hover:text-brand-gold transition-colors block">Portfolio</a></li>
+      <li class="menu-item opacity-0 translate-y-10"><a href="#about" class="hover:text-brand-gold transition-colors block">About</a></li>
+      <li class="menu-item opacity-0 translate-y-10"><a href="createurs.html" class="hover:text-brand-gold transition-colors block">Back to grid</a></li>
+    </ul>
+  </div>
+  <!-- Hero -->
+  <section id="home" class="relative h-screen w-full flex items-center justify-center overflow-hidden bg-brand-dark">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#B08D57] to-[#5a482d] opacity-50"></div>
+    <div class="absolute inset-0 flex items-center justify-center">
+       <div id="hero-img" class="w-full h-full bg-cover bg-center blind-mask blind-mask-animated grayscale contrast-[1.2] brightness-75 mix-blend-multiply transition-all duration-[2s]"></div>
+       <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(to right, rgba(0,0,0,0.85) 0px, rgba(0,0,0,0.85) 6px, transparent 6px, transparent 12px);"></div>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent opacity-90"></div>
+    <div class="absolute bottom-12 md:bottom-24 left-6 md:left-12 mix-blend-difference z-10">
+      <h1 class="text-6xl md:text-[8rem] font-condensed font-black tracking-tighter uppercase leading-[0.85] text-white">
+        <span id="h-line1" class="block opacity-0 translate-y-20">Creative</span>
+        <span id="h-line2" class="block opacity-0 translate-y-20 text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-[#e8c081]">Direction</span>
+      </h1>
+      <p id="h-desc" class="mt-6 text-lg md:text-2xl max-w-lg font-light tracking-wide text-gray-300 opacity-0">Digital art portfolio. Exploring the boundaries of perception through light, shadow and culture.</p>
+    </div>
+    <div id="h-scroll" class="absolute bottom-12 right-6 md:right-12 flex flex-col items-center gap-2 mix-blend-difference opacity-0">
+      <span class="text-xs uppercase tracking-widest font-condensed rotate-90 mb-8">Scroll</span>
+      <div class="w-px h-16 bg-gray-600 relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1/2 bg-brand-gold scroll-dot"></div></div>
+    </div>
+  </section>
+  <!-- Work -->
+  <section id="work" class="py-24 md:py-32 px-6 md:px-12 bg-brand-dark relative z-10">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 md:mb-24 gap-6">
+      <h2 class="text-5xl md:text-8xl font-condensed font-black tracking-tighter uppercase leading-none reveal-up">Selected<br/>Work</h2>
+    </div>
+    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16"></div>
+  </section>
+  <!-- About -->
+  <section id="about" class="py-32 bg-brand-gold text-brand-dark overflow-hidden flex flex-col items-center justify-center relative z-10">
+    <div class="w-full relative flex overflow-x-hidden">
+      <div id="marquee-text" class="whitespace-nowrap flex text-7xl md:text-[12rem] font-condensed font-black uppercase tracking-tighter leading-none">
+        <span class="mx-8 marquee-part">LET'S CREATE SOMETHING</span><span class="mx-8 text-transparent marquee-part" style="-webkit-text-stroke: 2px #0A0A0A;">ARTIST</span>
+        <span class="mx-8 marquee-part">LET'S CREATE SOMETHING</span><span class="mx-8 text-transparent marquee-part" style="-webkit-text-stroke: 2px #0A0A0A;">ARTIST</span>
+      </div>
+    </div>
+    <div class="mt-24 text-center px-6 reveal-up">
+      <p id="artist-bio" class="text-2xl md:text-4xl font-sans font-medium max-w-4xl mx-auto leading-tight"></p>
+    </div>
+  </section>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+    const MOCK_DATA = {
+      amara: { id: 'amara', name: "Amara Diallo", city: "Paris", discipline: "Direction Artistique", style: "Mode", heroImage: "file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg", bio: "Directrice artistique basée à Paris.", projects: [{id:1, title:'NEON DREAMS', category:'Photo', image:'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1470&auto=format&fit=crop'}] },
+      kofi: { id: 'kofi', name: "Kofi Mensah", city: "NYC", discipline: "Art Contemporain", style: "Sculpture/Digital", heroImage: "file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg", bio: "Sculpteur digital.", projects: [{id:1, title:'THE ANCESTOR', category:'3D', image:'https://images.unsplash.com/photo-1544256718-3b6102ddf82e?q=80&w=1470&auto=format&fit=crop'}] }
+    };
+    const defaultData = MOCK_DATA['amara']; // Simplifié pour la sauvegarde
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const creatorId = params.get('creator') || 'amara';
+      let data;
+      
+      if (creatorId === 'me') {
+        const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+        const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+        const fn = p.fn || u.firstName || 'Ton';
+        const ln = p.ln || u.lastName || 'Nom';
+        data = {
+          name: fn + ' ' + ln,
+          city: p.city || 'Ville inconnue',
+          discipline: (p.discs && p.discs.length > 0) ? p.discs[0] : 'Créatif',
+          style: (p.discs && p.discs.length > 1) ? p.discs[1] : 'Kafora',
+          heroImage: p.photo || defaultData.heroImage,
+          bio: p.bio || 'Aucune biographie renseignée.',
+          projects: []
+        };
+        // Optionnel : adapter les couleurs Cursor/Bordures si l'utilisateur a changé l'accent dans l'espace builder
+        if(p.accentColor) {
+          setTimeout(() => {
+            document.getElementById('custom-cursor').style.borderColor = p.accentColor;
+            document.getElementById('custom-cursor-dot').style.background = p.accentColor;
+            document.querySelectorAll('.blind-mask').forEach(el=> el.style.backgroundColor = p.accentColor);
+            document.getElementById('h-line2').className = `block opacity-0 translate-y-20 text-transparent bg-clip-text`;
+            document.getElementById('h-line2').style.backgroundImage = `linear-gradient(to right, ${p.accentColor}, #e8c081)`;
+          }, 100);
+        }
+      } else {
+        data = MOCK_DATA[creatorId.toLowerCase()] || defaultData;
+      }
+
+      document.getElementById('hero-img').style.backgroundImage = `url('${data.heroImage}')`;
+      document.getElementById('h-line1').innerText = data.discipline;
+      document.getElementById('h-line2').innerText = data.style;
+      document.getElementById('h-desc').innerText = data.bio;
+      document.getElementById('artist-bio').innerText = data.bio;
+      
+      const mp = document.querySelectorAll('.marquee-part');
+      mp[0].innerText = data.name.toUpperCase(); mp[1].innerText = data.city.toUpperCase();
+      mp[2].innerText = data.name.toUpperCase(); mp[3].innerText = data.city.toUpperCase();
+
+      const grid = document.getElementById('projects-grid');
+      data.projects.forEach((proj, idx) => {
+        grid.insertAdjacentHTML('beforeend', `<div class="group cursor-pointer reveal-up"><div class="relative overflow-hidden aspect-[4/5] mb-6"><div class="absolute inset-0 bg-cover bg-center transition-transform hover:scale-110" style="background-image:url('${proj.image}')"></div></div><h3 class="text-3xl font-condensed font-black">${proj.title}</h3></div>`);
+      });
+
+      gsap.to('#h-line1', { y: 0, opacity: 1, duration: 1 }); gsap.to('#h-line2', { y: 0, opacity: 1, duration: 1, delay: 0.2 });
+      gsap.to('#h-desc', { opacity: 1, duration: 1, delay: 0.5 }); gsap.to('#h-scroll', { opacity: 1, delay: 0.8 });
+      gsap.to('.scroll-dot', { y: 64, repeat: -1, duration: 1.5 });
+      gsap.to("#marquee-text", { x: "-50%", ease: "linear", duration: 15, repeat: -1 });
+      document.querySelectorAll('.reveal-up').forEach(el => gsap.to(el, { y: 0, opacity: 1, scrollTrigger: { trigger: el, start: "top 85%" } }));
+      
+      const cursor = document.getElementById('custom-cursor'), dot = document.getElementById('custom-cursor-dot');
+      window.addEventListener('mousemove', e => { gsap.to(dot, {x:e.clientX, y:e.clientY, duration:0.1}); gsap.to(cursor, {x:e.clientX, y:e.clientY, duration:0.5}); });
+    });
+  </script>
+</body>
+</html>

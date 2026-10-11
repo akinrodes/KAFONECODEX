@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Premium · Rejoindre l'élite</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    /* ── HERO FULL ── */
+    .prem-hero {
+      position: relative; width: 100vw; height: 100vh;
+      overflow: hidden; background: var(--ink);
+    }
+    .prem-hero img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 20%;
+      display: block;
+    }
+    .prem-hero-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right,
+        rgba(10,10,10,0.9) 0%,
+        rgba(10,10,10,0.5) 50%,
+        transparent 100%
+      );
+    }
+    .prem-hero-copy {
+      position: absolute; top: 50%; left: 48px;
+      transform: translateY(-50%);
+    }
+    .prem-hero-copy .t-hero { font-size: clamp(60px,8vw,130px); margin: 20px 0 28px; }
+    .prem-hero-copy p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 300; letter-spacing: 0.08em; line-height: 1.7;
+      color: rgba(255,255,255,0.5); max-width: 420px; margin-bottom: 40px;
+    }
+
+    /* ── PRICING SECTION ── */
+    .pricing-section { padding: 100px 48px; background: var(--parchment); }
+    .pricing-header { text-align: center; margin-bottom: 64px; }
+    .pricing-header .t-title { margin-bottom: 14px; }
+    .pricing-header p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 300; letter-spacing: 0.08em;
+      color: var(--ash); max-width: 440px; margin: 0 auto;
+    }
+
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(2,1fr);
+      gap: 1px; background: var(--dust);
+      max-width: 860px; margin: 0 auto;
+    }
+    .price-card {
+      background: var(--cream); padding: 48px 40px;
+      position: relative;
+    }
+    .price-card.featured {
+      background: var(--ink);
+    }
+    .price-tier {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 400; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 16px;
+    }
+    .price-card.featured .price-tier { color: var(--bronze); }
+    .price-amount {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 64px;
+      letter-spacing: -0.025em; color: var(--ink); line-height: 1;
+      margin-bottom: 6px;
+    }
+    .price-card.featured .price-amount { color: var(--parchment); }
+    .price-period {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 36px;
+    }
+    .price-features { list-style: none; margin-bottom: 44px; }
+    .price-features li {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.06em; color: var(--ash);
+      padding: 10px 0; border-bottom: 1px solid var(--dust);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .price-card.featured .price-features li {
+      color: rgba(234,226,212,0.6);
+      border-bottom-color: #1c1c1c;
+    }
+    .price-features li.on { color: var(--ink); font-weight: 400; }
+    .price-card.featured .price-features li.on { color: var(--parchment); font-weight: 400; }
+    .check { color: var(--bronze); flex-shrink: 0; }
+    .cross { color: var(--dust); flex-shrink: 0; }
+    .price-card.featured .cross { color: #2e2e2e; }
+
+    /* ── FEATURES VISUAL ── */
+    .features-visual {
+      padding: 100px 48px; background: var(--ink);
+    }
+    .fv-header { margin-bottom: 60px; }
+    .fv-header .t-title { color: var(--parchment); margin-bottom: 12px; }
+    .fv-header p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; letter-spacing: 0.08em; line-height: 1.7;
+      color: var(--ash); max-width: 500px;
+    }
+    .fv-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: #1c1c1c; }
+    .fv-card {
+      background: #080808; padding: 44px 32px;
+    }
+    .fv-icon {
+      width: 40px; height: 40px;
+      border: 1px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px; color: var(--bronze);
+    }
+    .fv-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 16px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--parchment); margin-bottom: 12px;
+    }
+    .fv-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.7; color: var(--ash);
+    }
+
+    /* ── ONBOARDING ── */
+    .onboard-section { padding: 100px 48px; background: var(--parchment); }
+    .ob-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--dust); }
+    .ob-step { background: var(--cream); padding: 36px 28px; }
+    .ob-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 48px; font-weight: 900;
+      letter-spacing: -0.02em; color: var(--dust); margin-bottom: 20px; line-height: 1;
+    }
+    .ob-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 16px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--ink); margin-bottom: 10px;
+    }
+    .ob-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.7; color: var(--ash);
+    }
+
+    @media (max-width: 900px) {
+      .prem-hero-copy { left: 24px; right: 24px; top: auto; bottom: 60px; transform: none; }
+      .pricing-section, .features-visual, .onboard-section { padding-left: 24px; padding-right: 24px; }
+      .pricing-grid, .fv-grid, .ob-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html" class="active">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="#pricing" class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="prem-hero">
+    <img src="file:///E:/AfroPunk/62650066f30ffc98f0935082f8188fb8.jpg" alt="Kafora Premium" />
+    <div class="prem-hero-over"></div>
+    <div class="social-rail"><div class="social-rail-inner"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a></div></div>
+    <div class="prem-hero-copy">
+      <span class="t-label light">Créateur Kafora</span>
+      <h1 class="t-hero">Rejoindre<br>l'élite</h1>
+      <p>Ton portfolio interactif, ta vitrine mondiale, ton accès à la culture. Gratuit pour commencer — irrésistible en Premium.</p>
+      <a href="#pricing" class="btn btn-bronze">Voir les offres</a>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-header">
+      <h2 class="t-title">Choisissez votre niveau</h2>
+      <p>Commencez gratuitement. Passez Premium quand vous êtes prêt.</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- FREE -->
+      <div class="price-card">
+        <div class="price-tier">Gratuit</div>
+        <div class="price-amount">0€</div>
+        <div class="price-period">Pour toujours</div>
+        <ul class="price-features">
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Profil public dans l'annuaire</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>3 liens externes</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Photo de profil</li>
+          <li><span class="cross"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Portfolio complet</li>
+          <li><span class="cross"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Analytics profil</li>
+          <li><span class="cross"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Module Affiliation</li>
+          <li><span class="cross"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Pass Événementiel QR</li>
+          <li><span class="cross"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Mise en avant Hub Kafora</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;text-align:center;">Créer un compte</a>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="price-card featured">
+        <div class="price-tier" style="display:flex;align-items:center;gap:10px;">
+          Premium <span class="pill solid" style="font-size:9px;">Recommandé</span>
+        </div>
+        <div class="price-amount">9€</div>
+        <div class="price-period">par mois — sans engagement</div>
+        <ul class="price-features">
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Profil public premium (badge vérifié)</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Liens illimités</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Portfolio drag & drop complet</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Analytics (vues, clics, conversions)</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Module Affiliation + Tracking</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Pass Événementiel QR (−20% partout)</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Mise en avant carrousels Kafora</li>
+          <li class="on"><span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>Visible par les Titans (recruteurs)</li>
+        </ul>
+        <a href="#" class="btn btn-bronze" style="width:100%;text-align:center;">Passer Premium — 9€/mois</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES VISUAL -->
+  <section class="features-visual">
+    <div class="fv-header">
+      <h2 class="t-title" style="color:var(--parchment);">Votre espace Premium</h2>
+      <p>Tout ce dont un créateur sérieux a besoin, en un seul endroit.</p>
+    </div>
+    <div class="fv-grid">
+      <div class="fv-card">
+        <div class="fv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+        <div class="fv-title">Portfolio Drag & Drop</div>
+        <div class="fv-desc">Construisez votre CV interactif en quelques clics. Blocs texte, liens, vidéos, photos.</div>
+      </div>
+      <div class="fv-card">
+        <div class="fv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="fv-title">Analytics Temps Réel</div>
+        <div class="fv-desc">Combien de vues, de clics, de contacts recruteurs ce mois-ci. Données claires, actionnables.</div>
+      </div>
+      <div class="fv-card">
+        <div class="fv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="fv-title">Module Affiliation</div>
+        <div class="fv-desc">Monétisez vos redirections. Collez votre lien affilié ou synchronisez avec Kafora Pay.</div>
+      </div>
+      <div class="fv-card">
+        <div class="fv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="0"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <div class="fv-title">Expériences & CV</div>
+        <div class="fv-desc">Ajoutez des lignes de CV type LinkedIn : marques, collaborations, shows, résidences.</div>
+      </div>
+      <div class="fv-card">
+        <div class="fv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="0"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="fv-title">Pass Événementiel QR</div>
+        <div class="fv-desc">Un QR code membre unique. Présentez-le à l'entrée des événements partenaires pour vos avantages.</div>
+      </div>
+      <div class="fv-card">
+        <div class="fv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/></svg></div>
+        <div class="fv-title">Visible par les Titans</div>
+        <div class="fv-desc">Votre profil apparaît dans les recherches des recruteurs et marques partenaires Kafora.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONBOARDING STEPS -->
+  <section class="onboard-section">
+    <div style="margin-bottom:52px;text-align:center;">
+      <h2 class="t-title">Démarrer en 4 étapes</h2>
+    </div>
+    <div class="ob-grid">
+      <div class="ob-step">
+        <div class="ob-num">01</div>
+        <div class="ob-title">Créer votre compte</div>
+        <div class="ob-desc">Via Google, Instagram ou e-mail. 30 secondes, aucune CB requise pour commencer.</div>
+      </div>
+      <div class="ob-step">
+        <div class="ob-num">02</div>
+        <div class="ob-title">Construire votre profil</div>
+        <div class="ob-desc">Photo, discipline, localisation, bio. L'IA Kafora vous guide pas à pas.</div>
+      </div>
+      <div class="ob-step">
+        <div class="ob-num">03</div>
+        <div class="ob-title">Passer Premium</div>
+        <div class="ob-desc">9€/mois via Lemon Squeezy. Paiement sécurisé, annulable à tout moment.</div>
+      </div>
+      <div class="ob-step">
+        <div class="ob-num">04</div>
+        <div class="ob-title">Être découvert</div>
+        <div class="ob-desc">Votre profil est visible par des milliers de visiteurs et recruteurs dès la publication.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+  </script>
+</body>
+</html>

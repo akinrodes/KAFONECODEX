@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RØDE — Annuaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            parchment:  '#EAE2D4',
+            cream:      '#F5F0E8',
+            ink:        '#0A0A0A',
+            ash:        '#8C8478',
+            bronze:     '#B08D57',
+            dust:       '#D6CCBC',
+            void:       '#FFFFFF',
+          },
+          fontFamily: {
+            condensed: ['"Barlow Condensed"', 'sans-serif'],
+            sans:      ['Barlow', 'sans-serif'],
+            serif:     ['"DM Serif Display"', 'serif'],
+          },
+          letterSpacing: {
+            widest2: '0.25em',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: #EAE2D4;
+      color: #0A0A0A;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 400ms ease;
+    }
+    #navbar.scrolled {
+      background: #EAE2D4;
+      border-bottom: 1px solid #D6CCBC;
+    }
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      text-decoration: none;
+      transition: color 400ms;
+    }
+    #navbar.scrolled .nav-logo { color: #0A0A0A; }
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .nav-links a:hover { color: #B08D57; }
+    #navbar.scrolled .nav-links a { color: #0A0A0A; }
+    #navbar.scrolled .nav-links a:hover { color: #B08D57; }
+    .nav-icons { display: flex; gap: 20px; align-items: center; }
+    .nav-icon {
+      color: rgba(255,255,255,0.85);
+      cursor: pointer;
+      transition: color 200ms;
+    }
+    .nav-icon:hover { color: #B08D57; }
+    #navbar.scrolled .nav-icon { color: #0A0A0A; }
+    #navbar.scrolled .nav-icon:hover { color: #B08D57; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #0f0c09;
+    }
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center top;
+      opacity: 0;
+      transition: opacity 1000ms ease;
+    }
+    .hero-slide.active { opacity: 1; }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(10,10,10,0.85) 0%,
+        rgba(10,10,10,0.3) 40%,
+        transparent 70%
+      );
+    }
+
+    /* Social rail */
+    .social-rail {
+      position: absolute;
+      right: -32px;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      display: flex;
+      gap: 28px;
+      transform-origin: center center;
+    }
+    .social-rail a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8C8478;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 200ms;
+    }
+    .social-rail a:hover { color: #B08D57; }
+
+    /* Hero text */
+    .hero-content {
+      position: absolute;
+      bottom: 80px;
+      left: 40px;
+      right: 120px;
+    }
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .hero-eyebrow span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    .pill {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #B08D57;
+      border: 1px solid #B08D57;
+      border-radius: 999px;
+      padding: 3px 12px;
+    }
+    .hero-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(72px, 10vw, 160px);
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      text-transform: none;
+    }
+
+    /* Slide indicators */
+    .slide-indicators {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+    }
+    .slide-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: #D6CCBC;
+      cursor: pointer;
+      transition: color 200ms;
+    }
+    .slide-num.active { color: #FFFFFF; }
+
+    /* Scroll arrow */
+    .scroll-arrow {
+      position: absolute;
+      bottom: 36px;
+      left: 40px;
+      color: rgba(255,255,255,0.4);
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #8C8478;
+    }
+
+    /* ── CREATOR CARDS ── */
+    .creator-card {
+      flex: 0 0 260px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .creator-card-img {
+      width: 260px;
+      height: 347px; /* 3:4 ratio */
+      background: #2a2218;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+      transition: border-color 300ms ease;
+    }
+    .creator-card:hover .creator-card-img {
+      border-color: #B08D57;
+    }
+    .creator-card-img-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(160deg, #3d2e1a 0%, #1a1510 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .creator-card-info {
+      padding: 12px 0 0;
+    }
+    .creator-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #0A0A0A;
+    }
+    .creator-card-tag {
+      margin-top: 6px;
+    }
+
+    /* ── HORIZONTAL SCROLL ── */
+    .h-scroll {
+      display: flex;
+      gap: 1px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 4px;
+    }
+    .h-scroll::-webkit-scrollbar { display: none; }
+
+    /* ── EVENT CARDS ── */
+    .event-card {
+      flex: 0 0 320px;
+      border: 1px solid #1e1e1e;
+      padding: 32px 28px;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 300ms ease;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+    .event-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,10,0.78);
+      z-index: 0;
+    }
+    .event-card > * { position: relative; z-index: 1; }
+    .event-card:hover { border-color: #B08D57; }
+    .event-date {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #8C8478;
+    }
+    .event-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 28px;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      color: #EAE2D4;
+      margin: 12px 0 8px;
+    }
+    .event-city {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #8C8478;
+    }
+    .event-pill {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #B08D57;
+      border: 1px solid #B08D57;
+      border-radius: 999px;
+      padding: 3px 12px;
+      margin-top: 20px;
+    }
+    .event-arrow {
+      position: absolute;
+      bottom: 28px;
+      right: 28px;
+      color: #8C8478;
+      transition: color 200ms, transform 200ms;
+    }
+    .event-card:hover .event-arrow {
+      color: #B08D57;
+      transform: translate(3px, -3px);
+    }
+
+    /* ── CONTACT SHEET GRID ── */
+    .contact-sheet {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #D6CCBC;
+    }
+    .sheet-tile {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: #1a1510;
+    }
+    .sheet-tile-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: linear-gradient(160deg, #2a2018 0%, #0f0c09 100%);
+      transition: transform 600ms ease;
+    }
+    .sheet-tile:nth-child(2) .sheet-tile-img { aspect-ratio: 3/2; }
+    .sheet-tile:nth-child(5) .sheet-tile-img { aspect-ratio: 3/2; }
+    .sheet-tile:hover .sheet-tile-img { transform: scale(1.03); }
+    .sheet-tile-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,10,0);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+      transition: background 300ms ease;
+    }
+    .sheet-tile:hover .sheet-tile-overlay { background: rgba(10,10,10,0.6); }
+    .sheet-tile-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 300ms ease, transform 300ms ease;
+    }
+    .sheet-tile-cat {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #B08D57;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 300ms ease 50ms, transform 300ms ease 50ms;
+      margin-top: 4px;
+    }
+    .sheet-tile:hover .sheet-tile-name,
+    .sheet-tile:hover .sheet-tile-cat {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: #D6CCBC;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0A0A0A;
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .footer-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 32px;
+      letter-spacing: -0.02em;
+      color: #EAE2D4;
+    }
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #8C8478;
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .footer-links a:hover { color: #B08D57; }
+    .footer-social {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-social a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8C8478;
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .footer-social a:hover { color: #B08D57; }
+    .footer-bottom {
+      border-top: 1px solid #1e1e1e;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #3a3a3a;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      #navbar { padding: 20px 20px; }
+      .nav-links { display: none; }
+      .hero-content { left: 20px; right: 60px; bottom: 60px; }
+      .hero-headline { font-size: clamp(56px, 16vw, 90px); }
+      .social-rail { display: none; }
+      section { padding: 60px 20px !important; }
+      .creator-card { flex: 0 0 200px; }
+      .creator-card-img { width: 200px; height: 267px; }
+      .event-card { flex: 0 0 260px; }
+      .contact-sheet { grid-template-columns: repeat(2, 1fr); }
+      .footer-top { flex-direction: column; gap: 24px; }
+      .footer-links { flex-wrap: wrap; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════
+       NAVIGATION
+  ════════════════════════════════════════ -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">RØDE</a>
+
+    <ul class="nav-links">
+      <li><a href="#">Découvrir</a></li>
+      <li><a href="#">Créateurs</a></li>
+      <li><a href="#">Événements</a></li>
+      <li><a href="#">Titans</a></li>
+    </ul>
+
+    <div class="nav-icons">
+      <!-- Search -->
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <!-- Profile -->
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-slide active" style="background-image:url('file:///E:/AfroPunk/86b4849f724e79786db3ccd0b418a93c.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('file:///E:/AfroPunk/c78917647cdcb2262e3424b8ec875098.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('file:///E:/AfroPunk/edbf6e221e7d36de896a033428cf7866.jpg');"></div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <!-- Social Rail -->
+    <div style="position:absolute; right:20px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:0; align-items:center;">
+      <div class="social-rail">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span>Mode · Art · Musique</span>
+        <span class="pill">Nouvelle Saison</span>
+      </div>
+      <h1 class="hero-headline">
+        Discover<br>The Culture
+      </h1>
+    </div>
+
+    <!-- Slide Indicators -->
+    <div class="slide-indicators">
+      <span class="slide-num active">01</span>
+      <span class="slide-num">02</span>
+      <span class="slide-num">03</span>
+    </div>
+
+    <!-- Scroll Arrow -->
+    <div class="scroll-arrow">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SECTION 2 — CRÉATEURS DE LA SEMAINE
+  ════════════════════════════════════════ -->
+  <section style="padding: 80px 40px; background: #EAE2D4;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:40px;">
+      <span class="section-label">Créateurs de la semaine</span>
+      <a href="#" style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8C8478; text-decoration:none; transition:color 200ms;" onmouseover="this.style.color='#B08D57'" onmouseout="this.style.color='#8C8478'">Voir tous →</a>
+    </div>
+
+    <div class="h-scroll" style="gap:1px;">
+
+      <!-- Card 1 -->
+      <div class="creator-card">
+        <div class="creator-card-img">
+          <div class="creator-card-img-inner" style="background:none;">
+            <img src="file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          </div>
+        </div>
+        <div class="creator-card-info">
+          <div class="creator-card-name">Amara Diallo</div>
+          <div class="creator-card-tag"><span class="pill" style="font-size:9px;">Mode · Paris</span></div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="creator-card">
+        <div class="creator-card-img">
+          <div class="creator-card-img-inner" style="background:none;">
+            <img src="file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          </div>
+        </div>
+        <div class="creator-card-info">
+          <div class="creator-card-name">Kofi Mensah</div>
+          <div class="creator-card-tag"><span class="pill" style="font-size:9px;">Art · NYC</span></div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="creator-card">
+        <div class="creator-card-img">
+          <div class="creator-card-img-inner" style="background:none;">
+            <img src="file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          </div>
+        </div>
+        <div class="creator-card-info">
+          <div class="creator-card-name">Yasmine Touré</div>
+          <div class="creator-card-tag"><span class="pill" style="font-size:9px;">Musique · Abidjan</span></div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="creator-card">
+        <div class="creator-card-img">
+          <div class="creator-card-img-inner" style="background:none;">
+            <img src="file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          </div>
+        </div>
+        <div class="creator-card-info">
+          <div class="creator-card-name">Léa Fontaine</div>
+          <div class="creator-card-tag"><span class="pill" style="font-size:9px;">Mode · Londres</span></div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="creator-card">
+        <div class="creator-card-img">
+          <div class="creator-card-img-inner" style="background:none;">
+            <img src="file:///E:/AfroPunk/d613edb2f36b6672c163e35db1650f8e.jpg" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          </div>
+        </div>
+        <div class="creator-card-info">
+          <div class="creator-card-name">Brahim Ndiaye</div>
+          <div class="creator-card-tag"><span class="pill" style="font-size:9px;">Photographie · Dakar</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════
+       SECTION 3 — ÉVÉNEMENTS RØDE
+  ════════════════════════════════════════ -->
+  <section style="padding: 80px 40px; background: #0A0A0A;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:40px;">
+      <span class="section-label" style="color:#3a3a3a;">Événements RØDE</span>
+      <a href="#" style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#3a3a3a; text-decoration:none; transition:color 200ms;" onmouseover="this.style.color='#B08D57'" onmouseout="this.style.color='#3a3a3a'">Agenda complet →</a>
+    </div>
+
+    <div class="h-scroll" style="gap:1px;">
+
+      <!-- Event 1 -->
+      <div class="event-card" style="background-image:url('file:///E:/AfroPunk/547b63bcc200c0f14bb30d8a32a36563.jpg');">
+        <div class="event-date">12 Avril 2025 · Paris, France</div>
+        <div class="event-name">RØDE×<br>Africa<br>Parade</div>
+        <div class="event-city">Champs-Élysées</div>
+        <div class="event-pill">Premium −20%</div>
+        <div class="event-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7M7 7h10v10"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Event 2 -->
+      <div class="event-card" style="background-image:url('file:///E:/AfroPunk/9049e1aab83c1de5a68bc705e52ef172.jpg');">
+        <div class="event-date">26 Avril 2025 · Paris, France</div>
+        <div class="event-name">RØDE×<br>Party<br>Vol.3</div>
+        <div class="event-city">La Machine du Moulin Rouge</div>
+        <div class="event-pill">Premium −20%</div>
+        <div class="event-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7M7 7h10v10"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Event 3 — Partenaire -->
+      <div class="event-card" style="border-color:#2e2e2e;background-image:url('file:///E:/AfroPunk/cd7cd903390999dbdd8f5f974c2646c9.jpg');">
+        <div class="event-date">3 Mai 2025 · Paris, France</div>
+        <div class="event-name">Palais de<br>Tokyo<br>Night</div>
+        <div class="event-city">Palais de Tokyo — Partenaire</div>
+        <div class="event-pill">Entrée Libre Membres</div>
+        <div class="event-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7M7 7h10v10"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Event 4 — Partenaire -->
+      <div class="event-card" style="border-color:#2e2e2e;background-image:url('file:///E:/AfroPunk/c50ef3818289dd9a07b467c933738a40.jpg');">
+        <div class="event-date">10 Mai 2025 · Abidjan, CI</div>
+        <div class="event-name">RØDE<br>West<br>Africa</div>
+        <div class="event-city">Sofitel Abidjan</div>
+        <div class="event-pill">Billetterie Ouverte</div>
+        <div class="event-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7M7 7h10v10"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SECTION 4 — NOUVELLES COLLECTIONS
+  ════════════════════════════════════════ -->
+  <section style="padding:0; background:#EAE2D4;">
+    <div style="padding:80px 40px 32px; display:flex; justify-content:space-between; align-items:baseline;">
+      <span class="section-label">Nouvelles Collections</span>
+      <a href="#" style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8C8478; text-decoration:none; transition:color 200ms;" onmouseover="this.style.color='#B08D57'" onmouseout="this.style.color='#8C8478'">Explorer →</a>
+    </div>
+
+    <div class="contact-sheet">
+      <div class="sheet-tile">
+        <div class="sheet-tile-img" style="background-image:url('file:///E:/AfroPunk/9d64d796c2853985ea5f061518870b71.jpg');background-size:cover;background-position:center;"></div>
+        <div class="sheet-tile-overlay">
+          <div class="sheet-tile-name">Amara Diallo</div>
+          <div class="sheet-tile-cat">Mode · SS25</div>
+        </div>
+      </div>
+      <div class="sheet-tile">
+        <div class="sheet-tile-img" style="background-image:url('file:///E:/AfroPunk/caaa4ddcefd16329089301daf7a22769.jpg');background-size:cover;background-position:center;"></div>
+        <div class="sheet-tile-overlay">
+          <div class="sheet-tile-name">Studio Noire</div>
+          <div class="sheet-tile-cat">Art · Installation</div>
+        </div>
+      </div>
+      <div class="sheet-tile">
+        <div class="sheet-tile-img" style="background-image:url('file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg');background-size:cover;background-position:center;"></div>
+        <div class="sheet-tile-overlay">
+          <div class="sheet-tile-name">Kofi Mensah</div>
+          <div class="sheet-tile-cat">Photographie</div>
+        </div>
+      </div>
+      <div class="sheet-tile">
+        <div class="sheet-tile-img" style="background-image:url('file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg');background-size:cover;background-position:center;"></div>
+        <div class="sheet-tile-overlay">
+          <div class="sheet-tile-name">Yasmine T.</div>
+          <div class="sheet-tile-cat">Musique · EP</div>
+        </div>
+      </div>
+      <div class="sheet-tile">
+        <div class="sheet-tile-img" style="background-image:url('file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg');background-size:cover;background-position:center;"></div>
+        <div class="sheet-tile-overlay">
+          <div class="sheet-tile-name">Léa Fontaine</div>
+          <div class="sheet-tile-cat">Mode · Capsule</div>
+        </div>
+      </div>
+      <div class="sheet-tile">
+        <div class="sheet-tile-img" style="background-image:url('file:///E:/AfroPunk/ddc1f140ec485d8ae3ee3e2204da0937.jpg');background-size:cover;background-position:center;"></div>
+        <div class="sheet-tile-overlay">
+          <div class="sheet-tile-name">Brahim N.</div>
+          <div class="sheet-tile-cat">Art · Série</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-logo">RØDE</div>
+      <ul class="footer-links">
+        <li><a href="#">Créateurs</a></li>
+        <li><a href="#">Événements</a></li>
+        <li><a href="#">Titans</a></li>
+        <li><a href="#">Premium</a></li>
+        <li><a href="#">À propos</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 RØDE — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll behaviour
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Hero slideshow
+    const slides = document.querySelectorAll('.hero-slide');
+    const nums   = document.querySelectorAll('.slide-num');
+    let current  = 0;
+
+    function goTo(i) {
+      slides[current].classList.remove('active');
+      nums[current].classList.remove('active');
+      current = i;
+      slides[current].classList.add('active');
+      nums[current].classList.add('active');
+    }
+
+    nums.forEach((el, i) => el.addEventListener('click', () => goTo(i)));
+
+    // Auto-advance every 5s
+    setInterval(() => goTo((current + 1) % slides.length), 5000);
+  </script>
+
+</body>
+</html>

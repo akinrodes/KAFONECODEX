@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Discover The Culture</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    body { overflow-x: hidden; }
+
+    /* ══ HERO STAGE — fond noir cinématique ══════════════════ */
+    .hero-stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background-color: #0A0A0A;
+      background-image:
+        radial-gradient(ellipse at 15% 50%,  rgba(176,141,87,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 20%,  rgba(176,141,87,0.04) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.02) 0%, transparent 50%);
+      overflow: hidden;
+    }
+
+    /* Grain cinéma */
+    .hero-stage::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    /* ══ CARDS STACK — grande zone centrale/droite ═══════════ */
+    .cards-stack-wrap {
+      position: absolute;
+      top: 0; right: 0;
+      width: 68%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    /* ── Pass Card — format éditorial grand ── */
+    .pass-card {
+      position: absolute;
+      width: 280px;
+      background: #EDE5D3;
+      border: 1px solid rgba(234,226,212,0.20);
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow:
+        0 40px 80px rgba(0,0,0,0.55),
+        0 10px 30px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(255,255,255,0.05);
+      transition: transform 700ms cubic-bezier(0.34,1.25,0.64,1), box-shadow 350ms ease, opacity 450ms ease;
+      will-change: transform;
+    }
+
+    /* Positions en éventail — plus larges, plus dramatiques */
+    .pass-card[data-i="0"] { transform: rotate(-14deg) translate(-155px, 30px) scale(0.92); z-index: 10; }
+    .pass-card[data-i="1"] { transform: rotate(0deg)   translate(0px,    0px)  scale(1.00); z-index: 30; }
+    .pass-card[data-i="2"] { transform: rotate(14deg)  translate(155px,  30px) scale(0.92); z-index: 20; }
+
+    /* Hover en mode empilé */
+    .cards-stack-wrap:not(.expanded) .pass-card[data-i="0"]:hover {
+      transform: rotate(-14deg) translate(-155px, 0px) scale(0.97);
+      z-index: 40; box-shadow: 0 50px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(176,141,87,0.3);
+    }
+    .cards-stack-wrap:not(.expanded) .pass-card[data-i="1"]:hover {
+      transform: rotate(0deg) translate(0px, -20px) scale(1.04);
+      z-index: 40; box-shadow: 0 60px 120px rgba(0,0,0,0.70), 0 0 0 1px rgba(176,141,87,0.4);
+    }
+    .cards-stack-wrap:not(.expanded) .pass-card[data-i="2"]:hover {
+      transform: rotate(14deg) translate(155px, 0px) scale(0.97);
+      z-index: 40; box-shadow: 0 50px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(176,141,87,0.3);
+    }
+
+    /* — Header carte — */
+    .pass-card-header {
+      padding: 10px 14px 9px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(10,10,10,0.10);
+      background: rgba(176,141,87,0.10);
+    }
+    .pass-card-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.30em;
+      text-transform: uppercase; color: #0A0A0A;
+    }
+    .pass-card-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 300; letter-spacing: 0.14em; color: #8C8478;
+    }
+
+    /* — Photo — pleine largeur, haute */
+    .pass-card-photo {
+      width: 100%; height: 340px; overflow: hidden; background: #100e0a;
+    }
+    .pass-card-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      display: block; transition: transform 800ms cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .pass-card:hover .pass-card-photo img { transform: scale(1.06); }
+
+    /* — Info — */
+    .pass-card-info { padding: 12px 14px 8px; }
+    .pass-card-creator-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 15px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #0A0A0A; line-height: 1.1;
+    }
+    .pass-card-discipline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300; letter-spacing: 0.16em;
+      color: #6b5e4a; margin-top: 4px;
+    }
+
+    /* — Barcode strip — */
+    .pass-card-footer {
+      padding: 9px 14px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(10,10,10,0.08);
+    }
+    .pass-barcode { display: flex; gap: 1.5px; align-items: flex-end; height: 20px; }
+    .pass-barcode b { display: block; width: 1.5px; background: rgba(10,10,10,0.55); }
+    .pass-card-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 400; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #B08D57;
+      border: 1px solid #B08D57; padding: 3px 7px; border-radius: 2px;
+    }
+
+    /* ── Bouton Retour ── */
+    .gallery-back {
+      position: absolute; top: 88px; left: 48px; z-index: 20;
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 400; letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(234,226,212,0.50);
+      background: none; border: none; cursor: pointer; padding: 0;
+      opacity: 0; pointer-events: none; transform: translateX(-8px);
+      transition: opacity 300ms ease, transform 300ms ease, color 200ms;
+    }
+    .gallery-back.visible { opacity: 1; pointer-events: all; transform: translateX(0); }
+    .gallery-back:hover { color: #B08D57; }
+
+    /* ── MODE ÉTENDU ── */
+    .hero-stage.expanded { height: auto; min-height: 100vh; overflow-y: auto; }
+    .hero-stage.expanded .featured-block { display: none; }
+    .hero-stage.expanded .social-rail-right { display: none; }
+    .hero-stage.expanded .cards-stack-wrap {
+      position: static; width: 100%; height: auto;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); justify-content: center;
+      gap: 28px; padding: 108px 56px 80px; align-items: start;
+    }
+    .hero-stage.expanded .pass-card {
+      position: static; width: 100%;
+      transform: none !important; opacity: 1 !important; pointer-events: all !important;
+    }
+    .hero-stage.expanded .pass-card:hover {
+      transform: translateY(-8px) !important;
+      box-shadow: 0 48px 96px rgba(0,0,0,0.60) !important;
+    }
+    .hero-stage.expanded .pass-card-photo { height: 300px; }
+
+    /* ══ FEATURED BLOCK — panneau gauche ═════════════════════ */
+    .featured-block {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 42%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 130px 48px 44px;
+      z-index: 4;
+    }
+
+    /* — Badge semaine — */
+    .featured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .featured-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #B08D57;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.7); }
+    }
+    .featured-badge-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(176,141,87,0.9);
+    }
+
+    /* — Nom créateur (transition smooth) — */
+    .featured-name-wrap {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 24px;
+    }
+    .featured-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(52px, 6.5vw, 96px);
+      line-height: 0.88;
+      letter-spacing: -0.025em;
+      color: #EAE2D4;
+      transition: opacity 400ms ease, transform 400ms ease;
+    }
+    .featured-name.switching {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    /* — Infos créateur — */
+    .featured-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .featured-discipline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      color: rgba(234,226,212,0.55);
+      transition: opacity 350ms ease;
+    }
+    .featured-discipline.switching { opacity: 0; }
+    .featured-city {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.35);
+    }
+    .featured-city::before {
+      content: '';
+      display: block;
+      width: 16px; height: 1px;
+      background: #B08D57;
+    }
+    .featured-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.75);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(234,226,212,0.30);
+      padding-bottom: 3px;
+      transition: color 200ms, border-color 200ms, gap 200ms;
+      width: fit-content;
+    }
+    .featured-cta:hover { color: #B08D57; border-color: #B08D57; gap: 16px; }
+
+    /* — Navigation bas — */
+    .featured-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .scroll-arrow-btn {
+      color: rgba(234,226,212,0.35);
+      display: flex;
+      animation: nudge 2.2s infinite;
+      background: none; border: none; cursor: pointer; padding: 0;
+    }
+    @keyframes nudge {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(5px); }
+    }
+    .slide-indicators {
+      display: flex;
+      gap: 18px;
+    }
+    .s-dot-dark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.10em;
+      color: rgba(234,226,212,0.25);
+      cursor: pointer;
+      background: none; border: none; padding: 0;
+      transition: color 200ms;
+    }
+    .s-dot-dark.active { color: #EAE2D4; font-weight: 700; }
+
+    /* ══ GHOST NUMBER ═════════════════════════════════════════ */
+    .ghost-num {
+      position: absolute;
+      bottom: 100px;
+      left: -10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(160px, 20vw, 260px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: rgba(160,140,100,0.10);
+      user-select: none;
+      pointer-events: none;
+      z-index: 3;
+      transition: opacity 500ms ease;
+    }
+
+    /* ══ SOCIAL RAIL ══════════════════════════════════════════ */
+    .social-rail-right {
+      position: absolute;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .social-rail-right a {
+      color: rgba(234,226,212,0.30);
+      display: flex;
+      transition: color 200ms;
+    }
+    .social-rail-right a:hover { color: #B08D57; }
+
+    /* ══ NAV ══════════════════════════════════════════════════ */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 26px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+    }
+    .nav-left-group {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .nav-icon-dark {
+      color: rgba(234,226,212,0.40);
+      cursor: pointer;
+      transition: color 200ms;
+      display: flex;
+    }
+    .nav-icon-dark:hover { color: #B08D57; }
+    .nav-logo-dark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: #EAE2D4;
+      text-decoration: none;
+    }
+    .nav-logo-dark:hover { color: #B08D57; }
+    .nav-links-center {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .nav-links-center a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: rgba(234,226,212,0.40);
+      transition: color 200ms;
+    }
+    .nav-links-center a:hover,
+    .nav-links-center a.active { color: #B08D57; }
+    .nav-icon-right {
+      color: rgba(234,226,212,0.50);
+      cursor: pointer;
+      transition: color 200ms;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .nav-icon-right:hover { color: #B08D57; }
+
+    /* ══ SECTIONS BELOW HERO ═════════════════════════════════ */
+
+    /* — Manifesto — */
+    .section-manifesto {
+      background: #EAE2D4;
+      padding: 120px 48px 100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: end;
+      border-top: 1px solid rgba(10,10,10,0.08);
+    }
+    .manifesto-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #B08D57;
+      margin-bottom: 28px;
+    }
+    .manifesto-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(42px, 5vw, 76px);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: #0A0A0A;
+    }
+    .manifesto-body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.75;
+      color: #5a4f40;
+      margin-bottom: 40px;
+    }
+    .manifesto-stat {
+      display: flex;
+      gap: 48px;
+      margin-top: 12px;
+    }
+    .stat-block { display: flex; flex-direction: column; gap: 4px; }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 40px;
+      letter-spacing: -0.02em;
+      color: #0A0A0A;
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #8C8478;
+    }
+
+    /* — Features — */
+    .section-features {
+      background: #0A0A0A;
+      padding: 100px 48px;
+    }
+    .features-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 64px;
+      border-bottom: 1px solid #1c1c1c;
+      padding-bottom: 32px;
+    }
+    .features-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(36px, 4vw, 60px);
+      letter-spacing: -0.02em;
+      color: #EAE2D4;
+      line-height: 0.9;
+    }
+    .features-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #8C8478;
+      max-width: 260px;
+      text-align: right;
+      line-height: 1.8;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #1c1c1c;
+    }
+    .feat-card {
+      background: #0A0A0A;
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transition: background 300ms ease;
+    }
+    .feat-card:hover { background: #111; }
+    .feat-icon {
+      width: 36px; height: 36px;
+      color: #B08D57;
+      display: flex;
+    }
+    .feat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      color: #2e2e2e;
+    }
+    .feat-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #EAE2D4;
+      line-height: 1;
+    }
+    .feat-desc {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #5a5040;
+    }
+
+    /* — Audience — */
+    .section-audience {
+      background: #EAE2D4;
+      padding: 100px 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    .audience-panel {
+      padding: 64px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid rgba(10,10,10,0.08);
+      transition: border-color 300ms;
+    }
+    .audience-panel:hover { border-color: #B08D57; }
+    .audience-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: #B08D57;
+    }
+    .audience-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(32px, 3.5vw, 52px);
+      letter-spacing: -0.02em;
+      color: #0A0A0A;
+      line-height: 0.92;
+    }
+    .audience-body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.75;
+      color: #5a4f40;
+    }
+    .audience-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .audience-list li {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: #6b5e4a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .audience-list li::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+      background: #B08D57;
+      flex-shrink: 0;
+    }
+    .audience-cta {
+      margin-top: 12px;
+    }
+
+    /* — CTA Banner — */
+    .section-cta {
+      background: #0A0A0A;
+      padding: 100px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 32px;
+    }
+    .cta-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #B08D57;
+    }
+    .cta-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(44px, 6vw, 88px);
+      letter-spacing: -0.025em;
+      color: #EAE2D4;
+      line-height: 0.9;
+      max-width: 800px;
+    }
+    .cta-sub {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #5a5040;
+      max-width: 520px;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    /* — Kingdom tagline — */
+    .section-kingdom {
+      background: #0A0A0A;
+      padding: 80px 48px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border-top: 1px solid rgba(176,141,87,0.15);
+    }
+    .kingdom-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.40em;
+      text-transform: uppercase;
+      color: #B08D57;
+      margin: 0 0 20px;
+    }
+    .kingdom-line {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(52px, 9vw, 130px);
+      letter-spacing: -0.03em;
+      line-height: 0.88;
+      color: #EAE2D4;
+      margin: 0;
+      background: linear-gradient(135deg, #EAE2D4 0%, #B08D57 55%, #EAE2D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* — Footer — */
+    .home-footer {
+      background: #0A0A0A;
+      border-top: 1px solid #1c1c1c;
+      padding: 36px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .home-footer-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: #EAE2D4;
+      text-decoration: none;
+    }
+    .home-footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #2e2e2e;
+    }
+    .home-footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .home-footer-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: #5a5040;
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .home-footer-links a:hover { color: #B08D57; }
+
+    /* ══ MOBILE ═══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .cards-stack-wrap { width: 100%; }
+      .featured-block { width: 100%; padding: 120px 24px 40px; background: rgba(10,10,10,0.75); }
+      .featured-name { font-size: clamp(40px, 12vw, 64px); }
+      .pass-card { width: 200px; }
+      .pass-card-photo { height: 240px; }
+      .pass-card[data-i="0"] { transform: rotate(-12deg) translate(-110px, 20px) scale(0.92); }
+      .pass-card[data-i="2"] { transform: rotate(12deg)  translate(110px,  20px) scale(0.92); }
+      .hero-stage.expanded .cards-stack-wrap { grid-template-columns: repeat(2, 1fr); padding: 80px 20px 48px; gap: 14px; }
+      .gallery-back { left: 20px; }
+      #navbar { padding: 18px 20px; }
+      .nav-links-center { display: none; }
+      .social-rail-right { display: none; }
+      .section-manifesto { grid-template-columns: 1fr; gap: 40px; padding: 72px 24px; }
+      .section-features { padding: 72px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .features-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .features-sub { text-align: left; }
+      .section-audience { grid-template-columns: 1fr; padding: 0; }
+      .audience-panel { padding: 48px 24px; }
+      .section-cta { padding: 72px 24px; }
+      .cta-actions { flex-direction: column; align-items: center; }
+      .home-footer { flex-direction: column; gap: 24px; text-align: center; padding: 36px 24px; }
+      .home-footer-links { flex-wrap: wrap; justify-content: center; gap: 20px; }
+    }
+
+    /* ══ BOUTON THÈME ═════════════════════════════════════════ */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(234,226,212,0.18);
+      background: rgba(234,226,212,0.06);
+      cursor: pointer;
+      color: rgba(234,226,212,0.55);
+      transition: border-color 250ms, background 250ms, color 250ms, transform 350ms cubic-bezier(0.34,1.4,0.64,1);
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover {
+      border-color: #B08D57;
+      color: #B08D57;
+      transform: rotate(20deg);
+    }
+    .theme-toggle .icon-sun  { display: none; }
+    .theme-toggle .icon-moon { display: block; }
+
+    /* ══ THÈME CLAIR ═════════════════════════════════════════ */
+    body.light-theme .theme-toggle {
+      border-color: rgba(10,10,10,0.18);
+      background: rgba(10,10,10,0.05);
+      color: rgba(10,10,10,0.55);
+    }
+    body.light-theme .theme-toggle .icon-sun  { display: block; }
+    body.light-theme .theme-toggle .icon-moon { display: none; }
+
+    body.light-theme .hero-stage {
+      background-color: #D8CEBA;
+      background-image:
+        radial-gradient(ellipse at 0% 0%,   rgba(0,0,0,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 40%,  rgba(245,235,215,0.45) 0%, transparent 65%),
+        radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.06) 0%, transparent 50%);
+    }
+    body.light-theme .hero-stage::before { mix-blend-mode: multiply; opacity: 0.08; }
+
+    body.light-theme .nav-logo-dark      { color: #0A0A0A; }
+    body.light-theme .nav-icon-dark      { color: rgba(10,10,10,0.45); }
+    body.light-theme .nav-links-center a { color: rgba(10,10,10,0.50); }
+    body.light-theme .nav-icon-right     { color: rgba(10,10,10,0.55); }
+
+    body.light-theme .featured-badge-text  { color: #B08D57; }
+    body.light-theme .featured-name        { color: #0A0A0A; }
+    body.light-theme .featured-name.switching { opacity: 0; }
+    body.light-theme .featured-discipline  { color: #6b5e4a; }
+    body.light-theme .featured-city        { color: #8C8478; }
+    body.light-theme .featured-cta         { color: #0A0A0A; border-color: rgba(10,10,10,0.25); }
+    body.light-theme .featured-cta:hover   { color: #B08D57; border-color: #B08D57; }
+
+    body.light-theme .scroll-arrow-btn { color: #6b5e4a; }
+    body.light-theme .s-dot-dark       { color: rgba(10,10,10,0.30); }
+    body.light-theme .s-dot-dark.active { color: #0A0A0A; }
+
+    body.light-theme .gallery-back     { color: rgba(10,10,10,0.45); }
+    body.light-theme .gallery-back:hover { color: #B08D57; }
+
+    body.light-theme .social-rail-right a { color: rgba(10,10,10,0.28); }
+
+    body.light-theme .pass-card {
+      box-shadow: 0 18px 52px rgba(0,0,0,0.14), 0 4px 14px rgba(0,0,0,0.08);
+    }
+    body.light-theme .cards-stack-wrap:not(.expanded) .pass-card[data-i="0"]:hover,
+    body.light-theme .cards-stack-wrap:not(.expanded) .pass-card[data-i="1"]:hover,
+    body.light-theme .cards-stack-wrap:not(.expanded) .pass-card[data-i="2"]:hover {
+      box-shadow: 0 32px 64px rgba(0,0,0,0.18), 0 0 0 1px rgba(176,141,87,0.4);
+    }
+
+    @media (max-width: 768px) {
+      body.light-theme .featured-block { background: rgba(216,206,186,0.90); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <div class="nav-left-group">
+      <span class="nav-icon-dark">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </span>
+      <a href="index.html" class="nav-logo-dark">Kafora</a>
+    </div>
+
+    <ul class="nav-links-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html">Marques</a></li>
+      <li><a href="marques.html">Marques</a></li>
+    </ul>
+
+    <div style="display:flex;align-items:center;gap:16px;">
+      <!-- Toggle thème clair / sombre -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème" onclick="toggleTheme()">
+        <!-- Lune (mode sombre actif) -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Soleil (mode clair actif) -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <a href="connexion.html" class="nav-icon-right" title="Connexion">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="premium.html" class="nav-icon-right">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO STAGE -->
+  <div class="hero-stage" id="heroStage">
+
+    <!-- Bouton retour (mode étendu) -->
+    <button class="gallery-back" id="galleryBack" onclick="collapseCards()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Retour
+    </button>
+
+    <!-- Pass Cards empilées -->
+    <div class="cards-stack-wrap" id="cardsWrap">
+
+      <!-- Card 1 -->
+      <div class="pass-card" data-i="0" onclick="expandCards()">
+        <div class="pass-card-header">
+          <span class="pass-card-brand">Kafora Pass</span>
+          <span class="pass-card-num">01 / 03</span>
+        </div>
+        <div class="pass-card-photo">
+          <img src="file:///C:/Users/toto/Documents/te/0a8fce3f5749b2baed2b2cc8ed445483.jpg" alt="Amara Diallo" />
+        </div>
+        <div class="pass-card-info">
+          <div class="pass-card-creator-name">Amara Diallo</div>
+          <div class="pass-card-discipline">Mode · Paris, France</div>
+        </div>
+        <div class="pass-card-footer">
+          <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+          <span class="pass-card-tag">Featured</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="pass-card" data-i="1" onclick="expandCards()">
+        <div class="pass-card-header">
+          <span class="pass-card-brand">Kafora Pass</span>
+          <span class="pass-card-num">02 / 03</span>
+        </div>
+        <div class="pass-card-photo">
+          <img src="file:///C:/Users/toto/Documents/te/1eb230d1dfa1e0d22dd2c42d7c9243e8.jpg" alt="Kofi Mensah" />
+        </div>
+        <div class="pass-card-info">
+          <div class="pass-card-creator-name">Kofi Mensah</div>
+          <div class="pass-card-discipline">Art Contemporain · Accra</div>
+        </div>
+        <div class="pass-card-footer">
+          <div class="pass-barcode"><b style="height:100%"></b><b style="height:50%"></b><b style="height:85%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b><b style="height:90%"></b><b style="height:45%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:65%"></b><b style="height:95%"></b><b style="height:50%"></b><b style="height:100%"></b></div>
+          <span class="pass-card-tag">Featured</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="pass-card" data-i="2" onclick="expandCards()">
+        <div class="pass-card-header">
+          <span class="pass-card-brand">Kafora Pass</span>
+          <span class="pass-card-num">03 / 03</span>
+        </div>
+        <div class="pass-card-photo">
+          <img src="file:///C:/Users/toto/Documents/te/2cbc89ee1e084a77dac918173a63a68f.jpg" alt="Léa Traoré" />
+        </div>
+        <div class="pass-card-info">
+          <div class="pass-card-creator-name">Léa Traoré</div>
+          <div class="pass-card-discipline">Musique · Dakar, Sénégal</div>
+        </div>
+        <div class="pass-card-footer">
+          <div class="pass-barcode"><b style="height:80%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:85%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:65%"></b><b style="height:90%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:60%"></b><b style="height:35%"></b><b style="height:80%"></b><b style="height:95%"></b><b style="height:100%"></b></div>
+          <span class="pass-card-tag">Featured</span>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Panneau gauche — créateur mis en avant -->
+    <div class="featured-block">
+
+      <!-- Badge -->
+      <div class="featured-badge">
+        <span class="featured-badge-dot"></span>
+        <span class="featured-badge-text">Créateurs de la semaine</span>
+      </div>
+
+      <!-- Nom -->
+      <div class="featured-name-wrap">
+        <h1 class="featured-name" id="featName">Amara<br>Diallo</h1>
+      </div>
+
+      <!-- Méta + CTA -->
+      <div class="featured-meta">
+        <span class="featured-discipline" id="featDiscipline">Mode · Paris</span>
+        <span class="featured-city" id="featCity">France</span>
+        <a href="profil.html" class="featured-cta" id="featCta">
+          Voir le profil
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <div class="featured-nav">
+        <button class="scroll-arrow-btn" aria-label="Explorer" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </button>
+        <div class="slide-indicators">
+          <button class="s-dot-dark active" data-slide="0">01</button>
+          <button class="s-dot-dark" data-slide="1">02</button>
+          <button class="s-dot-dark" data-slide="2">03</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Social rail -->
+    <div class="social-rail-right">
+      <a href="#" aria-label="Facebook">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="#" aria-label="Instagram">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" aria-label="TikTok">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.16 8.16 0 0 0 4.77 1.52V6.75a4.85 4.85 0 0 1-1-.06z"/></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ══ MANIFESTO ══════════════════════════════════════════════ -->
+  <section id="about" class="section-manifesto">
+    <div>
+      <div class="manifesto-label">À propos de Kafora</div>
+      <h2 class="manifesto-title">La culture<br>mérite une<br>scène à sa<br>hauteur.</h2>
+    </div>
+    <div>
+      <p class="manifesto-body">
+        Kafora est la première plateforme dédiée aux créateurs de la diaspora africaine — danse, architecture, cinéma, mode, musique, photographie et bien plus. Un espace où la visibilité devient revenus, où chaque profil est une vitrine et chaque clic, une opportunité.
+      </p>
+      <p class="manifesto-body">
+        Notre modèle SaaS connecte les talents émergents à leur audience mondiale grâce à des profils éditoriaux, un système d'affiliation intégré et une présence événementielle physique.
+      </p>
+      <div class="manifesto-stat">
+        <div class="stat-block">
+          <span class="stat-num">300+</span>
+          <span class="stat-label">Créateurs</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num">12</span>
+          <span class="stat-label">Villes</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num">3</span>
+          <span class="stat-label">Disciplines</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FEATURES ════════════════════════════════════════════════ -->
+  <section class="section-features">
+    <div class="features-header">
+      <h2 class="features-title">Ce que<br>Kafora offre</h2>
+      <p class="features-sub">Une infrastructure complète pour exister, grandir et monétiser sa création.</p>
+    </div>
+    <div class="features-grid">
+
+      <div class="feat-card">
+        <span class="feat-num">01</span>
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+        <div class="feat-name">Profil Éditorial</div>
+        <p class="feat-desc">Une page personnelle soignée : portfolio, biographie, discipline, localisation. Pensée pour impressionner à la première visite.</p>
+      </div>
+
+      <div class="feat-card">
+        <span class="feat-num">02</span>
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <div class="feat-name">Affiliation Intégrée</div>
+        <p class="feat-desc">Chaque lien vers une boutique externe génère une commission trackée. Transforme ta visibilité en revenu passif dès le premier clic.</p>
+      </div>
+
+      <div class="feat-card">
+        <span class="feat-num">03</span>
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="feat-name">Annuaire Vivant</div>
+        <p class="feat-desc">Un répertoire filtrable par discipline, ville et style. Le bon créateur, au bon endroit, au bon moment.</p>
+      </div>
+
+      <div class="feat-card">
+        <span class="feat-num">04</span>
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        </div>
+        <div class="feat-name">Titans Program</div>
+        <p class="feat-desc">Un label d'excellence pour les créateurs qui ont atteint un niveau de référence. Visibilité accrue, partenariats exclusifs, placement éditorial.</p>
+      </div>
+
+      <div class="feat-card">
+        <span class="feat-num">05</span>
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="feat-name">Événements</div>
+        <p class="feat-desc">Kafora organise des expériences physiques — soirées, showcases, pop-ups — pour ancrer la culture dans le monde réel.</p>
+      </div>
+
+      <div class="feat-card">
+        <span class="feat-num">06</span>
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="feat-name">Dashboard Analytics</div>
+        <p class="feat-desc">Vues, clics, revenus d'affiliation, performance par contenu. Comprendre son audience pour mieux la servir.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ AUDIENCE ════════════════════════════════════════════════ -->
+  <section class="section-audience">
+
+    <div class="audience-panel">
+      <span class="audience-tag">Pour les créateurs</span>
+      <h3 class="audience-title">Ton talent,<br>ta vitrine.</h3>
+      <p class="audience-body">Rejoins la communauté Kafora et accède à une infrastructure pensée pour les créateurs indépendants de la diaspora. Profil éditorial, affiliation, événements — tout ce qu'il faut pour vivre de sa passion.</p>
+      <ul class="audience-list">
+        <li>Profil professionnel en 5 minutes</li>
+        <li>Liens affiliés vers ta boutique ou tes collaborations</li>
+        <li>Invitation aux événements Kafora</li>
+        <li>Candidature au programme Titans</li>
+      </ul>
+      <div class="audience-cta">
+        <a href="premium.html" class="btn btn-primary">Rejoindre Kafora</a>
+      </div>
+    </div>
+
+    <div class="audience-panel">
+      <span class="audience-tag">Pour les curieux</span>
+      <h3 class="audience-title">Explore.<br>Découvre.<br>Soutiens.</h3>
+      <p class="audience-body">Kafora est ta porte d'entrée dans l'univers des créateurs de la diaspora. Découvre des talents, suis leur actualité, assiste aux événements et shoppe directement depuis leurs profils.</p>
+      <ul class="audience-list">
+        <li>Accès à l'annuaire complet des créateurs</li>
+        <li>Agenda des événements culturels</li>
+        <li>Contenu éditorial exclusif Premium</li>
+        <li>Achat direct depuis les profils créateurs</li>
+      </ul>
+      <div class="audience-cta">
+        <a href="createurs.html" class="btn btn-outline">Explorer les créateurs</a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══ CTA BANNER ══════════════════════════════════════════════ -->
+  <section class="section-cta">
+    <span class="cta-eyebrow">Kafora Premium — Saison 2025</span>
+    <h2 class="cta-title">La culture n'attend pas.</h2>
+    <p class="cta-sub">Accède en avant-première aux profils exclusifs, aux événements privés et aux contenus éditoriaux réservés aux membres Premium.</p>
+    <div class="cta-actions">
+      <a href="premium.html" class="btn btn-bronze">Passer Premium</a>
+      <a href="createurs.html" class="btn btn-ghost">Voir les créateurs</a>
+    </div>
+  </section>
+
+  <!-- ══ KINGDOM TAGLINE ═══════════════════════════════════════════ -->
+  <section class="section-kingdom">
+    <p class="kingdom-tag">Kafora</p>
+    <h2 class="kingdom-line">Claim your kingdom.</h2>
+  </section>
+
+  <!-- ══ FOOTER ══════════════════════════════════════════════════ -->
+  <footer class="home-footer">
+    <a href="index.html" class="home-footer-logo">Kafora</a>
+    <ul class="home-footer-links">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html">Marques</a></li>
+      <li><a href="marques.html">Marques</a></li>
+    </ul>
+    <span class="home-footer-copy">© 2025 Kafora — All rights reserved</span>
+  </footer>
+
+  <script>
+    // ── Toggle thème clair / sombre ──
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('kafora-theme', isLight ? 'light' : 'dark');
+    }
+    // Restaure la préférence au chargement
+    if (localStorage.getItem('kafora-theme') === 'light') {
+      document.body.classList.add('light-theme');
+    }
+
+    const heroStage  = document.getElementById('heroStage');
+    const cardsWrap  = document.getElementById('cardsWrap');
+    const backBtn    = document.getElementById('galleryBack');
+
+    function expandCards() {
+      heroStage.classList.add('expanded');
+      backBtn.classList.add('visible');
+      heroStage.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function collapseCards() {
+      heroStage.classList.remove('expanded');
+      backBtn.classList.remove('visible');
+    }
+
+    // Clic en dehors des cards en mode étendu → collapse
+    // (exclure la navbar pour ne pas perturber la navigation)
+    const navbar = document.getElementById('navbar');
+    document.addEventListener('click', (e) => {
+      if (heroStage.classList.contains('expanded') &&
+          !cardsWrap.contains(e.target) &&
+          !backBtn.contains(e.target) &&
+          !navbar.contains(e.target)) {
+        collapseCards();
+      }
+    });
+
+    // ── Données créateurs de la semaine (placement payant) ──
+    // → Remplacer chaque "profile" par l'URL réelle du profil créateur
+    const creators = [
+      {
+        name:       'Amara<br>Diallo',
+        discipline: 'Mode · Paris',
+        city:       'France',
+        profile:    'profil.html?creator=amara',
+        label:      '01',
+      },
+      {
+        name:       'Kofi<br>Mensah',
+        discipline: 'Art Contemporain · Accra',
+        city:       'Ghana',
+        profile:    'profil.html?creator=kofi',
+        label:      '02',
+      },
+      {
+        name:       'Léa<br>Traoré',
+        discipline: 'Musique · Dakar',
+        city:       'Sénégal',
+        profile:    'profil.html?creator=lea',
+        label:      '03',
+      },
+    ];
+
+    // ── Logique "Top Créateurs" (Mérite vs Ultra Premium) ──
+    // Note : Actuellement mocké avec les 3 créateurs par défaut. 
+    // Plus tard, un appel API vérifiera s'il y a 3 "Sponsors Accueil" (payés très chers). 
+    // Sinon, l'API renverra les 3 créateurs ayant eu le plus de clics dans la semaine (au mérite).
+
+    const dots     = document.querySelectorAll('.s-dot-dark');
+    const featName = document.getElementById('featName');
+    const featDisc = document.getElementById('featDiscipline');
+    const featCity = document.getElementById('featCity');
+    const featCta  = document.getElementById('featCta');
+    let cur = 0;
+
+    function goTo(i) {
+      featName.classList.add('switching');
+      featDisc.classList.add('switching');
+      cur = i;
+      dots.forEach(d => d.classList.toggle('active', +d.dataset.slide === cur));
+
+      setTimeout(() => {
+        const c = creators[cur];
+        featName.innerHTML   = c.name;
+        featDisc.textContent = c.discipline;
+        featCity.textContent = c.city;
+        featCta.href         = c.profile;         // ← lien synchronisé
+        featName.classList.remove('switching');
+        featDisc.classList.remove('switching');
+      }, 380);
+    }
+
+    dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.slide)));
+    
+    // Init state (so if creators[0] was overwritten, it applies immediately)
+    goTo(0);
+
+    const rotateInterval = setInterval(() => goTo((cur + 1) % creators.length), 5500);
+
+    // Arrêter la rotation quand on quitte la page (évite les glitches de navigation)
+    window.addEventListener('beforeunload', () => clearInterval(rotateInterval));
+  </script>
+</body>
+</html>

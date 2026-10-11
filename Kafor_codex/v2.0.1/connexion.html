@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0A0A0A;
+      color: #EAE2D4;
+      font-family: 'Barlow', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ══ LAYOUT SPLIT ══════════════════════════════════════════ */
+    .login-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ══ PANNEAU GAUCHE — visuel ══════════════════════════════ */
+    .login-visual {
+      position: relative;
+      background: #0A0A0A;
+      overflow: hidden;
+    }
+
+    .login-visual-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 30%, rgba(176,141,87,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(176,141,87,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 0%,  rgba(234,226,212,0.03) 0%, transparent 40%);
+    }
+
+    /* Grain cinéma */
+    .login-visual::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .login-visual-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+    }
+
+    .login-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      color: #EAE2D4;
+      text-decoration: none;
+    }
+    .login-logo:hover { color: #B08D57; }
+
+    .login-visual-headline {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.40em;
+      text-transform: uppercase;
+      color: #B08D57;
+      margin-bottom: 24px;
+    }
+
+    .login-big-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(52px, 6vw, 96px);
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      color: #EAE2D4;
+      margin-bottom: 32px;
+    }
+
+    .login-big-title span {
+      background: linear-gradient(135deg, #EAE2D4 0%, #B08D57 55%, #EAE2D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-tagline {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(234,226,212,0.45);
+      max-width: 320px;
+    }
+
+    /* Barre déco bronze en bas */
+    .login-visual-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .login-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .login-stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #B08D57;
+    }
+    .login-stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.35);
+    }
+    .login-stat-sep {
+      width: 1px;
+      height: 32px;
+      background: rgba(176,141,87,0.25);
+    }
+
+    /* ══ PANNEAU DROIT — formulaire ═══════════════════════════ */
+    .login-form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 64px;
+      background: #0f0e0c;
+      border-left: 1px solid rgba(176,141,87,0.10);
+      position: relative;
+    }
+
+    .login-form-inner {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    /* Titre form */
+    .form-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 32px;
+      letter-spacing: -0.01em;
+      color: #EAE2D4;
+      margin-bottom: 6px;
+    }
+
+    .form-subtitle {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(234,226,212,0.40);
+      margin-bottom: 36px;
+    }
+
+    .form-subtitle a {
+      color: #B08D57;
+      text-decoration: none;
+    }
+    .form-subtitle a:hover { text-decoration: underline; }
+
+    /* ── Boutons sociaux ── */
+    .social-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .btn-social {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 20px;
+      background: rgba(234,226,212,0.04);
+      border: 1px solid rgba(234,226,212,0.12);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 200ms, border-color 200ms;
+      text-decoration: none;
+    }
+    .btn-social:hover {
+      background: rgba(234,226,212,0.08);
+      border-color: rgba(176,141,87,0.30);
+    }
+
+    .btn-social-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .btn-social-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: rgba(234,226,212,0.75);
+      flex: 1;
+      text-align: center;
+    }
+
+    /* ── Séparateur ── */
+    .form-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .form-divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(234,226,212,0.08);
+    }
+    .form-divider-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.25);
+    }
+
+    /* ── Champs ── */
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.40);
+    }
+
+    .field-input {
+      background: rgba(234,226,212,0.04);
+      border: 1px solid rgba(234,226,212,0.10);
+      border-radius: 6px;
+      padding: 13px 16px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      color: #EAE2D4;
+      outline: none;
+      transition: border-color 200ms, background 200ms;
+      width: 100%;
+    }
+    .field-input::placeholder { color: rgba(234,226,212,0.20); }
+    .field-input:focus {
+      border-color: rgba(176,141,87,0.50);
+      background: rgba(234,226,212,0.06);
+    }
+
+    /* Row email + mot de passe oublié */
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .forgot-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      color: rgba(176,141,87,0.70);
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .forgot-link:hover { color: #B08D57; }
+
+    /* ── Bouton submit ── */
+    .btn-submit {
+      width: 100%;
+      padding: 15px 24px;
+      background: #B08D57;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #0A0A0A;
+      cursor: pointer;
+      transition: background 200ms, transform 150ms;
+      margin-bottom: 20px;
+    }
+    .btn-submit:hover {
+      background: #c9a26a;
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ── Message d'erreur ── */
+    .form-error {
+      display: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      color: rgba(220, 80, 60, 0.85);
+      background: rgba(220, 80, 60, 0.08);
+      border: 1px solid rgba(220, 80, 60, 0.20);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .form-error.visible { display: block; }
+
+    /* ── Comptes démo ── */
+    .demo-accounts {
+      margin-top: 28px;
+      border: 1px solid rgba(176,141,87,0.22);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+    .demo-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(176,141,87,0.65);
+      margin-bottom: 10px;
+    }
+    .demo-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(234,226,212,0.06);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .demo-row:last-child { border-bottom: none; }
+    .demo-row:hover .demo-email { color: #B08D57; }
+    .demo-email {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 400; letter-spacing: 0.06em;
+      color: rgba(234,226,212,0.55);
+      transition: color 150ms;
+    }
+    .demo-pass {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300; letter-spacing: 0.06em;
+      color: rgba(234,226,212,0.25);
+    }
+
+    /* ── Lien inscription ── */
+    .form-register {
+      text-align: center;
+    }
+    .form-register-text {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      color: rgba(234,226,212,0.30);
+    }
+    .form-register-text a {
+      color: #B08D57;
+      text-decoration: none;
+      font-weight: 400;
+    }
+    .form-register-text a:hover { text-decoration: underline; }
+
+    /* ══ RESPONSIVE ════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .login-wrap { grid-template-columns: 1fr; }
+      .login-visual { display: none; }
+      .login-form-panel {
+        padding: 48px 28px;
+        border-left: none;
+        min-height: 100vh;
+        align-items: flex-start;
+        padding-top: 80px;
+      }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="kafora-db.js"></script>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <!-- ══ PANNEAU GAUCHE ══════════════════════════════════════════ -->
+  <div class="login-visual">
+    <div class="login-visual-bg"></div>
+    <div class="login-visual-content">
+
+      <a href="index.html" class="login-logo">Kafora</a>
+
+      <div class="login-visual-headline">
+        <p class="login-eyebrow">Plateforme créateurs</p>
+        <h1 class="login-big-title">
+          Claim<br>your<br><span>kingdom.</span>
+        </h1>
+        <p class="login-tagline">
+          Rejoins la première plateforme dédiée aux créateurs de la diaspora africaine. Un espace où la visibilité devient revenus.
+        </p>
+      </div>
+
+      <div class="login-visual-footer">
+        <div class="login-stat">
+          <span class="login-stat-num">300+</span>
+          <span class="login-stat-label">Créateurs</span>
+        </div>
+        <div class="login-stat-sep"></div>
+        <div class="login-stat">
+          <span class="login-stat-num">12</span>
+          <span class="login-stat-label">Villes</span>
+        </div>
+        <div class="login-stat-sep"></div>
+        <div class="login-stat">
+          <span class="login-stat-num">3</span>
+          <span class="login-stat-label">Disciplines</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ PANNEAU DROIT — FORMULAIRE ═════════════════════════════ -->
+  <div class="login-form-panel">
+    <div class="login-form-inner">
+
+      <h2 class="form-title">Connexion</h2>
+      <p class="form-subtitle">
+        Pas encore membre ? <a href="inscription.html">Créer un compte</a>
+      </p>
+
+      <!-- Boutons sociaux -->
+      <div class="social-btns">
+        <a href="#" class="btn-social" onclick="handleSocialLogin('google'); return false;">
+          <svg class="btn-social-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span class="btn-social-text">Continuer avec Google</span>
+        </a>
+
+        <a href="#" class="btn-social" onclick="handleSocialLogin('instagram'); return false;">
+          <svg class="btn-social-icon" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#F58529"/>
+                <stop offset="50%" stop-color="#DD2A7B"/>
+                <stop offset="100%" stop-color="#8134AF"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig-grad)"/>
+            <circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5" fill="none"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="white"/>
+          </svg>
+          <span class="btn-social-text">Continuer avec Instagram</span>
+        </a>
+      </div>
+
+      <!-- Séparateur -->
+      <div class="form-divider">
+        <div class="form-divider-line"></div>
+        <span class="form-divider-text">ou</span>
+        <div class="form-divider-line"></div>
+      </div>
+
+      <!-- Message erreur -->
+      <div class="form-error" id="formError">
+        Email ou mot de passe incorrect. Veuillez réessayer.
+      </div>
+
+      <!-- Formulaire -->
+      <form class="form-fields" onsubmit="handleLogin(event)">
+        <div class="field-group">
+          <label class="field-label" for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            class="field-input"
+            placeholder="ton@email.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="field-group">
+          <div class="field-row">
+            <label class="field-label" for="password">Mot de passe</label>
+            <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+          </div>
+          <input
+            id="password"
+            type="password"
+            class="field-input"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-submit">Se connecter</button>
+      </form>
+
+      <div class="demo-accounts">
+        <p class="demo-label">Comptes démo — cliquer pour remplir et connecter</p>
+        <div class="demo-row" onclick="fillDemo('amara@kafora.com','amara2024','amara','Amara','Diallo')">
+          <span class="demo-email">amara@kafora.com</span>
+          <span class="demo-pass">amara2024</span>
+        </div>
+        <div class="demo-row" onclick="fillDemo('kofi@kafora.com','kofi2024','kofi','Kofi','Mensah')">
+          <span class="demo-email">kofi@kafora.com</span>
+          <span class="demo-pass">kofi2024</span>
+        </div>
+        <div class="demo-row" onclick="fillDemo('lea@kafora.com','lea2024','lea','Léa','Traoré')">
+          <span class="demo-email">lea@kafora.com</span>
+          <span class="demo-pass">lea2024</span>
+        </div>
+        <div class="demo-row" onclick="fillDemo('nia@kafora.com','nia2024','nia','Nia','Osei')">
+          <span class="demo-email">nia@kafora.com</span>
+          <span class="demo-pass">nia2024</span>
+        </div>
+      </div>
+
+      <div class="form-register">
+        <p class="form-register-text">
+          Nouveau créateur ? <a href="inscription.html">Rejoindre Kafora</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Données complètes par compte démo ──
+  const DEMO_ACCOUNTS = {
+    'amara@kafora.com': {
+      password: 'amara2024', creatorId: 'amara', firstName: 'Amara', lastName: 'Diallo',
+      profil: {
+        fn: 'Amara', ln: 'Diallo',
+        bio: 'Styliste et directrice artistique basée à Paris. Fondatrice du collectif Wax Moderne. Collaborations avec Jacquemus, ASOS Africa et LVMH Métiers d\'Art. 6 ans d\'expérience dans la mode contemporaine africaine.',
+        city: 'Paris', country: 'France',
+        ig: '@amaradiallo.paris', tt: '@amaradiallo', web: 'amaradiallo.com',
+        photo: 'file:///E:/AfroPunk/6fb830fe4265057425a90408bedb3b48.jpg',
+        discs: ['Mode', 'Design'],
+        accentColor: '#B08D57', layout: 'editorial', sectionOrder: null,
+        portSeason: 'SS2025 — Wax Moderne',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/71c9355a09e0bcbb933442127fa67adb.jpg', label: 'Wax Moderne SS25',    affiliateUrl: 'https://asos.com',     affiliatePartner: 'asos'     },
+          { img: 'file:///E:/AfroPunk/79eeb1e2a7fe6db9984d911c1dd15a82.jpg', label: 'Editorial Jacquemus', affiliateUrl: 'https://farfetch.com',  affiliatePartner: 'farfetch'  },
+          { img: 'file:///E:/AfroPunk/84ccceffca1c045c77c578ea83feb4cf.jpg', label: 'Capsule ASOS Africa',  affiliateUrl: 'https://asos.com',     affiliatePartner: 'asos'     },
+          { img: 'file:///E:/AfroPunk/8a9359b093539eadca0c720f980ef191.jpg', label: 'LVMH Métiers d\'Art' },
+          { img: 'file:///E:/AfroPunk/8cb2d83fde90c38b44cb993cb454c0e0.jpg', label: 'Backstage Paris FW' },
+          { img: 'file:///E:/AfroPunk/92d024d51c5fcb4e0675985054f87cf3.jpg', label: 'Collectif Wax Moderne', affiliateUrl: 'https://asos.com',   affiliatePartner: 'asos'     },
+        ],
+        experiences: [
+          { year: '2024', brand: 'LVMH',       role: 'Directrice Artistique — Métiers d\'Art Africa Collection', tag: 'Mode' },
+          { year: '2023', brand: 'Jacquemus',  role: 'Styliste Éditoriale — Campagne Soleil de l\'Afrique',      tag: 'Mode' },
+          { year: '2023', brand: 'ASOS Africa',role: 'Co-Créatrice — Capsule Wax Moderne × ASOS',               tag: 'Collaboration' },
+          { year: '2022', brand: 'Paris FW',   role: 'Directrice Casting — Afro Couture Week',                   tag: 'Événement' },
+          { year: '2019', brand: 'Fondation',  role: 'Fondatrice — Collectif Wax Moderne, Paris',                tag: 'Entrepreneuriat' },
+        ],
+        boutiqueName: 'Boutique Amara Diallo', boutiqueSub: 'Édition limitée · Livraison mondiale',
+        boutiqueIntro: 'Pièces en édition limitée issues des collections Wax Moderne. Mobile Money accepté.',
+        shop: [
+          { name: 'Collection Wax Moderne SS25', sub: 'Prêt-à-porter · 12 pièces',       url: 'https://asos.com/fr/women/ctas/editorial-pages/page/kafora-amara'          },
+          { name: 'Capsule Jacquemus × Amara',   sub: 'Collaboration · Sold out bientôt', url: 'https://www.farfetch.com/fr/sets/jacquemus-x-amara-diallo--set-10000.aspx' },
+          { name: 'Archive ASOS Africa',          sub: 'Vintage · Pièces uniques',         url: 'https://asos.com/fr/women/ctas/editorial-pages/page/kafora-archive'        },
+        ],
+      },
+      partners: {
+        asos:    { name: 'ASOS',    clicks: 847, rev: '124.50' },
+        sephora: { name: 'Sephora', clicks: 312, rev: '58.20'  },
+        farfetch:{ name: 'Farfetch',clicks: 203, rev: '210.00' },
+      },
+      links: [
+        { name: 'Robe Wax Printed ASOS',        url: 'kafora.track/asos-wm9x2k',  originalUrl: 'https://asos.com', partner: 'ASOS',     partnerId: 'asos',     clicks: 214, at: Date.now()-86400000*3 },
+        { name: 'Foundation Teint Parfait',      url: 'kafora.track/sephora-f4r8j', originalUrl: 'https://sephora.fr', partner: 'Sephora', partnerId: 'sephora',  clicks: 89,  at: Date.now()-86400000*5 },
+        { name: 'Blazer Oversize Jacquemus',     url: 'kafora.track/farfetch-bl3z', originalUrl: 'https://farfetch.com', partner: 'Farfetch', partnerId: 'farfetch', clicks: 156, at: Date.now()-86400000*7 },
+        { name: 'Collection Complète SS25',      url: 'kafora.track/asos-ss25kf',  originalUrl: 'https://asos.com', partner: 'ASOS',     partnerId: 'asos',     clicks: 378, at: Date.now()-86400000*2 },
+        { name: 'Palette Sahel Glow Sephora',    url: 'kafora.track/sephora-sg7m', originalUrl: 'https://sephora.fr', partner: 'Sephora', partnerId: 'sephora',  clicks: 67,  at: Date.now()-86400000   },
+      ],
+    },
+
+    'kofi@kafora.com': {
+      password: 'kofi2024', creatorId: 'kofi', firstName: 'Kofi', lastName: 'Mensah',
+      profil: {
+        fn: 'Kofi', ln: 'Mensah',
+        bio: 'Artiste plasticien basé à Accra. Mon travail explore la mémoire collective de la diaspora africaine à travers la peinture, l\'installation et la photographie. Expositions au MoMA, Tate Modern, Lagos Biennale.',
+        city: 'Accra', country: 'Ghana',
+        ig: '@kofi.mensah.art', tt: '@kofimensah', web: 'kofimensah.com',
+        photo: 'file:///C:/Users/toto/Documents/te/1eb230d1dfa1e0d22dd2c42d7c9243e8.jpg',
+        discs: ['Art Contemporain', 'Sculpture', 'Photographie'],
+        accentColor: '#C0623A', layout: 'galerie', sectionOrder: null,
+        portSeason: 'Œuvres 2023—2025',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/caaa4ddcefd16329089301daf7a22769.jpg', label: 'Lagos Calling',   affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/267b726556e0c96095c282aebaaa7250.jpg', label: 'Berlin Diaspora' },
+          { img: 'file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg', label: 'Paris Series',    affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/d613edb2f36b6672c163e35db1650f8e.jpg', label: 'Dakar Mémoires' },
+          { img: 'file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg', label: 'Accra Gold',      affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/ddc1f140ec485d8ae3ee3e2204da0937.jpg', label: 'Mali Textures' },
+        ],
+        experiences: [
+          { year: '2024', brand: 'MoMA',        role: 'Exposition collective — New Voices of the Diaspora',    tag: 'Art' },
+          { year: '2024', brand: 'Tate Modern', role: 'Résidence artistique — African Contemporary Program',   tag: 'Résidence' },
+          { year: '2023', brand: 'Lagos BF',    role: 'Artiste vedette — Lagos Biennale of Contemporary Art',  tag: 'Biennale' },
+          { year: '2022', brand: 'Serpentine',  role: 'Solo Exhibition — Memory & Gold',                       tag: 'Solo' },
+          { year: '2020', brand: 'Fondation',   role: 'Fondateur — Anansi Art Space, Accra',                   tag: 'Entrepreneuriat' },
+        ],
+        boutiqueName: 'Atelier Kofi Mensah', boutiqueSub: 'Œuvres originales · Tirages limités',
+        boutiqueIntro: 'Œuvres originales, tirages limités et objets d\'art. Expédition sécurisée internationale depuis Accra.',
+        shop: [
+          { name: 'Série "Memory & Gold"',  sub: 'Tirage 1/10 · Huile sur toile',    url: 'https://www.farfetch.com/fr/sets/kofi-mensah-memory-gold--set-10001.aspx' },
+          { name: 'Print "Lagos Calling"',  sub: 'Édition numérique signée · 50 ex', url: 'https://www.farfetch.com/fr/sets/kofi-mensah-prints--set-10002.aspx'      },
+          { name: 'Sculpture "Anansi I"',   sub: 'Bronze · Pièce unique',             url: 'https://www.farfetch.com/fr/sets/kofi-mensah-sculpture--set-10003.aspx'   },
+        ],
+      },
+      partners: {
+        farfetch: { name: 'Farfetch', clicks: 189, rev: '340.00' },
+        asos:     { name: 'ASOS',     clicks: 94,  rev: '42.80'  },
+      },
+      links: [
+        { name: 'Carnet de croquis Moleskine Art',   url: 'kafora.track/asos-cr7kq',     originalUrl: 'https://asos.com', partner: 'ASOS',     partnerId: 'asos',     clicks: 31,  at: Date.now()-86400000*10 },
+        { name: 'Série limitée Farfetch × MoMA',     url: 'kafora.track/farfetch-mm2aa', originalUrl: 'https://farfetch.com', partner: 'Farfetch', partnerId: 'farfetch', clicks: 122, at: Date.now()-86400000*4  },
+        { name: 'Print Pack "Accra Gold" 3 formats', url: 'kafora.track/farfetch-ag5px', originalUrl: 'https://farfetch.com', partner: 'Farfetch', partnerId: 'farfetch', clicks: 67,  at: Date.now()-86400000*6  },
+      ],
+    },
+
+    'lea@kafora.com': {
+      password: 'lea2024', creatorId: 'lea', firstName: 'Léa', lastName: 'Traoré',
+      profil: {
+        fn: 'Léa', ln: 'Traoré',
+        bio: 'Artiste musicale et productrice basée à Dakar. Mon univers mêle afrobeats, soul et sonorités mandingues. Signée Universal Music Africa. Headliner à l\'Olympia Paris 2024.',
+        city: 'Dakar', country: 'Sénégal',
+        ig: '@leatraore.music', tt: '@leatraore', web: 'leatraore.com',
+        photo: 'file:///C:/Users/toto/Documents/te/2cbc89ee1e084a77dac918173a63a68f.jpg',
+        discs: ['Musique', 'Danse', 'Vidéo'],
+        accentColor: '#6B8E7B', layout: 'magazine', sectionOrder: null,
+        portSeason: 'Discographie & Lives 2022—2025',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', label: 'Album Cover — Mbaye' },
+          { img: 'file:///E:/AfroPunk/22e59bcb003c982c719ddf7a5cda4d4b.jpg', label: 'Session Dakar Studio' },
+          { img: 'file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg', label: 'Live Olympia Paris',  affiliateUrl: 'https://nike.com',    affiliatePartner: 'nike'     },
+          { img: 'file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg', label: 'Clip "Teranga"',      affiliateUrl: 'https://nike.com',    affiliatePartner: 'nike'     },
+          { img: 'file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg', label: 'Festival Lagos 2024' },
+          { img: 'file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg', label: 'Tournée Afrique 2024' },
+        ],
+        experiences: [
+          { year: '2025', brand: 'Universal', role: 'Signature — Universal Music Africa',            tag: 'Label' },
+          { year: '2024', brand: 'Olympia',   role: 'Headliner — Soirée Afro Diaspora, Paris',       tag: 'Live' },
+          { year: '2024', brand: 'BBC Africa',role: 'Artiste du mois — BBC Africa Music',             tag: 'Média' },
+          { year: '2023', brand: 'Spotify',   role: 'Playlist "Equal Africa" — 2M d\'écoutes',        tag: 'Streaming' },
+          { year: '2022', brand: 'Fondation', role: 'Lancement du collectif Sons du Sahel, Dakar',    tag: 'Entrepreneuriat' },
+        ],
+        boutiqueName: 'Univers Léa Traoré', boutiqueSub: 'Musique · Merch · Live',
+        boutiqueIntro: 'Musique, merchandise et expériences live. Rejoins l\'univers Sons du Sahel.',
+        shop: [
+          { name: 'Album "Mbaye" — Digital',  sub: 'Téléchargement + livret PDF',     url: 'https://open.spotify.com/artist/lea-traore-kafora'       },
+          { name: 'Hoodie "Sons du Sahel"',   sub: 'Collection limitée · 100 pièces', url: 'https://www.nike.com/fr/w/kafora-lea-traore-merch-10004' },
+          { name: 'Pass VIP — Tournée 2025',  sub: 'Meet & Greet + backstage',        url: 'https://www.sephora.fr/kafora/lea-traore-vip-2025'       },
+        ],
+      },
+      partners: {
+        sephora: { name: 'Sephora', clicks: 523, rev: '98.40' },
+        nike:    { name: 'Nike',    clicks: 341, rev: '75.60' },
+      },
+      links: [
+        { name: 'Casque JBL Edition "Teranga"',  url: 'kafora.track/nike-ter9x',    originalUrl: 'https://nike.com', partner: 'Nike',    partnerId: 'nike',    clicks: 198, at: Date.now()-86400000*2 },
+        { name: 'Parfum "Nuit Sahel" Sephora',   url: 'kafora.track/sephora-ns4k',  originalUrl: 'https://sephora.fr', partner: 'Sephora', partnerId: 'sephora', clicks: 143, at: Date.now()-86400000*4 },
+        { name: 'Sneakers AF1 Black & Gold Nike', url: 'kafora.track/nike-af1bg',   originalUrl: 'https://nike.com', partner: 'Nike',    partnerId: 'nike',    clicks: 267, at: Date.now()-86400000*5 },
+        { name: 'Gloss "Dakar Glow" Sephora',    url: 'kafora.track/sephora-dg2m',  originalUrl: 'https://sephora.fr', partner: 'Sephora', partnerId: 'sephora', clicks: 89,  at: Date.now()-86400000*8 },
+      ],
+    },
+
+    'nia@kafora.com': {
+      password: 'nia2024', creatorId: 'nia', firstName: 'Nia', lastName: 'Osei',
+      profil: {
+        fn: 'Nia', ln: 'Osei',
+        bio: 'Photographe documentaire et de mode basée à Londres. Mon travail célèbre l\'identité noire britannique et afro-caribéenne. Publiée dans Vogue UK, i-D, Dazed & Confused. Fondatrice de NiaFrames Studio, Hackney.',
+        city: 'Londres', country: 'Royaume-Uni',
+        ig: '@niaframes', tt: '@nia.osei', web: 'niaframes.co.uk',
+        photo: 'file:///C:/Users/toto/Documents/te/36b3634cb200cf3a6f9fea2151046d14.jpg',
+        discs: ['Photographie', 'Mode', 'Cinéma'],
+        accentColor: '#7E6B9A', layout: 'minimal', sectionOrder: null,
+        portSeason: 'Selected Works 2022—2025',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/9d92497c5b2a8e5c2e28a56596a18fb0.jpg', label: 'Vogue UK SS24',         affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg', label: 'i-D Portrait Series',   affiliateUrl: 'https://asos.com',     affiliatePartner: 'asos'     },
+          { img: 'file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg', label: 'Dazed Editorial' },
+          { img: 'file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', label: 'Black British Identity', affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg', label: 'Afro-Caribbean Portraits' },
+          { img: 'file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg', label: 'London Streets 2024' },
+        ],
+        experiences: [
+          { year: '2025', brand: 'Vogue UK',  role: 'Photographe contributrice — Mode & Culture',   tag: 'Editorial' },
+          { year: '2024', brand: 'i-D',       role: 'Cover Shoot — "The New Black British"',         tag: 'Portrait' },
+          { year: '2024', brand: 'Dazed',     role: 'Photographe de couverture — Issue 12',           tag: 'Mode' },
+          { year: '2023', brand: 'V&A Museum',role: 'Exposition — "Diaspora in Lens", Londres',       tag: 'Exposition' },
+          { year: '2022', brand: 'Fondation', role: 'Lancement de NiaFrames Studio, Hackney',         tag: 'Entrepreneuriat' },
+        ],
+        boutiqueName: 'NiaFrames Prints', boutiqueSub: 'Tirages signés · Éditions limitées',
+        boutiqueIntro: 'Tirages photographiques en édition limitée, signés et numérotés. Expédition depuis Londres.',
+        shop: [
+          { name: 'Print "Vogue UK SS24"',          sub: 'Format 60×90 · Tirage 1/20',  url: 'https://www.farfetch.com/fr/sets/nia-osei-prints--set-20001.aspx'   },
+          { name: 'Series "Black British"',          sub: 'Coffret 5 tirages · Signé',   url: 'https://www.farfetch.com/fr/sets/nia-osei-series--set-20002.aspx'   },
+          { name: 'Zine "Afro-Caribbean Portraits"', sub: 'Édition collector · 200 ex.', url: 'https://asos.com/fr/women/ctas/editorial-pages/page/kafora-nia-zine' },
+        ],
+      },
+      partners: {
+        asos:    { name: 'ASOS',    clicks: 276, rev: '52.30' },
+        farfetch:{ name: 'Farfetch',clicks: 418, rev: '385.00' },
+      },
+      links: [
+        { name: 'Appareil Fuji X100VI Edition Noire', url: 'kafora.track/farfetch-fx6n', originalUrl: 'https://farfetch.com', partner: 'Farfetch', partnerId: 'farfetch', clicks: 201, at: Date.now()-86400000*2 },
+        { name: 'Veste Photo ASOS Studio',             url: 'kafora.track/asos-vp9ms',   originalUrl: 'https://asos.com',     partner: 'ASOS',     partnerId: 'asos',     clicks: 88,  at: Date.now()-86400000*3 },
+        { name: 'Sac Caméra Luxury Farfetch',          url: 'kafora.track/farfetch-sc3l', originalUrl: 'https://farfetch.com', partner: 'Farfetch', partnerId: 'farfetch', clicks: 134, at: Date.now()-86400000*6 },
+        { name: 'Body ASOS Édition Limitée',           url: 'kafora.track/asos-body4k',  originalUrl: 'https://asos.com',     partner: 'ASOS',     partnerId: 'asos',     clicks: 55,  at: Date.now()-86400000*9 },
+      ],
+    },
+  };
+
+  // ── Injecte toutes les données démo dans localStorage puis redirige ──
+  function fillDemo(email, pass, creatorId, firstName, lastName) {
+    try {
+      const account = DEMO_ACCOUNTS[email];
+      if (!account) return;
+
+      // Vide les anciennes données d'un éventuel compte précédent
+      localStorage.removeItem('kafora-profil');
+      localStorage.removeItem('kafora-links');
+      localStorage.removeItem('kafora-partners');
+      localStorage.removeItem('kafora-pass-id');
+
+      localStorage.setItem('kafora-user', JSON.stringify({
+        email, creatorId, firstName, lastName, loggedAt: Date.now(),
+      }));
+      localStorage.setItem('kafora-profil',   JSON.stringify(account.profil));
+      localStorage.setItem('kafora-partners', JSON.stringify(account.partners));
+      localStorage.setItem('kafora-links',    JSON.stringify(account.links));
+
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      alert('Erreur Kafora (Demo) : ' + err.message);
+    }
+  }
+
+  // ── Connexion manuelle ──
+  function handleLogin(e) {
+    e.preventDefault();
+    try {
+      const email    = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+      const error    = document.getElementById('formError');
+
+      if (!email || password.length < 4) {
+        error.textContent = 'Identifiants incorrects ou trop courts.';
+        error.classList.add('visible');
+        setTimeout(() => error.classList.remove('visible'), 4000);
+        return;
+      }
+
+      const account = DEMO_ACCOUNTS[email];
+      if (account) {
+        if (account.password !== password) {
+          error.textContent = 'Mot de passe incorrect.';
+          error.classList.add('visible');
+          setTimeout(() => error.classList.remove('visible'), 4000);
+          return;
+        }
+        // Même traitement qu'un clic démo
+        fillDemo(email, password, account.creatorId, account.firstName, account.lastName);
+      } else {
+        // Compte non-démo : tente Firebase, fallback localStorage
+        kaforaSignIn(email, password).then(function(r) {
+          if (r.ok) {
+            window.location.href = 'dashboard.html';
+          } else {
+            // Firebase non configuré ou offline : connexion locale
+            localStorage.setItem('kafora-user', JSON.stringify({ email, loggedAt: Date.now() }));
+            window.location.href = 'dashboard.html';
+          }
+        }).catch(function() {
+          localStorage.setItem('kafora-user', JSON.stringify({ email, loggedAt: Date.now() }));
+          window.location.href = 'dashboard.html';
+        });
+        return;
+      }
+    } catch (err) {
+      alert('Erreur Kafora (Connexion) : ' + err.message);
+    }
+  }
+
+  // ── Social login ──
+  function handleSocialLogin(provider) {
+    try {
+      localStorage.setItem('kafora-user', JSON.stringify({ provider, loggedAt: Date.now() }));
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      alert('Erreur Kafora (Social) : ' + err.message);
+    }
+  }
+
+</script>
+
+
+</body>
+</html>

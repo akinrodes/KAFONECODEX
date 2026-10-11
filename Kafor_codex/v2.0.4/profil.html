@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Profil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    /* ── Accent par créateur (overridé en JS) ── */
+    :root { --accent: #B08D57; }
+
+    /* ── Bannière prévisualisation ── */
+    .preview-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: rgba(176,141,87,0.96);
+      padding: 11px 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .preview-banner.hidden { display: none; }
+    .preview-banner-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: #0A0A0A;
+    }
+    .preview-banner-back {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: #0A0A0A; text-decoration: none;
+      border: 1px solid rgba(0,0,0,0.25); padding: 6px 14px;
+      transition: background 200ms;
+    }
+    .preview-banner-back:hover { background: rgba(0,0,0,0.10); }
+    body.is-preview { padding-top: 44px; }
+
+    /* ── BADGE VÉRIFIÉ ── */
+    .badge-verified {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+      color: #0A0A0A; background: #B08D57;
+      padding: 3px 8px;
+    }
+
+    /* ── PROFILE HERO ── */
+    .profil-hero {
+      position: relative; width: 100vw; height: 100vh;
+      overflow: hidden; background: var(--ink);
+    }
+    .profil-hero img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 15%;
+      display: block;
+    }
+    .profil-hero-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top,
+        rgba(10,10,10,1) 0%,
+        rgba(10,10,10,0.5) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+    /* Teinte d'ambiance par créateur */
+    .profil-hero-tint {
+      position: absolute; inset: 0;
+      opacity: 0.08;
+      background: var(--accent);
+      mix-blend-mode: color;
+      pointer-events: none;
+    }
+    .profil-identity {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 0 48px 52px;
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+    }
+    .profil-name {
+      font-family: var(--custom-font, 'Barlow Condensed', sans-serif);
+      font-weight: 900;
+      font-size: clamp(56px, 8vw, 120px);
+      line-height: 0.88; letter-spacing: -0.025em;
+      color: var(--void);
+    }
+    .profil-meta { text-align: right; flex-shrink: 0; padding-bottom: 12px; }
+    .profil-stats { display: flex; gap: 32px; margin-top: 20px; }
+    .stat { text-align: right; }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 28px;
+      color: var(--void); letter-spacing: -0.02em; line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ash);
+      margin-top: 4px;
+    }
+
+    /* ── PROFILE BODY ── */
+    .profil-body { background: var(--ink); }
+
+    /* Pill colorée par créateur */
+    .pill-accent {
+      display: inline-block;
+      padding: 5px 14px;
+      border: 1px solid var(--accent);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.30em; text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,0,0,0.4);
+    }
+
+    /* Bio strip */
+    .bio-strip {
+      padding: 52px 48px; border-bottom: 1px solid #1c1c1c;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+    }
+    .bio-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.7;
+      color: rgba(234,226,212,0.55);
+      grid-column: span 2;
+    }
+    .bio-tags { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+
+    /* CTA row */
+    .cta-row {
+      padding: 32px 48px; border-bottom: 1px solid #1c1c1c;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .cta-row-left {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ash);
+    }
+    .cta-row-btns { display: flex; gap: 12px; }
+    .btn-accent {
+      display: inline-block;
+      padding: 11px 24px;
+      background: var(--accent); border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: #0A0A0A; text-decoration: none;
+      cursor: pointer; transition: opacity 200ms;
+    }
+    .btn-accent:hover { opacity: 0.85; }
+
+    /* ── PORTFOLIO GRID ── */
+    .portfolio-section { padding: 64px 48px; background: var(--ink); }
+    .portfolio-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 36px;
+    }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1px;
+      background: #1c1c1c;
+    }
+    .port-tile {
+      position: relative; overflow: hidden; cursor: pointer;
+      background: var(--ink);
+    }
+    .port-tile-img {
+      width: 100%; aspect-ratio: 3/4;
+      object-fit: cover; display: block;
+      transition: transform 700ms ease;
+    }
+    .port-tile:nth-child(2) .port-tile-img { aspect-ratio: 3/2; }
+    .port-tile:nth-child(5) .port-tile-img { aspect-ratio: 3/2; }
+    .port-tile:hover .port-tile-img { transform: scale(1.04); }
+    .port-tile-over {
+      position: absolute; inset: 0;
+      background: rgba(10,10,10,0);
+      display: flex; align-items: flex-end; padding: 20px;
+      transition: background 300ms;
+    }
+    .port-tile:hover .port-tile-over { background: rgba(10,10,10,0.65); }
+    .port-tile-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--accent);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 300ms, transform 300ms;
+    }
+    .port-tile:hover .port-tile-label { opacity: 1; transform: translateY(0); }
+
+    /* ── PORTFOLIO AFFILIATE BADGE ── */
+    .port-tile-aff-badge {
+      position: absolute; top: 14px; right: 14px;
+      background: var(--accent); color: #0A0A0A;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      padding: 5px 10px;
+      opacity: 0; transform: translateY(-6px);
+      transition: opacity 250ms, transform 250ms;
+      pointer-events: none;
+    }
+    .port-tile:hover .port-tile-aff-badge { opacity: 1; transform: translateY(0); }
+    a.port-tile { text-decoration: none; color: inherit; display: block; }
+
+    /* ── EXPERIENCES ── */
+    .experiences-section {
+      padding: 64px 48px; background: #080808;
+      border-top: 1px solid #1c1c1c;
+    }
+    .exp-timeline-item {
+      display: flex; gap: 24px;
+      margin-bottom: 32px;
+    }
+    .exp-timeline-item:last-child { margin-bottom: 0; }
+    .exp-timeline-left {
+      display: flex; flex-direction: column; align-items: center;
+      width: 56px; flex-shrink: 0;
+    }
+    .exp-timeline-logo {
+      width: 56px; height: 56px;
+      background: var(--accent); color: #080808;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700;
+      border-radius: 4px; z-index: 2;
+    }
+    .exp-timeline-line {
+      flex: 1; width: 2px; background: #1c1c1c;
+      margin-top: 8px; margin-bottom: -40px; /* extends to next item */
+      z-index: 1;
+    }
+    .exp-timeline-item:last-child .exp-timeline-line { display: none; }
+    
+    .exp-timeline-content {
+      flex: 1; padding-bottom: 24px;
+      margin-top: 4px;
+    }
+    .exp-header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 8px; }
+    .exp-role {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 22px;
+      font-weight: 700; letter-spacing: 0.02em; color: var(--parchment);
+      text-transform: uppercase; line-height: 1.1; margin-bottom: 6px;
+    }
+    .exp-brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .exp-brand {
+      font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 16px;
+      color: var(--parchment);
+    }
+    .exp-brand-link { text-decoration: underline; text-underline-offset: 4px; color: inherit; transition: opacity 200ms; }
+    .exp-brand-link:hover { opacity: 0.7; }
+    .exp-linked-badge {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px;
+      font-weight: 700; color: #0A0A0A; background: var(--accent);
+      padding: 3px 8px; border-radius: 3px; letter-spacing: 0.1em;
+      text-transform: uppercase; text-decoration: none;
+      transition: opacity 200ms;
+    }
+    .exp-linked-badge:hover { opacity: 0.8; }
+    .exp-year {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--ash);
+    }
+    .exp-desc { 
+      font-family: 'Barlow', sans-serif; font-size: 15px; 
+      font-weight: 300; line-height: 1.6; color: rgba(234,226,212,0.65); 
+      max-width: 720px; margin-top: 12px; 
+    }
+    .exp-media-grid { 
+      display: flex; gap: 14px; margin-top: 20px; 
+      overflow-x: auto; padding-bottom: 12px; align-items: center;
+    }
+    .exp-media-grid::-webkit-scrollbar { height: 4px; }
+    .exp-media-grid::-webkit-scrollbar-thumb { background: rgba(234,226,212,0.15); border-radius: 4px; }
+    .exp-media-item { 
+      height: 380px; flex-shrink: 0; border-radius: 6px; 
+      overflow: hidden; border: 1px solid rgba(234,226,212,0.1); 
+    }
+    .exp-media-item img { height: 100%; width: auto; object-fit: cover; }
+    
+    .exp-media-link-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 220px; width: 220px; flex-shrink: 0; border-radius: 6px;
+      background: rgba(234,226,212,0.05); color: var(--parchment);
+      text-decoration: none; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      border: 1px dashed rgba(234,226,212,0.2); transition: background 200ms, color 200ms;
+    }
+    .exp-media-link-btn:hover { background: var(--accent); color: #080808; border-color: var(--accent); text-decoration: none; }
+
+    /* ── BOUTIQUE ── */
+    .boutique-section {
+      padding: 80px 48px;
+      border-top: 1px solid #1c1c1c;
+      background: linear-gradient(180deg, #080808 0%, #0A0A0A 100%);
+    }
+    .boutique-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 36px;
+    }
+    .boutique-intro {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.06em; color: rgba(234,226,212,0.40);
+      max-width: 480px;
+    }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      background: #1c1c1c;
+    }
+    .shop-item {
+      background: #080808;
+      padding: 28px 32px;
+      display: flex; justify-content: space-between;
+      align-items: center; gap: 20px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .shop-item:hover { background: #0f0f0f; }
+    .shop-item-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 17px;
+      letter-spacing: 0.02em;
+      color: var(--parchment);
+      margin-bottom: 4px;
+    }
+    .shop-item-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ash);
+    }
+    .shop-item-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--accent);
+      flex-shrink: 0;
+      white-space: nowrap;
+      transition: opacity 200ms;
+    }
+    .shop-item:hover .shop-item-cta { opacity: 0.7; }
+    .shop-item-clicks {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300;
+      letter-spacing: 0.14em;
+      color: rgba(234,226,212,0.18);
+      margin-left: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Bouton test mise en page ── */
+    .test-layout-bar {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      z-index: 999; display: flex; align-items: center; gap: 16px;
+      background: rgba(10,10,10,0.92);
+      border: 1px solid rgba(176,141,87,0.45);
+      padding: 14px 24px;
+      backdrop-filter: blur(8px);
+    }
+    .test-layout-bar p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.14em; color: rgba(234,226,212,0.55);
+      white-space: nowrap;
+    }
+    .test-layout-bar button {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.26em; text-transform: uppercase;
+      color: #0A0A0A; background: var(--accent);
+      border: none; padding: 9px 20px; cursor: pointer;
+      white-space: nowrap; transition: opacity 200ms;
+      flex-shrink: 0;
+    }
+    .test-layout-bar button:hover { opacity: 0.82; }
+
+    @media (max-width: 900px) {
+      .profil-identity { flex-direction: column; align-items: flex-start; gap: 20px; padding: 0 24px 40px; }
+      .profil-meta { text-align: left; }
+      .profil-stats { justify-content: flex-start; }
+      .bio-strip { grid-template-columns: 1fr; padding: 40px 24px; }
+      .bio-text { grid-column: 1; }
+      .bio-tags { align-items: flex-start; }
+      .cta-row, .portfolio-section, .experiences-section, .boutique-section { padding-left: 24px; padding-right: 24px; }
+      .portfolio-grid { grid-template-columns: repeat(2,1fr); }
+      .exp-brand { width: 140px; }
+      .shop-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══ LAYOUTS ══ */
+    /* Magazine : hero plus court, première image portfolio en vedette */
+    body.layout-magazine .profil-hero { height: 65vh; }
+    body.layout-magazine .bio-text { font-size: 17px; line-height: 1.9; }
+    body.layout-magazine .portfolio-grid { grid-template-columns: 2fr 1fr 1fr; }
+    body.layout-magazine .portfolio-grid .port-tile:first-child { grid-row: span 2; }
+    body.layout-magazine .portfolio-grid .port-tile:first-child .port-tile-img { aspect-ratio: unset; height: 100%; }
+
+    /* Minimal : hero compact, mise en page centrée, grille serrée */
+    body.layout-minimal .profil-hero { height: 38vh; }
+    body.layout-minimal .bio-strip { display: block; max-width: 680px; margin: 0 auto; text-align: center; }
+    body.layout-minimal .bio-text { grid-column: 1; }
+    body.layout-minimal .bio-tags { align-items: center; flex-direction: row; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+    body.layout-minimal .portfolio-grid { grid-template-columns: repeat(4, 1fr); }
+    body.layout-minimal .portfolio-section { padding-top: 48px; padding-bottom: 48px; }
+    body.layout-minimal .port-tile-img,
+    body.layout-minimal .port-tile:nth-child(2) .port-tile-img,
+    body.layout-minimal .port-tile:nth-child(5) .port-tile-img { aspect-ratio: 1/1; }
+
+    /* Galerie : portfolio pleine largeur, grille 4 colonnes sans padding */
+    body.layout-galerie .profil-hero { height: 52vh; }
+    body.layout-galerie .portfolio-section { padding-left: 0; padding-right: 0; }
+    body.layout-galerie .portfolio-header { padding: 40px 48px 0; }
+    body.layout-galerie .portfolio-grid { grid-template-columns: repeat(4, 1fr); }
+    body.layout-galerie .port-tile-img,
+    body.layout-galerie .port-tile:nth-child(2) .port-tile-img,
+    body.layout-galerie .port-tile:nth-child(5) .port-tile-img { aspect-ratio: 3/4; }
+
+    /* ══ CONTRÔLES SECTIONS (mode prévisualisation) ══ */
+    .section-controls {
+      display: none;
+      position: absolute; top: 14px; right: 14px; z-index: 20;
+      background: rgba(10,10,10,0.90);
+      border: 1px solid rgba(176,141,87,0.45);
+      color: rgba(176,141,87,0.85);
+      padding: 6px 12px; gap: 7px; align-items: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.26em; text-transform: uppercase;
+      gap: 4px; border-radius: 4px; user-select: none;
+    }
+    .section-btn {
+      background: none; border: 1px solid rgba(176,141,87,0.35);
+      color: #B08D57; width: 22px; height: 22px;
+      border-radius: 3px; cursor: pointer; font-size: 13px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 150ms, border-color 150ms;
+    }
+    .section-btn:hover:not(:disabled) { background: rgba(176,141,87,0.18); border-color: #B08D57; }
+    .section-btn:disabled { opacity: 0.25; cursor: default; }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 9px;
+      font-weight: 700; letter-spacing: 0.26em; text-transform: uppercase;
+      color: rgba(176,141,87,0.65); padding: 0 4px;
+    }
+    .section-wrap { position: relative; }
+    body.preview-drag .section-wrap { cursor: default; }
+    body.preview-drag .section-wrap:hover > .section-controls { display: flex; }
+
+    /* ══ ENHANCEMENTS ÉDITORIAUX ══════════════════════════════ */
+
+    /* Hero grain cinéma */
+    .profil-hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .profil-identity { z-index: 2; }
+
+    /* Section numbers on profil sections */
+    .profil-section-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.40em; text-transform: uppercase;
+      color: rgba(176,141,87,0.35);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .profil-section-num::after {
+      content: ''; display: block; width: 28px; height: 1px;
+      background: rgba(176,141,87,0.30);
+    }
+
+    /* Portfolio section header golden rule */
+    .portfolio-header::after {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: rgba(176,141,87,0.25);
+      align-self: center;
+    }
+
+    /* Port tile grain overlay */
+    .port-tile::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 2;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+
+    /* Bio strip — barcode deco */
+    .bio-barcode {
+      display: flex; gap: 1.5px; align-items: flex-end;
+      height: 20px; opacity: 0.12; margin-top: 20px;
+    }
+    .bio-barcode b { display: block; width: 1.5px; background: var(--parchment); }
+
+    /* Stat hover */
+    .stat { transition: transform 300ms cubic-bezier(0.34,1.25,0.64,1); cursor: default; }
+    .stat:hover { transform: translateY(-3px); }
+    .stat:hover .stat-num { color: var(--accent); }
+    .stat-num { transition: color 300ms; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ PREVIEW BANNER ══ -->
+  <div class="preview-banner hidden" id="previewBanner">
+    <span class="preview-banner-text">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:8px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Prévisualisation — Voici ce que les visiteurs voient sur ton profil
+    </span>
+    <a href="dashboard.html" class="preview-banner-back">← Retour au dashboard</a>
+  </div>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html" class="active">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html">Marques</a></li>
+      <li><a href="marques.html">Marques</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="connexion.html" class="nav-icon" title="Connexion"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="profil-hero">
+    <img id="heroImg" src="" alt="" />
+    <div class="profil-hero-over"></div>
+    <div class="profil-hero-tint" id="heroTint"></div>
+    <div class="social-rail"><div class="social-rail-inner"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a></div></div>
+    <div class="profil-identity">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <span class="t-label light" id="heroDisc">—</span>
+          <span class="pill-accent" id="heroBadge">Premium</span>
+        </div>
+        <h1 class="profil-name" id="heroName"></h1>
+      </div>
+      <div class="profil-meta">
+        <div class="profil-stats">
+          <div class="stat"><div class="stat-num" id="sFollowers">—</div><div class="stat-label">Followers</div></div>
+          <div class="stat"><div class="stat-num" id="sCollabs">—</div><div class="stat-label">Collaborations</div></div>
+          <div class="stat"><div class="stat-num" id="sYears">—</div><div class="stat-label">Ans d'activité</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ BODY ══ -->
+  <div class="profil-body">
+
+  <div id="sectionsContainer">
+
+    <!-- ══ BIO ══ -->
+    <div class="section-wrap" data-sid="bio">
+      <div class="section-controls"></div>
+      <div class="bio-strip">
+        <p class="bio-text" id="bioCopy">—</p>
+        <div class="bio-tags" id="bioTags"></div>
+      </div>
+      <div class="cta-row">
+        <span class="cta-row-left">Contacter · Collaborer · Recruter</span>
+        <div class="cta-row-btns">
+          <span id="contactContainer"></span>
+          <button class="btn btn-ghost" id="btnPressKit" onclick="openPressKit()" style="padding:11px 24px;font-size:11px;cursor:pointer;">Press Kit ↗</button>
+          <a href="#portfolio" class="btn btn-ghost" style="padding:11px 24px;font-size:11px;">Voir le portfolio</a>
+          <a href="#boutique" class="btn-accent" id="ctaBoutique">Visiter la boutique →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PORTFOLIO ══ -->
+    <div class="section-wrap" data-sid="portfolio">
+      <div class="section-controls"></div>
+      <section class="portfolio-section" id="portfolio">
+        <div class="portfolio-header">
+          <h2 class="t-sub" style="color:var(--parchment);">Portfolio</h2>
+          <span class="t-label" id="portSeason">—</span>
+        </div>
+        <div class="portfolio-grid" id="portfolioGrid"></div>
+      </section>
+    </div>
+
+    <!-- ══ EXPERIENCES ══ -->
+    <div class="section-wrap" data-sid="experiences">
+      <div class="section-controls"></div>
+      <section class="experiences-section">
+        <div style="margin-bottom:36px;display:flex;justify-content:space-between;align-items:baseline;">
+          <h2 class="t-sub" style="color:var(--parchment);">Expériences</h2>
+          <span class="t-label">CV Créateur</span>
+        </div>
+        <div id="expList"></div>
+      </section>
+    </div>
+
+    <!-- ══ BOUTIQUE ══ -->
+    <div class="section-wrap" data-sid="boutique">
+      <div class="section-controls"></div>
+      <section class="boutique-section" id="boutique">
+        <div class="boutique-header">
+          <div>
+            <h2 class="t-sub" style="color:var(--parchment);margin-bottom:10px;" id="boutiqueName">Boutique</h2>
+            <p class="boutique-intro" id="boutiqueIntro">—</p>
+          </div>
+          <span class="t-label" id="boutiqueSub">Édition limitée</span>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </section>
+    </div>
+
+    <!-- ══ SIMILAIRES (Suggestion Profil) ══ -->
+    <div class="section-wrap" data-sid="similar">
+      <section class="portfolio-section" style="border-top:1px solid #1c1c1c;">
+        <div class="portfolio-header">
+          <h2 class="t-sub" style="color:var(--parchment);">Créateurs similaires</h2>
+          <span class="t-label">À découvrir</span>
+        </div>
+        <div class="portfolio-grid" id="similarGrid" style="grid-template-columns: repeat(4, 1fr); gap: 14px; background: transparent;"></div>
+      </section>
+    </div>
+
+  </div>
+
+  </div>
+
+  <!-- ══ TEST MISE EN PAGE ══ -->
+  <div class="test-layout-bar" id="testLayoutBar" style="display:none">
+    <p>Tu es connecté en tant que ce créateur</p>
+    <button onclick="loadAsMe()">Personnaliser mon profil →</button>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="casting.html">Casting</a></li>
+      <li><a href="missions.html">Missions</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html">Marques</a></li>
+      <li><a href="marques.html">Marques</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Données créateurs ──────────────────────────────────────
+    const CREATORS = {
+      amara: {
+        verified:    true,
+        boosted:     true,
+        accentColor: '#B08D57',
+        title:       'Kafora — Amara Diallo · Mode Paris',
+        heroImg:     'file:///E:/AfroPunk/6fb830fe4265057425a90408bedb3b48.jpg',
+        discipline:  'Mode · Paris, France',
+        badge:       'Premium',
+        name:        'Amara<br>Diallo',
+        followers:   '48k', collabs: '124', years: '6',
+        bio:         'Styliste et directrice artistique basée à Paris, spécialisée dans la mode contemporaine africaine. Fondatrice du collectif Wax Moderne. Collaborations avec Jacquemus, Asos Africa, et LVMH Métiers d\'Art.',
+        tags:        ['Haute Couture', 'Direction Artistique', 'Wax & Textile', 'Casting Mode'],
+        portSeason:  'SS2025 Collection',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/71c9355a09e0bcbb933442127fa67adb.jpg', label: 'Wax Moderne SS25',    affiliateUrl: 'https://asos.com',     affiliatePartner: 'asos'     },
+          { img: 'file:///E:/AfroPunk/79eeb1e2a7fe6db9984d911c1dd15a82.jpg', label: 'Editorial Jacquemus', affiliateUrl: 'https://farfetch.com',  affiliatePartner: 'farfetch'  },
+          { img: 'file:///E:/AfroPunk/84ccceffca1c045c77c578ea83feb4cf.jpg', label: 'Capsule ASOS Africa',  affiliateUrl: 'https://asos.com',     affiliatePartner: 'asos'     },
+          { img: 'file:///E:/AfroPunk/8a9359b093539eadca0c720f980ef191.jpg', label: 'LVMH Métiers d\'Art' },
+          { img: 'file:///E:/AfroPunk/8cb2d83fde90c38b44cb993cb454c0e0.jpg', label: 'Backstage Paris FW' },
+          { img: 'file:///E:/AfroPunk/92d024d51c5fcb4e0675985054f87cf3.jpg', label: 'Collectif Wax Moderne', affiliateUrl: 'https://asos.com',   affiliatePartner: 'asos'     },
+        ],
+        email: 'contact@amaradiallo.fr',
+        experiences: [
+          { year: '2024', brand: 'Vogue France', role: 'Directrice de Création', description: 'Direction artistique du shooting exclusif Fashion Week de Paris. Supervision des équipes de stylisme et gestion des sets complexes.', linkedProfile: 'vogue', media: ['file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg', 'file:///E:/AfroPunk/e7ca30197ff55a5d8b8d182df3d3f997.jpg', 'file:///E:/AfroPunk/e8efb2d315c0cf421331db3594ee6212.jpg'] },
+          { year: '2022 - 2023', brand: 'Jacquemus', role: 'Styliste Senior', description: 'Stylisme pour la collection "Soleil de l\'Afrique".\nMise en valeur des tissus traditionnels africains dans une approche moderne et asymétrique. Collaboration sur la scénographie du défilé. Instagram pré-chargé en exemple.', media: ['file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] }
+        ],
+        boutiqueName:  'Boutique Amara Diallo',
+        boutiqueIntro: 'Pièces en édition limitée issues des collections Wax Moderne. Livraison mondiale. Mobile Money accepté.',
+        boutiqueSub:   'Édition limitée · Livraison mondiale',
+        shop: [
+          { name: 'Collection Wax Moderne SS25', sub: 'Prêt-à-porter · 12 pièces',       url: 'https://asos.com/fr/women/ctas/editorial-pages/page/kafora-amara'     },
+          { name: 'Capsule Jacquemus × Amara',   sub: 'Collaboration · Sold out bientôt', url: 'https://www.farfetch.com/fr/sets/jacquemus-x-amara-diallo--set-10000.aspx' },
+          { name: 'Archive ASOS Africa',          sub: 'Vintage · Pièces uniques',         url: 'https://asos.com/fr/women/ctas/editorial-pages/page/kafora-archive'   },
+        ],
+      },
+
+      kofi: {
+        verified:    true,
+        accentColor: '#C0623A',
+        title:       'Kafora — Kofi Mensah · Art Contemporain',
+        heroImg:     'file:///C:/Users/toto/Documents/te/1eb230d1dfa1e0d22dd2c42d7c9243e8.jpg',
+        discipline:  'Art Contemporain · Accra, Ghana',
+        badge:       'Premium',
+        name:        'Kofi<br>Mensah',
+        followers:   '32k', collabs: '87', years: '8',
+        bio:         'Artiste plasticien basé à Accra, dont le travail explore la mémoire collective de la diaspora africaine à travers la peinture, l\'installation et la photographie. Expositions à Lagos, Londres et New York.',
+        tags:        ['Peinture', 'Installation', 'Photographie', 'Art Urbain'],
+        portSeason:  'Œuvres 2023—2025',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/caaa4ddcefd16329089301daf7a22769.jpg', label: 'Lagos Calling',   affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/267b726556e0c96095c282aebaaa7250.jpg', label: 'Berlin Diaspora' },
+          { img: 'file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg', label: 'Paris Series',    affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/d613edb2f36b6672c163e35db1650f8e.jpg', label: 'Dakar Mémoires' },
+          { img: 'file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg', label: 'Accra Gold',      affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/ddc1f140ec485d8ae3ee3e2204da0937.jpg', label: 'Mali Textures' },
+        ],
+        email: 'studio@kofimensah.art',
+        experiences: [
+          { year: '2024', brand: 'MoMA',         role: 'Exposition collective — New Voices',   tag: 'Art', description: 'Installation digitale immersive avec projection mapping sur 4 espaces distincts. Utilisation de technologies interactives.', media: ['file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] },
+          { year: '2024', brand: 'Tate Modern',  role: 'Résidence artistique — African Program',  tag: 'Résidence', description: 'Création d\'un corpus d\'oeuvres 3D avec focus sur les masques culturels modélisés et intégrés dans un décor onirique urbain.', media: ['file:///E:/AfroPunk/ed22ba242943b39456246d71ef190208.jpg'] }
+        ],
+        boutiqueName:  'Atelier Kofi Mensah',
+        boutiqueIntro: 'Œuvres originales, tirages limités et objets d\'art. Expédition sécurisée internationale depuis Accra.',
+        boutiqueSub:   'Œuvres originales · Tirages limités',
+        shop: [
+          { name: 'Série "Memory & Gold"',  sub: 'Tirage 1/10 · Huile sur toile',    url: 'https://www.farfetch.com/fr/sets/kofi-mensah-memory-gold--set-10001.aspx' },
+          { name: 'Print "Lagos Calling"',  sub: 'Édition numérique signée · 50 ex', url: 'https://www.farfetch.com/fr/sets/kofi-mensah-prints--set-10002.aspx'      },
+          { name: 'Sculpture "Anansi I"',   sub: 'Bronze · Pièce unique',             url: 'https://www.farfetch.com/fr/sets/kofi-mensah-sculpture--set-10003.aspx'   },
+        ],
+      },
+
+      lea: {
+        accentColor: '#6B8E7B',
+        title:       'Kafora — Léa Traoré · Musique Dakar',
+        heroImg:     'file:///C:/Users/toto/Documents/te/2cbc89ee1e084a77dac918173a63a68f.jpg',
+        discipline:  'Musique · Dakar, Sénégal',
+        badge:       'Membre',
+        name:        'Léa<br>Traoré',
+        followers:   '61k', collabs: '53', years: '5',
+        bio:         'Artiste musicale et productrice basée à Dakar. Son univers mêle afrobeats, soul et sonorités mandingues. Tournées internationales, collaborations avec des labels européens et africains.',
+        tags:        ['Afrobeats', 'Soul', 'Production', 'Live Performance'],
+        portSeason:  'Discographie & Lives',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', label: 'Album Cover — Mbaye' },
+          { img: 'file:///E:/AfroPunk/22e59bcb003c982c719ddf7a5cda4d4b.jpg', label: 'Session Dakar Studio' },
+          { img: 'file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg', label: 'Live Olympia Paris',  affiliateUrl: 'https://nike.com',    affiliatePartner: 'nike'     },
+          { img: 'file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg', label: 'Clip "Teranga"',      affiliateUrl: 'https://nike.com',    affiliatePartner: 'nike'     },
+          { img: 'file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg', label: 'Festival Lagos' },
+          { img: 'file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg', label: 'Tournée Afrique 24' },
+        ],
+        experiences: [
+          { year: '2025', brand: 'Universal',    role: 'Signature — Label Universal Music Africa',           tag: 'Label', description: 'Direction artistique visuelle autour de la sortie du nouvel album. Instagram pré-chargé en exemple.', media: ['file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] },
+          { year: '2024', brand: 'Olympia',      role: 'Headliner — Soirée Afro Diaspora, Paris',            tag: 'Live', description: 'Production d\'un set complet alliant musique live et créations 3D en fond visuel.', media: ['file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg'] },
+          { year: '2024', brand: 'BBC Africa',   role: 'Artiste du mois — BBC Africa Music',                  tag: 'Média' },
+          { year: '2023', brand: 'Spotify',      role: 'Playlist "Equal Africa" — 2M d\'écoutes',             tag: 'Streaming' },
+          { year: '2022', brand: 'Fondation',    role: 'Lancement du collectif Sons du Sahel, Dakar',         tag: 'Entrepreneuriat' },
+        ],
+        boutiqueName:  'Univers Léa Traoré',
+        boutiqueIntro: 'Musique, merchandise et expériences live. Rejoins l\'univers Sons du Sahel depuis n\'importe où dans le monde.',
+        boutiqueSub:   'Musique · Merch · Live',
+        shop: [
+          { name: 'Album "Mbaye" — Digital',  sub: 'Téléchargement + livret PDF',     url: 'https://open.spotify.com/artist/lea-traore-kafora'        },
+          { name: 'Hoodie "Sons du Sahel"',   sub: 'Collection limitée · 100 pièces', url: 'https://www.nike.com/fr/w/kafora-lea-traore-merch-10004'  },
+          { name: 'Pass VIP — Tournée 2025',  sub: 'Meet & Greet + backstage',        url: 'https://www.sephora.fr/kafora/lea-traore-vip-2025'        },
+        ],
+      },
+
+      nia: {
+        verified:    true,
+        boosted:     true,
+        accentColor: '#7E6B9A',
+        title:       'Kafora — Nia Osei · Photographie Londres',
+        heroImg:     'file:///C:/Users/toto/Documents/te/36b3634cb200cf3a6f9fea2151046d14.jpg',
+        discipline:  'Photographie · Londres, Royaume-Uni',
+        badge:       'Premium',
+        name:        'Nia<br>Osei',
+        followers:   '27k', collabs: '96', years: '4',
+        bio:         'Photographe documentaire et de mode basée à Londres. Son travail célèbre l\'identité noire britannique et afro-caribéenne. Publiée dans Vogue UK, i-D et Dazed & Confused.',
+        tags:        ['Mode', 'Documentaire', 'Portrait', 'Editorial'],
+        portSeason:  'Selected Works 2022—2025',
+        portfolio: [
+          { img: 'file:///E:/AfroPunk/9d92497c5b2a8e5c2e28a56596a18fb0.jpg', label: 'Vogue UK SS24',         affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg', label: 'i-D Portrait Series',   affiliateUrl: 'https://asos.com',     affiliatePartner: 'asos'     },
+          { img: 'file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg', label: 'Dazed Editorial' },
+          { img: 'file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', label: 'Black British Identity', affiliateUrl: 'https://farfetch.com', affiliatePartner: 'farfetch' },
+          { img: 'file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg', label: 'Afro-Caribbean Portraits' },
+          { img: 'file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg', label: 'London Streets 2024' },
+        ],
+        experiences: [
+          { year: '2025', brand: 'Vogue UK',   role: 'Photographe contribu. — Mode & Culture',              tag: 'Editorial' },
+          { year: '2024', brand: 'i-D',        role: 'Cover Shoot — "The New Black British"',               tag: 'Portrait' },
+          { year: '2024', brand: 'Dazed',      role: 'Photographe de couverture — Issue 12',                tag: 'Mode' },
+          { year: '2023', brand: 'V&A Museum', role: 'Exposition — "Diaspora in Lens", Londres',             tag: 'Exposition' },
+          { year: '2022', brand: 'Fondation',  role: 'Lancement de NiaFrames Studio, Hackney',              tag: 'Entrepreneuriat' },
+        ],
+        boutiqueName:  'NiaFrames Prints',
+        boutiqueIntro: 'Tirages photographiques en édition limitée, signés et numérotés. Expédition depuis Londres.',
+        boutiqueSub:   'Tirages signés · Éditions limitées',
+        shop: [
+          { name: 'Print "Vogue UK SS24"',          sub: 'Format 60×90 · Tirage 1/20',  url: 'https://www.farfetch.com/fr/sets/nia-osei-prints--set-20001.aspx'   },
+          { name: 'Series "Black British"',          sub: 'Coffret 5 tirages · Signé',   url: 'https://www.farfetch.com/fr/sets/nia-osei-series--set-20002.aspx'   },
+          { name: 'Zine "Afro-Caribbean Portraits"', sub: 'Édition collector · 200 ex.', url: 'https://asos.com/fr/women/ctas/editorial-pages/page/kafora-nia-zine' },
+        ],
+      },
+    };
+
+    // ── Chargement ────────────────────────────────────────────
+    const param = new URLSearchParams(window.location.search).get('creator') || 'amara';
+    let data;
+
+    if (param === 'me') {
+      // ── Profil dynamique depuis localStorage (prévisualisation) ──
+      const u = JSON.parse(localStorage.getItem('kafora-user')   || '{}');
+      const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+      const links = JSON.parse(localStorage.getItem('kafora-links') || '[]');
+
+      const fn   = p.fn || u.firstName || 'Mon';
+      const ln   = p.ln || u.lastName  || 'Profil';
+      const disc = (p.discs && p.discs.length) ? p.discs[0] : 'Créateur';
+      const city = p.city    || '—';
+      const country = p.country || '';
+
+      data = {
+        accentColor:   p.accentColor || '#B08D57',
+        title:         'Kafora — ' + fn + ' ' + ln,
+        heroImg:       p.photo || '',
+        discipline:    disc + ' · ' + city + (country ? ', ' + country : ''),
+        badge:         'Membre',
+        name:          fn + '<br>' + ln,
+        followers:     '—', collabs: '—', years: '—',
+        bio:           p.bio || 'Aucune biographie renseignée. Complète ton profil depuis le dashboard.',
+        tags:          p.discs || [],
+        portSeason:    p.portSeason || 'Portfolio',
+        portfolio:     p.portfolio  || [],
+        experiences:   p.experiences || [],
+        boutiqueName:  p.boutiqueName  || fn + ' ' + ln + ' — Boutique',
+        boutiqueIntro: p.boutiqueIntro || 'Ajoute tes liens affiliés depuis le dashboard pour les afficher ici.',
+        boutiqueSub:   p.boutiqueSub   || 'Liens affiliés',
+        shop: (p.shop && p.shop.length) ? p.shop : links.map(function(l) {
+          return { name: l.name, sub: l.url, url: l.url };
+        }),
+        email:         p.email || '',
+        font:          p.font || "'Barlow Condensed', sans-serif",
+        customPort:    p.customPort || null
+      };
+
+      // Bannière + offset nav
+      const banner = document.getElementById('previewBanner');
+      banner.classList.remove('hidden');
+      document.body.classList.add('is-preview');
+
+    } else {
+      data = CREATORS[param] || CREATORS.amara;
+    }
+
+    // Accent couleur et Police
+    document.documentElement.style.setProperty('--accent', data.accentColor);
+    if(data.font) { document.documentElement.style.setProperty('--custom-font', data.font); }
+
+    // Titre + hero
+    document.title = data.title;
+    document.getElementById('heroImg').src        = data.heroImg;
+    document.getElementById('heroImg').alt        = data.name.replace('<br>', ' ');
+    document.getElementById('heroDisc').textContent = data.discipline;
+    document.getElementById('heroBadge').textContent = data.badge;
+    if (data.verified) {
+      const verBadge = document.createElement('span');
+      verBadge.className = 'badge-verified';
+      verBadge.textContent = '✓ Vérifié';
+      document.getElementById('heroBadge').insertAdjacentElement('afterend', verBadge);
+    }
+    document.getElementById('heroName').innerHTML = data.name;
+    document.getElementById('sFollowers').textContent = data.followers;
+    document.getElementById('sCollabs').textContent   = data.collabs;
+    document.getElementById('sYears').textContent     = data.years;
+
+    // Bio
+    document.getElementById('bioCopy').textContent = data.bio;
+    document.getElementById('bioTags').innerHTML   = data.tags.map(t => `<span class="pill">${t}</span>`).join('');
+
+    // Portfolio
+    document.getElementById('portSeason').textContent = data.portSeason;
+    if (data.customPort) {
+      document.getElementById('portfolioGrid').style.display = 'none';
+      const customWrap = document.createElement('div');
+      customWrap.className = 'custom-portfolio-agent-rendered';
+      customWrap.innerHTML = data.customPort;
+      document.getElementById('portfolio').appendChild(customWrap);
+      document.getElementById('portfolio').style.padding = '0';
+    } else if (data.portfolio && data.portfolio.length > 0) {
+      document.getElementById('portfolioGrid').innerHTML = data.portfolio.map(function(p) {
+        const inner = `<img class="port-tile-img" src="${p.img || p.image}" alt="${p.label}" />
+          <div class="port-tile-over"><span class="port-tile-label">${p.label}</span></div>
+          ${p.affiliateUrl ? '<span class="port-tile-aff-badge">Voir la pièce →</span>' : ''}`;
+        if (p.affiliateUrl) {
+          const partner = p.affiliatePartner || 'unknown';
+          return `<a class="port-tile" href="#" onclick="handleAffiliateClick(event,'${p.affiliateUrl}','${param}','${partner}')">${inner}</a>`;
+        }
+        return `<div class="port-tile">${inner}</div>`;
+      }).join('');
+    } else {
+      document.getElementById('portfolioGrid').style.background = 'none';
+      document.getElementById('portfolioGrid').innerHTML =
+        `<p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:0.14em;color:rgba(234,226,212,0.25);text-align:center;padding:60px 0;grid-column:1/-1">Portfolio à compléter — la gestion du portfolio arrive prochainement.</p>`;
+    }
+
+    // Contacts (Gated - Accès Marque)
+    const uStr = localStorage.getItem('kafora-user');
+    const u = uStr ? JSON.parse(uStr) : {};
+    const isMe = (param === 'me');
+    const contactContainer = document.getElementById('contactContainer');
+    
+    if (isMe || u.kaforaBrand) {
+      const email = data.email || 'contact@createur.com';
+      contactContainer.innerHTML = `<a href="mailto:${email}" class="btn btn-ghost" style="padding:11px 24px;font-size:11px;border:1px solid var(--accent);color:var(--accent);">Contacter (Email)</a>`;
+    } else {
+      contactContainer.innerHTML = `<a href="premium.html" class="btn btn-ghost" style="padding:11px 24px;font-size:11px;border:1px solid #8C8478;color:#8C8478;" title="Réservé aux marques abonnées">Contact 🔒</a>`;
+    }
+
+    // Expériences
+    if (data.experiences.length > 0) {
+      document.getElementById('expList').innerHTML = data.experiences.map(function(e) {
+        let linkedHtml = e.linkedProfile ? `<a href="profil.html?creator=${e.linkedProfile}" class="exp-linked-badge" title="Voir son profil Kafora">🔗 PROFIL ASSOCIÉ</a>` : '';
+        let brandHtml = e.linkedProfile ? `<a href="profil.html?creator=${e.linkedProfile}" class="exp-brand-link">${e.brand}</a>` : e.brand;
+        let descHtml = e.description ? `<div class="exp-desc">${e.description.replace(/\n/g, '<br>')}</div>` : '';
+        let tagHtml = e.tag ? `<span class="pill">${e.tag}</span>` : '';
+        
+        let mediaHtml = '';
+        if (e.media && e.media.length > 0) {
+          mediaHtml = `<div class="exp-media-grid">${e.media.map(m => {
+            if(m.includes('instagram.com/p/') || m.includes('instagram.com/reel/')) {
+              let igUrl = m.split('?')[0];
+              if(!igUrl.endsWith('/')) igUrl += '/';
+              return `<iframe src="${igUrl}embed" width="300" height="380" frameborder="0" scrolling="no" allowtransparency="true" class="exp-ig-iframe" style="background:white; border-radius:6px; flex-shrink:0;"></iframe>`;
+            }
+            if(m.includes('tiktok.com') || (!m.match(/\.(jpeg|jpg|gif|png|webp)/i) && m.startsWith('http'))) {
+              return `<a href="${m}" target="_blank" class="exp-media-link-btn" title="${m}">🔗 Voir le lien</a>`;
+            }
+            return `<div class="exp-media-item"><img src="${m}" loading="lazy" /></div>`;
+          }).join('')}</div>`;
+        }
+
+        let firstLetter = e.brand ? e.brand.charAt(0).toUpperCase() : '✦';
+
+        return `<div class="exp-timeline-item">
+          <div class="exp-timeline-left">
+            <div class="exp-timeline-logo">${firstLetter}</div>
+            <div class="exp-timeline-line"></div>
+          </div>
+          <div class="exp-timeline-content">
+            <div class="exp-header">
+              <div style="display:flex; flex-direction:column; gap:4px">
+                <span class="exp-role">${e.role}</span>
+                <div class="exp-brand-row">
+                  <span class="exp-brand">${brandHtml}</span>
+                  <span class="exp-year" style="margin:0;">· ${e.year}</span>
+                  ${tagHtml}
+                  ${linkedHtml}
+                </div>
+              </div>
+            </div>
+            ${descHtml}
+            ${mediaHtml}
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      document.getElementById('expList').innerHTML =
+        `<p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:0.14em;color:rgba(234,226,212,0.25);padding:24px 0">Aucune expérience renseignée pour l'instant.</p>`;
+    }
+
+    // Boutique
+    document.getElementById('boutiqueName').textContent  = data.boutiqueName;
+    document.getElementById('boutiqueIntro').textContent = data.boutiqueIntro;
+    document.getElementById('boutiqueSub').textContent   = data.boutiqueSub;
+
+    // ── Click tracking ──
+    const CLICKS_KEY = 'kafora-shop-clicks-' + param;
+    const clicks = JSON.parse(localStorage.getItem(CLICKS_KEY) || '{}');
+
+    document.getElementById('shopGrid').innerHTML = data.shop.map((item, i) => {
+      const count = clicks[i] || 0;
+      return `<a class="shop-item" href="${item.url}" data-idx="${i}" target="_blank" rel="noopener">
+        <div class="shop-item-left">
+          <div class="shop-item-name">${item.name}</div>
+          <div class="shop-item-sub">${item.sub}</div>
+        </div>
+        <span class="shop-item-cta">Accéder →</span>
+        ${count > 0 ? `<span class="shop-item-clicks">${count} clic${count > 1 ? 's' : ''}</span>` : ''}
+      </a>`;
+    }).join('');
+
+    document.getElementById('shopGrid').addEventListener('click', function(e) {
+      const item = e.target.closest('.shop-item');
+      if (!item) return;
+      const idx = item.dataset.idx;
+      clicks[idx] = (clicks[idx] || 0) + 1;
+      localStorage.setItem(CLICKS_KEY, JSON.stringify(clicks));
+    });
+
+    // ── Press Kit — Paywall Accès Marque ──
+    function openPressKit() {
+      const params = new URLSearchParams(window.location.search);
+      const param  = params.get('creator') || 'me';
+      const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+      const isMe = (param === 'me');
+
+      if (isMe || u.kaforaBrand === 'true') {
+        window.open('presskit_deck.html?creator=' + param, '_blank');
+      } else {
+        if (confirm('Le Press Kit de ce créateur est réservé aux marques abonnées (Accès Marque — 99€/mois).\n\nVoulez-vous découvrir nos offres marques ?')) {
+          window.location.href = 'marques.html';
+        }
+      }
+    }
+
+    // ── Attribution affiliation 30 jours + redirect ──
+    function handleAffiliateClick(e, affiliateUrl, creatorId, partnerId) {
+      e.preventDefault();
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      localStorage.setItem(
+        'kafora-attribution-' + creatorId,
+        JSON.stringify({ creatorId: creatorId, partnerId: partnerId, expiry: expiry, at: Date.now() })
+      );
+      window.open(affiliateUrl, '_blank', 'noopener');
+    }
+
+    // ── Barre "Personnaliser mon profil" — uniquement si connecté en tant que ce créateur ──
+    (function() {
+      const rawUser = localStorage.getItem('kafora-user');
+      const user = rawUser ? JSON.parse(rawUser) : null;
+      if (user && user.creatorId === param) {
+        document.getElementById('testLayoutBar').style.display = 'flex';
+      }
+    })();
+
+    // ── Charge le profil preset dans localStorage et redirige vers ?creator=me ──
+    function loadAsMe() {
+      const nameParts = data.name.replace(/<br>/g, ' ').split(' ');
+      const existing = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+      const profil = {
+        fn:            nameParts[0] || '',
+        ln:            nameParts.slice(1).join(' ') || '',
+        bio:           data.bio,
+        city:          (data.discipline.split('·')[1] || '').trim().split(',')[0].trim(),
+        country:       (data.discipline.split(',')[1] || '').trim(),
+        discs:         data.tags.slice(0, 3),
+        photo:         data.heroImg,
+        accentColor:   existing.accentColor || data.accentColor,
+        layout:        existing.layout || 'editorial',
+        sectionOrder:  existing.sectionOrder || null,
+        portSeason:    data.portSeason,
+        portfolio:     data.portfolio,
+        experiences:   data.experiences,
+        boutiqueName:  data.boutiqueName,
+        boutiqueIntro: data.boutiqueIntro,
+        boutiqueSub:   data.boutiqueSub,
+        shop:          data.shop,
+      };
+      localStorage.setItem('kafora-profil', JSON.stringify(profil));
+      window.location.href = 'profil.html?creator=me';
+    }
+
+    // ── Layout + ordre des sections ──
+    (function() {
+      const raw = localStorage.getItem('kafora-profil');
+      const profil = raw ? JSON.parse(raw) : {};
+      const layout = profil.layout || 'editorial';
+      document.body.classList.add('layout-' + layout);
+      if (profil.sectionOrder && profil.sectionOrder.length) {
+        const container = document.getElementById('sectionsContainer');
+        profil.sectionOrder.forEach(function(sid) {
+          const el = container.querySelector('[data-sid="' + sid + '"]');
+          if (el) container.appendChild(el);
+        });
+      }
+    })();
+
+    // ── Contrôles flèches (preview mode uniquement) ──
+    if (param === 'me') {
+      document.body.classList.add('preview-drag');
+      const container = document.getElementById('sectionsContainer');
+
+      function saveSectionOrder() {
+        const order = [...container.querySelectorAll('.section-wrap')].map(function(s) { return s.dataset.sid; });
+        const raw = localStorage.getItem('kafora-profil');
+        const profil = raw ? JSON.parse(raw) : {};
+        profil.sectionOrder = order;
+        localStorage.setItem('kafora-profil', JSON.stringify(profil));
+      }
+
+      function refreshArrows() {
+        const sections = [...container.querySelectorAll('.section-wrap')];
+        sections.forEach(function(sec, idx) {
+          const up = sec.querySelector('.btn-up');
+          const dn = sec.querySelector('.btn-dn');
+          if (up) up.disabled = (idx === 0);
+          if (dn) dn.disabled = (idx === sections.length - 1);
+        });
+      }
+
+      function initSectionControls() {
+        container.querySelectorAll('.section-wrap').forEach(function(sec) {
+          const ctrl = sec.querySelector('.section-controls');
+          if (!ctrl) return;
+          ctrl.innerHTML = '';
+
+          const label = document.createElement('span');
+          label.className = 'section-label';
+          label.textContent = 'Déplacer';
+
+          const btnUp = document.createElement('button');
+          btnUp.className = 'section-btn btn-up';
+          btnUp.title = 'Monter';
+          btnUp.innerHTML = '↑';
+          btnUp.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const prev = sec.previousElementSibling;
+            if (prev && prev.classList.contains('section-wrap')) {
+              container.insertBefore(sec, prev);
+              refreshArrows();
+              saveSectionOrder();
+            }
+          });
+
+          const btnDn = document.createElement('button');
+          btnDn.className = 'section-btn btn-dn';
+          btnDn.title = 'Descendre';
+          btnDn.innerHTML = '↓';
+          btnDn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const next = sec.nextElementSibling;
+            if (next && next.classList.contains('section-wrap')) {
+              container.insertBefore(next, sec);
+              refreshArrows();
+              saveSectionOrder();
+            }
+          });
+
+          ctrl.appendChild(label);
+          ctrl.appendChild(btnUp);
+          ctrl.appendChild(btnDn);
+        });
+        refreshArrows();
+      }
+
+      initSectionControls();
+    }
+
+    // ── Créateurs Similaires (Boosted & Découverte) ──
+    const similarGrid = document.getElementById('similarGrid');
+    if (similarGrid) {
+      let others = Object.keys(CREATORS)
+        .filter(k => k !== param)
+        .map(k => ({ id: k, ...CREATORS[k] }));
+
+      // Priorité aux profils boostés
+      others.sort((a, b) => {
+        const aBoost = a.boosted ? 1 : 0;
+        const bBoost = b.boosted ? 1 : 0;
+        return bBoost - aBoost;
+      });
+
+      // Garder 4 max
+      others = others.slice(0, 4);
+
+      if (others.length === 0) {
+        similarGrid.innerHTML = `<p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:0.14em;color:rgba(234,226,212,0.25);grid-column:1/-1;">Aucun créateur similaire pour le moment.</p>`;
+      } else {
+        similarGrid.innerHTML = others.map(function(c) {
+          const badgeHtml = c.boosted ? `<span class="port-tile-aff-badge" style="background:#EAE2D4;color:#B08D57;border:1px solid #B08D57;">★ En vedette</span>` : '';
+          return `
+            <div class="port-tile" onclick="window.location.href='profil.html?creator=${c.id}'" style="aspect-ratio: 3/4; border-radius: 8px; border: 1px solid ${c.boosted ? 'rgba(176,141,87,0.5)' : '#1c1c1c'}">
+              <img class="port-tile-img" src="${c.heroImg}" alt="${c.name.replace(/<br>/g, ' ')}" style="aspect-ratio:3/4; border-radius: 8px;" />
+              <div class="port-tile-over" style="background:linear-gradient(to top, rgba(10,10,10,0.9), transparent);">
+                <span class="port-tile-label" style="opacity:1; transform:none; color:var(--parchment); font-size:14px;">
+                  ${c.name.replace('<br>', ' ')}<br>
+                  <span style="font-size:10px; color:var(--ash); letter-spacing:0.1em; font-weight:300;">${c.discipline.split('·')[0].trim()}</span>
+                </span>
+              </div>
+              ${badgeHtml}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // ── Nav scroll ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafora — Metagalerie Immersive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Barlow:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="kafora-db.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Barlow', 'sans-serif'], condensed: ['"Barlow Condensed"', 'sans-serif'] }, colors: { brand: { gold: '#B08D57', dark: '#0A0A0A', cream: '#EAE2D4' } } } }
+    }
+  </script>
+  <style>
+    :root { --brand-gold: #B08D57; --brand-dark: #0A0A0A; --brand-cream: #EAE2D4; }
+    body { background-color: var(--brand-dark); color: var(--brand-cream); overflow: hidden; margin: 0; }
+    
+    /* ── 3D SCENE ── */
+    #gallery-container {
+      width: 100vw; height: 100vh;
+      perspective: 1200px;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+    }
+
+    #gallery-grid {
+      width: 300%; height: 300%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .gallery-room {
+      position: relative;
+      width: 100%; height: 100%;
+      border: 1px solid rgba(176,141,87,0.1);
+      background-size: cover;
+      background-position: center;
+      transition: filter 0.8s ease;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 40px;
+      transform-style: preserve-3d;
+    }
+
+    .gallery-room::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .room-content {
+      position: relative; z-index: 10;
+      transform: translateZ(50px);
+      opacity: 0;
+      transition: opacity 0.5s ease 0.3s;
+    }
+
+    .gallery-room.active .room-content { opacity: 1; }
+
+    /* ── HOTSPOTS ── */
+    .hotspot {
+      position: absolute;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(176,141,87,0.8);
+      border: 2px solid white;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(176,141,87,0.5);
+      animation: pulse 2s infinite;
+      z-index: 20;
+      transform: translateZ(30px);
+    }
+
+    .hotspot::after {
+      content: 'Detail';
+      position: absolute; left: 50px;
+      background: white; color: black;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      padding: 4px 10px; text-transform: uppercase;
+      opacity: 0; transform: translateX(-10px);
+      transition: all 0.3s ease;
+      white-space: nowrap; pointer-events: none;
+    }
+
+    .hotspot:hover::after { opacity: 1; transform: translateX(0); }
+
+    @keyframes pulse {
+      0% { transform: scale(1) translateZ(30px); box-shadow: 0 0 0 0 rgba(176,141,87,0.7); }
+      70% { transform: scale(1.1) translateZ(30px); box-shadow: 0 0 0 15px rgba(176,141,87,0); }
+      100% { transform: scale(1) translateZ(30px); box-shadow: 0 0 0 0 rgba(176,141,87,0); }
+    }
+
+    /* ── UI OVERLAY ── */
+    .gallery-ui {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 100;
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      padding: 40px;
+    }
+
+    .ui-top {
+      display: flex; justify-content: space-between; align-items: center;
+      pointer-events: auto;
+    }
+
+    .ui-bottom {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      pointer-events: auto;
+    }
+
+    .nav-btn {
+      background: rgba(10,10,10,0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(234,226,212,0.1);
+      padding: 12px 24px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.25em;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+    .nav-btn:hover { border-color: var(--brand-gold); color: var(--brand-gold); }
+
+    .room-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(15px);
+      padding: 40px;
+    }
+
+    .overlay-card {
+      background: #EAE2D4; color: #0A0A0A;
+      max-width: 900px; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+    }
+
+    .overlay-img { width: 100%; height: 100%; object-fit: cover; }
+    .overlay-info { padding: 50px; display: flex; flex-direction: column; }
+
+    /* ── CUSTOM CURSOR ── */
+    #cursor {
+      position: fixed; width: 24px; height: 24px;
+      border: 1px solid var(--brand-gold);
+      border-radius: 50%; pointer-events: none;
+      z-index: 1000; mix-blend-mode: difference;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s;
+    }
+  </style>
+</head>
+<body class="selection:bg-brand-gold selection:text-black">
+
+  <div id="cursor"></div>
+
+  <!-- ── PERSPECTIVE SCENE ── -->
+  <div id="gallery-container">
+    <div id="gallery-grid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+  <!-- ── UI ── -->
+  <div class="gallery-ui">
+    <div class="ui-top">
+      <a href="index.html" class="text-2xl font-condensed font-black tracking-tighter uppercase">Kafora<span class="text-brand-gold">.</span></a>
+      <div class="flex gap-4">
+        <button class="nav-btn" onclick="zoomOut()">Vue d'Ensemble</button>
+        <button class="nav-btn" onclick="window.location.href='createurs.html'">Annuaire</button>
+      </div>
+    </div>
+
+    <div class="ui-bottom">
+      <div class="max-w-md">
+        <p class="text-brand-gold font-condensed tracking-[0.3em] uppercase text-[10px] mb-2">Metagalerie Collective</p>
+        <h2 id="active-room-name" class="text-4xl md:text-6xl font-condensed font-black uppercase leading-none">Exploration</h2>
+        <p id="active-room-desc" class="mt-4 text-xs font-light tracking-wide text-brand-cream/60 leading-relaxed">
+          Naviguez entre les univers créatifs. Utilisez les hotspots pour découvrir les inspirations et les pièces shoppables.
+        </p>
+      </div>
+      <div class="flex flex-col items-end gap-4">
+        <div class="flex gap-2">
+            <button class="w-12 h-12 flex items-center justify-center border border-white/10 hover:border-brand-gold transition" onclick="moveCamera('left')">←</button>
+            <button class="w-12 h-12 flex items-center justify-center border border-white/10 hover:border-brand-gold transition" onclick="moveCamera('right')">→</button>
+        </div>
+        <p class="font-condensed text-[9px] tracking-widest opacity-30">USE ARROWS OR CLICK ROOMS TO MOVE</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── POPUP PRODUCT ── -->
+  <div id="product-overlay" class="room-overlay" onclick="closeOverlay()">
+    <div class="overlay-card" onclick="event.stopPropagation()">
+      <div class="relative">
+        <img id="overlay-img" src="" class="overlay-img" alt="Product">
+        <div id="overlay-brand" class="absolute top-6 left-6 bg-black text-white px-3 py-1 font-condensed text-[10px] tracking-widest uppercase">Brand</div>
+      </div>
+      <div class="overlay-info">
+        <h3 id="overlay-title" class="text-4xl font-condensed font-black uppercase leading-none mb-6">Product Title</h3>
+        <p id="overlay-desc" class="font-sans font-light text-sm leading-relaxed text-gray-600 mb-8">Detailed description of the piece.</p>
+        <div class="mt-auto flex justify-between items-end">
+            <span id="overlay-price" class="text-2xl font-condensed font-bold">149,00 €</span>
+            <button class="bg-black text-white px-8 py-4 font-condensed text-xs tracking-widest uppercase hover:bg-brand-gold hover:text-black transition">Acheter Maintenant</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentX = 1; // 0 to 2
+    let currentY = 1; // 0 to 2
+    let isZoomed = false;
+    let ROOMS = []; 
+
+    const grid = document.getElementById('gallery-grid');
+    const nameEl = document.getElementById('active-room-name');
+    const descEl = document.getElementById('active-room-desc');
+
+    async function initGallery() {
+      const dbProfiles = await kaforaListProfiles(9);
+      
+      const defaultRooms = [
+        { id: 1, name: "Amara Diallo", city: "Paris", desc: "Le Salon Sculptural — Une fusion entre minimalisme hausmannien.", img: "file:///C:/Users/toto/Documents/te/0a8fce3f5749b2baed2b2cc8ed445483.jpg",
+          hotspots: [{ x: 30, y: 40, title: "Canapé 'Sénoufo'", brand: "Leroy Merlin x AfroDesign", price: "890 €", img: "file:///C:/Users/toto/Documents/te/0a8fce3f5749b2baed2b2cc8ed445483.jpg" }]
+        },
+        { id: 5, name: "Metagalerie Hub", city: "Global", desc: "Le point de jonction de tous les créateurs Kafora.", img: "file:///C:/Users/toto/Documents/te/e7ca30197ff55a5d8b8d182df3d3f997.jpg", hotspots: [] }
+      ];
+
+      if (dbProfiles && dbProfiles.length > 0) {
+        ROOMS = dbProfiles.map((p, i) => ({
+          id: i + 1,
+          name: p.displayName,
+          city: p.city || 'Monde',
+          desc: p.bio || 'Univers créatif Kafora.',
+          img: p.photo || (i % 2 === 0 ? defaultRooms[0].img : defaultRooms[1].img),
+          hotspots: i === 0 ? defaultRooms[0].hotspots : []
+        }));
+        while (ROOMS.length < 9) {
+          ROOMS.push({ id: ROOMS.length+1, name: "Kafora Artist", city: "Africa", desc: "Joining soon.", img: defaultRooms[1].img, hotspots: [] });
+        }
+      } else {
+        ROOMS = defaultRooms;
+        while (ROOMS.length < 9) {
+          ROOMS.push({ id: ROOMS.length+1, name: "Kafora Artist", city: "Africa", desc: "Joining soon.", img: defaultRooms[Math.floor(Math.random()*defaultRooms.length)].img, hotspots: [] });
+        }
+      }
+
+      ROOMS.forEach((room, idx) => {
+        const div = document.createElement('div');
+        div.className = 'gallery-room';
+        div.style.backgroundImage = `url('${room.img}')`;
+        div.dataset.x = idx % 3;
+        div.dataset.y = Math.floor(idx / 3);
+        
+        div.innerHTML = `
+          <div class="room-content">
+            <p class="text-brand-gold font-condensed tracking-[0.3em] uppercase text-[10px] mb-2">${room.city}</p>
+            <h3 class="text-5xl font-condensed font-black uppercase leading-tight">${room.name}</h3>
+          </div>
+          ${Array.isArray(room.hotspots) ? room.hotspots.map((h, hIdx) => `
+            <div class="hotspot" style="top: ${h.y}%; left: ${h.x}%" onclick="openHotspot(event, ${idx}, ${hIdx})">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            </div>
+          `).join('') : ''}
+        `;
+        
+        div.onclick = () => {
+             if(!isZoomed) focusRoom(parseInt(div.dataset.x), parseInt(div.dataset.y));
+        };
+        grid.appendChild(div);
+      });
+      updateCamera();
+    }
+
+    function updateCamera() {
+      const roomIdx = currentY * 3 + currentX;
+      const room = ROOMS[roomIdx];
+      if(!room) return;
+      
+      nameEl.innerText = room.name;
+      descEl.innerText = room.desc;
+
+      document.querySelectorAll('.gallery-room').forEach(el => el.classList.remove('active'));
+      const roomsEls = document.querySelectorAll('.gallery-room');
+      if(roomsEls[roomIdx]) roomsEls[roomIdx].classList.add('active');
+
+      const moveX = (1 - currentX) * (100 / 3);
+      const moveY = (1 - currentY) * (100 / 3);
+      
+      const targetZ = isZoomed ? 800 : 0;
+      const targetRotateY = isZoomed ? 0 : (currentX - 1) * -10;
+      const targetRotateX = isZoomed ? 0 : (currentY - 1) * 10;
+
+      gsap.to(grid, {
+        x: `${moveX}%`,
+        y: `${moveY}%`,
+        z: targetZ,
+        rotateY: targetRotateY,
+        rotateX: targetRotateX,
+        duration: 1.2,
+        ease: "power3.inOut"
+      });
+    }
+
+    function focusRoom(x, y) {
+      currentX = x;
+      currentY = y;
+      isZoomed = true;
+      updateCamera();
+    }
+
+    function zoomOut() {
+      isZoomed = false;
+      updateCamera();
+    }
+
+    function moveCamera(dir) {
+        if(dir === 'left' && currentX > 0) currentX--;
+        else if(dir === 'right' && currentX < 2) currentX++;
+        else if(dir === 'up' && currentY > 0) currentY--;
+        else if(dir === 'down' && currentY < 2) currentY++;
+        updateCamera();
+    }
+
+    function openHotspot(e, roomIdx, hotspotIdx) {
+        e.stopPropagation();
+        const h = ROOMS[roomIdx].hotspots[hotspotIdx];
+        document.getElementById('overlay-img').src = h.img;
+        document.getElementById('overlay-title').innerText = h.title;
+        document.getElementById('overlay-brand').innerText = h.brand;
+        document.getElementById('overlay-price').innerText = h.price;
+        document.getElementById('overlay-desc').innerText = "Cette pièce exclusive a été sélectionnée par l'artiste pour son expression unique du luxe contemporain africain.";
+        
+        document.getElementById('product-overlay').style.display = 'flex';
+        gsap.fromTo('.overlay-card', { y: 100, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power4.out" });
+    }
+
+    function closeOverlay() {
+        gsap.to('.overlay-card', { y: 50, opacity: 0, duration: 0.4, onComplete: () => {
+            document.getElementById('product-overlay').style.display = 'none';
+        }});
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowLeft') moveCamera('left');
+        if(e.key === 'ArrowRight') moveCamera('right');
+        if(e.key === 'ArrowUp') moveCamera('up');
+        if(e.key === 'ArrowDown') moveCamera('down');
+        if(e.key === 'Escape') zoomOut();
+    });
+
+    const cursor = document.getElementById('cursor');
+    window.addEventListener('mousemove', (e) => {
+        gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+    });
+
+    initGallery();
+  </script>
+</body>
+</html>

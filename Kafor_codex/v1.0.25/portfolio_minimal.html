@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafora — Black Minimal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Barlow', 'sans-serif'],
+            display: ['"Barlow Condensed"', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              accent: 'var(--color-accent)', // Dynamic accent color
+              dark: '#050505'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --color-accent: #B08D57; /* Kafora Gold by default */
+    }
+    body {
+      background-color: theme('colors.brand.dark');
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+    
+    .noise-overlay {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Scroll animations GSAP init classes */
+    .fade-up { opacity: 0; transform: translateY(40px); }
+    .fade-left { opacity: 0; transform: translateX(-40px); }
+    .scale-up { opacity: 0; transform: scale(0.9); }
+  </style>
+</head>
+<body class="selection:bg-brand-accent selection:text-black">
+
+  <!-- Fixed Background -->
+  <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div id="bg-parallax" class="absolute inset-0 opacity-20 bg-cover bg-center bg-no-repeat mix-blend-luminosity scale-110" style="background-image: url('https://images.unsplash.com/photo-1682687982501-1e5898cb8f4b?q=80&w=2070&auto=format&fit=crop')"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/80 to-[#050505]"></div>
+    <div class="absolute inset-0 opacity-[0.02] noise-overlay"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-8 md:p-12 lg:p-16 pointer-events-none mix-blend-difference">
+    <!-- Logo -->
+    <div class="flex items-center gap-4 text-xl font-bold tracking-tight pointer-events-auto">
+      <span class="text-3xl font-display" id="logoInit">B</span>
+      <span class="h-[2px] w-8 bg-white"></span>
+      <span class="text-sm font-medium tracking-widest text-white/80 lowercase" id="logoText">black.</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex flex-col items-end gap-6 text-right pointer-events-auto">
+      <span class="text-[10px] font-bold tracking-[0.3em] text-brand-accent uppercase">Menu</span>
+      <ul class="flex flex-col gap-2 text-2xl font-bold tracking-tight md:text-3xl font-display uppercase">
+        <li><a href="dashboard.html" class="transition-colors hover:text-brand-accent">Dashboard.</a></li>
+        <li><a href="#works" class="transition-colors hover:text-brand-accent">Works.</a></li>
+        <li><a href="createurs.html" class="transition-colors hover:text-brand-accent">Directory.</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Content -->
+  <div class="relative z-10">
+    <!-- Hero Section -->
+    <section class="flex min-h-screen flex-col justify-center p-8 md:p-12 lg:p-16 pt-32">
+      <main class="flex-1 flex items-center">
+        <div class="max-w-4xl">
+          <h1 id="heroTitle" class="font-display text-7xl font-bold tracking-tighter md:text-[10rem] lg:text-[12rem] leading-[0.85] uppercase fade-up">
+            Black.
+          </h1>
+          <div class="mt-8 flex items-center gap-6 md:mt-12 fade-left" id="heroSubtitleContainer">
+            <span class="h-[2px] w-12 md:w-16 bg-white"></span>
+            <span id="heroSubtitle" class="text-2xl font-medium tracking-wide uppercase md:text-4xl lg:text-5xl text-gray-300">
+              Minimal Portfolio.
+            </span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="flex items-end justify-between text-[10px] font-bold tracking-[0.2em] text-white/40 pb-4" id="heroFooter">
+        <div class="uppercase" id="heroDiscipline">UI / UX - 2026.</div>
+        
+        <a href="#works" class="flex flex-col items-center gap-6 transition-colors hover:text-white group">
+          <div id="arrow-down" class="text-white group-hover:text-brand-accent transition-colors">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+          </div>
+          <span class="text-white uppercase group-hover:text-brand-accent transition-colors">Works</span>
+        </a>
+
+        <div class="flex items-center gap-8" id="socialLinks">
+          <!-- Will be injected -->
+        </div>
+      </footer>
+    </section>
+
+    <!-- Works Section -->
+    <section id="works" class="flex min-h-screen flex-col items-center justify-center p-8 md:p-12 lg:p-16 relative overflow-hidden">
+      <!-- Huge Background Text -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none opacity-[0.03] w-full">
+        <span id="bgText" class="font-display text-[15rem] md:text-[25rem] lg:text-[35rem] font-bold tracking-tighter whitespace-nowrap leading-none uppercase">
+          BLACK
+        </span>
+      </div>
+
+      <!-- Works Header -->
+      <div class="relative z-10 text-center mt-24">
+        <h2 class="font-display text-6xl font-black tracking-tighter uppercase md:text-8xl lg:text-9xl fade-up works-header">
+          Works.
+        </h2>
+        <div class="mt-6 flex items-center justify-center gap-6 md:mt-8 scale-up works-header-sub">
+          <span class="h-[2px] w-8 md:w-12 bg-white/50"></span>
+          <span class="text-lg font-medium tracking-widest uppercase md:text-2xl lg:text-3xl text-white/90">
+            see my design
+          </span>
+          <span class="h-[2px] w-8 md:w-12 bg-white/50"></span>
+        </div>
+      </div>
+
+      <!-- Works Grid -->
+      <div id="worksGrid" class="mt-24 grid w-full max-w-7xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 z-10">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // MOCK DATA (Idem que sur le portfolio artistique)
+    const MOCK_DATA = {
+      amara: { id: 'amara', name: "Amara Diallo", city: "Paris", discipline: "Direction Artistique", style: "Mode", heroImage: "file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg", projects: [{id:1, title:'NEON', category:'Photo', image:'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop'}, {id:2, title:'URBAN', category:'Editorial', image:'https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=800&auto=format&fit=crop'}, {id:3, title:'SYNTHESIS', category:'Art', image:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop'}], socials: ['IG', 'TW'] },
+      kofi: { id: 'kofi', name: "Kofi Mensah", city: "NYC", discipline: "Art Contemporain", style: "Sculpture/Digital", heroImage: "file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg", projects: [{id:1, title:'ANCESTOR', category:'3D', image:'https://images.unsplash.com/photo-1544256718-3b6102ddf82e?q=80&w=800&auto=format&fit=crop'}, {id:2, title:'WORLD', category:'Digital', image:'https://images.unsplash.com/photo-1601289176378-0cb9fd3c4d7e?q=80&w=800&auto=format&fit=crop'}], socials: ['IG'] }
+    };
+    const defaultData = MOCK_DATA['amara'];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Recupération Data
+      const params = new URLSearchParams(window.location.search);
+      const creatorId = params.get('creator') || 'amara';
+      let data;
+
+      if (creatorId === 'me') {
+        const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+        const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+        const fn = p.fn || u.firstName || 'Ton';
+        const ln = p.ln || u.lastName || 'Nom';
+        data = {
+          name: fn + ' ' + ln,
+          firstName: fn,
+          discipline: (p.discs && p.discs.length > 0) ? p.discs[0] : 'Créatif',
+          style: (p.discs && p.discs.length > 1) ? p.discs[1] : 'Kafora',
+          heroImage: p.photo || 'https://images.unsplash.com/photo-1682687982501-1e5898cb8f4b?q=80&w=2070&auto=format&fit=crop',
+          projects: p.portfolio || [],
+          socials: ['IG']
+        };
+        // Injection couleur accent du builder !
+        if(p.accentColor) document.documentElement.style.setProperty('--color-accent', p.accentColor);
+      } else {
+        data = MOCK_DATA[creatorId.toLowerCase()] || defaultData;
+        data.firstName = data.name.split(' ')[0];
+      }
+
+      // 2. Injection DOM
+      document.getElementById('bg-parallax').style.backgroundImage = `url('${data.heroImage}')`;
+      document.getElementById('logoInit').textContent = data.firstName.charAt(0).toUpperCase();
+      document.getElementById('logoText').textContent = data.firstName.toLowerCase() + '.';
+      
+      const titleLines = data.name.split(' ');
+      document.getElementById('heroTitle').innerHTML = titleLines[0] + '.<br/><span style="color:var(--color-accent);">' + (titleLines[1]||'') + '</span>';
+      document.getElementById('bgText').textContent = titleLines[0];
+      
+      document.getElementById('heroSubtitle').textContent = data.discipline;
+      document.getElementById('heroDiscipline').textContent = data.style.toUpperCase() + ' - 2026.';
+
+      const socialsHTML = data.socials.map(s => `<a href="#" class="transition-colors hover:text-white">${s}</a>`).join('');
+      document.getElementById('socialLinks').innerHTML = socialsHTML || `<a href="#" class="transition-colors hover:text-white">INSTAGRAM</a>`;
+
+      // 3. Grid Generation
+      const grid = document.getElementById('worksGrid');
+      if (data.projects && data.projects.length) {
+        data.projects.forEach((proj, i) => {
+          grid.innerHTML += `
+            <div class="project-card group relative aspect-[3/4] overflow-hidden bg-white/5 cursor-pointer opacity-0 translate-y-12">
+              <img src="${proj.image || proj.img}" alt="${proj.title || proj.label}" class="h-full w-full object-cover transition-all duration-1000 group-hover:scale-110 opacity-50 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-80"></div>
+              <div class="absolute bottom-0 left-0 p-8 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                <h3 class="text-2xl font-bold font-display uppercase tracking-tight">${proj.title || proj.label}</h3>
+                <p class="mt-2 text-xs text-brand-accent font-bold uppercase tracking-[0.2em]">${proj.category || 'PROJET'}</p>
+              </div>
+            </div>`;
+        });
+      } else {
+        grid.innerHTML = '<p class="col-span-1 md:col-span-2 lg:col-span-3 text-center text-white/40 tracking-widest text-sm uppercase">Le portfolio est vide.</p>';
+      }
+
+      // 4. GSAP Animations Setup
+      
+      // Parallax Background
+      gsap.to('#bg-parallax', {
+        yPercent: 30, ease: "none",
+        scrollTrigger: { trigger: "body", start: "top top", end: "bottom top", scrub: true }
+      });
+      // Fade out Hero Footer
+      gsap.to('#heroFooter', {
+        opacity: 0, ease: "none",
+        scrollTrigger: { trigger: "body", start: "top top", end: "20% top", scrub: true }
+      });
+
+      // Bouncing Arrow
+      gsap.to('#arrow-down', { y: 10, repeat: -1, yoyo: true, duration: 1, ease: 'power1.inOut' });
+
+      // Initial Reveal Animation
+      const tl = gsap.timeline();
+      tl.to('.fade-up', { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out', stagger: 0.2, delay: 0.1 })
+        .to('.fade-left', { x: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, "-=0.9");
+        
+      // Works Section Reveal
+      gsap.to('.works-header', {
+        y: 0, opacity: 1, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: '#works', start: 'top 75%' }
+      });
+      gsap.to('.works-header-sub', {
+        scale: 1, opacity: 1, duration: 1, delay: 0.2, ease: 'power3.out',
+        scrollTrigger: { trigger: '#works', start: 'top 75%' }
+      });
+
+      // Projects Grid Reveal with Stagger
+      ScrollTrigger.batch('.project-card', {
+        onEnter: batch => gsap.to(batch, { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out' }),
+        start: 'top 85%'
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Événements</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    body { background: var(--ink); color: var(--parchment); }
+
+    /* ── HERO ── */
+    .page-hero {
+      position: relative; width: 100vw; height: 100vh;
+      overflow: hidden; background: var(--ink);
+    }
+    .page-hero img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      display: block;
+    }
+    .page-hero-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.4) 45%, transparent 100%);
+    }
+    .page-hero-copy {
+      position: absolute; bottom: 60px; left: 48px; right: 48px;
+    }
+    .hero-meta {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 20px;
+    }
+    .hero-cta { margin-top: 32px; display: flex; gap: 16px; }
+
+    /* ── SECTION EVENTS ── */
+    .events-section { padding: 80px 48px; }
+    .events-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 44px;
+      padding-bottom: 18px; border-bottom: 1px solid #1c1c1c;
+    }
+    .events-header .t-title { color: var(--parchment); }
+
+    /* Grid 2 col */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: #1c1c1c;
+    }
+
+    .ev-card { min-height: 340px; padding: 36px 32px; }
+    .ev-card-date {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 16px;
+    }
+    .ev-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(28px, 3.5vw, 52px);
+      line-height: 0.9; letter-spacing: -0.02em;
+      color: var(--parchment); margin-bottom: 12px;
+    }
+    .ev-card-loc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 20px;
+    }
+    .ev-card-footer {
+      display: flex; justify-content: space-between;
+      align-items: flex-end;
+      position: absolute; bottom: 32px; left: 32px; right: 32px;
+    }
+    .ev-card-price {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 22px;
+      color: var(--parchment); letter-spacing: -0.01em;
+    }
+    .ev-card-arrow {
+      color: var(--ash);
+      transition: color 300ms, transform 300ms;
+    }
+    .ev-card:hover .ev-card-arrow { color: var(--bronze); transform: translate(3px,-3px); }
+
+    /* ── PARTNER EVENTS ── */
+    .partner-section { padding: 0 48px 80px; }
+    .partner-list {
+      border-top: 1px solid #1c1c1c;
+    }
+    .partner-row {
+      display: flex; align-items: center;
+      padding: 22px 0; border-bottom: 1px solid #1c1c1c;
+      cursor: pointer; transition: padding-left 300ms ease;
+      text-decoration: none; gap: 28px;
+    }
+    .partner-row:hover { padding-left: 12px; }
+    .pr-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 0.16em;
+      color: #2e2e2e; width: 28px; flex-shrink: 0;
+    }
+    .pr-date {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ash);
+      width: 140px; flex-shrink: 0;
+    }
+    .pr-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 18px;
+      letter-spacing: 0.02em; text-transform: uppercase;
+      color: var(--parchment); flex: 1;
+      transition: color 300ms;
+    }
+    .partner-row:hover .pr-name { color: var(--bronze); }
+    .pr-loc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ash);
+      width: 180px; text-align: right; flex-shrink: 0;
+    }
+    .pr-arrow { color: #2e2e2e; transition: color 300ms; flex-shrink: 0; }
+    .partner-row:hover .pr-arrow { color: var(--bronze); }
+
+    @media (max-width: 768px) {
+      .page-hero-copy { left: 24px; right: 24px; bottom: 40px; }
+      .events-section, .partner-section { padding-left: 24px; padding-right: 24px; }
+      .events-grid { grid-template-columns: 1fr; }
+      .pr-date, .pr-loc { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html" class="active">Événements</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="premium.html" class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- HERO — FEATURED EVENT -->
+  <section class="page-hero">
+    <img src="file:///E:/AfroPunk/547b63bcc200c0f14bb30d8a32a36563.jpg" alt="KaforaXAFRICAPARADE" />
+    <div class="page-hero-over"></div>
+    <div class="social-rail"><div class="social-rail-inner"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a></div></div>
+    <div class="page-hero-copy">
+      <div class="hero-meta">
+        <span class="pill">Événement Phare</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);">12 Avril 2025 · Paris</span>
+      </div>
+      <h1 class="t-hero" style="font-size:clamp(52px,8vw,130px);">Kafora×Africa<br>Parade</h1>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:300;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-top:16px;max-width:480px;">Le défilé afro-culturel le plus attendu de l'année. Créateurs, artistes et communauté réunis sur les Champs-Élysées.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-bronze">Réserver — À partir de 25€</a>
+        <a href="#" class="btn btn-ghost">En savoir plus</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS GRID -->
+  <section class="events-section">
+    <div class="events-header">
+      <h2 class="t-title" style="color:var(--parchment);">Agenda Kafora</h2>
+      <span class="t-label">Avril — Juin 2025</span>
+    </div>
+
+    <div class="events-grid">
+
+      <div class="ev-card" style="background-image:url('file:///E:/AfroPunk/9049e1aab83c1de5a68bc705e52ef172.jpg');">
+        <div class="ev-card-date">26 Avril 2025</div>
+        <div class="ev-card-name">Kafora×Party<br>Vol. 03</div>
+        <div class="ev-card-loc">La Machine du Moulin Rouge · Paris</div>
+        <div class="ev-card-footer">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);margin-bottom:4px;">À partir de</div>
+            <div class="ev-card-price">20€</div>
+            <div style="margin-top:8px;"><span class="pill" style="font-size:9px;">Premium −20%</span></div>
+          </div>
+          <span class="ev-card-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+      </div>
+
+      <div class="ev-card" style="background-image:url('file:///E:/AfroPunk/cd7cd903390999dbdd8f5f974c2646c9.jpg');">
+        <div class="ev-card-date">10 Mai 2025</div>
+        <div class="ev-card-name">Kafora West<br>Africa</div>
+        <div class="ev-card-loc">Sofitel Abidjan · Côte d'Ivoire</div>
+        <div class="ev-card-footer">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);margin-bottom:4px;">À partir de</div>
+            <div class="ev-card-price">15€</div>
+            <div style="margin-top:8px;"><span class="pill" style="font-size:9px;">Premium −20%</span></div>
+          </div>
+          <span class="ev-card-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+      </div>
+
+      <div class="ev-card" style="background-image:url('file:///E:/AfroPunk/c50ef3818289dd9a07b467c933738a40.jpg');">
+        <div class="ev-card-date">7 Juin 2025</div>
+        <div class="ev-card-name">Kafora×Party<br>NYC</div>
+        <div class="ev-card-loc">Elsewhere · Brooklyn, NYC</div>
+        <div class="ev-card-footer">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);margin-bottom:4px;">À partir de</div>
+            <div class="ev-card-price">$30</div>
+            <div style="margin-top:8px;"><span class="pill" style="font-size:9px;">Premium −20%</span></div>
+          </div>
+          <span class="ev-card-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+      </div>
+
+      <div class="ev-card" style="background-image:url('file:///E:/AfroPunk/32de3a17d1ae593e26d1cc92de210ccf.jpg');">
+        <div class="ev-card-date">21 Juin 2025</div>
+        <div class="ev-card-name">Kafora<br>Fête Musique</div>
+        <div class="ev-card-loc">Place de la République · Paris</div>
+        <div class="ev-card-footer">
+          <div>
+            <div class="ev-card-price" style="color:var(--bronze);">Gratuit</div>
+            <div style="margin-top:8px;"><span class="pill" style="font-size:9px;">Membres priorité</span></div>
+          </div>
+          <span class="ev-card-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PARTNER EVENTS -->
+  <section class="partner-section">
+    <div style="margin-bottom:28px;">
+      <h3 class="t-sub" style="color:var(--parchment);margin-bottom:8px;">Événements Partenaires</h3>
+      <p class="t-caption">Accès privilégié avec votre compte Kafora</p>
+    </div>
+
+    <div class="partner-list">
+      <a href="#" class="partner-row">
+        <span class="pr-num">01</span>
+        <span class="pr-date">3 Mai 2025</span>
+        <span class="pr-name">Palais de Tokyo Night</span>
+        <span style="margin-left:auto;margin-right:20px;"><span class="pill" style="font-size:9px;">Entrée libre membres</span></span>
+        <span class="pr-loc">Paris, France</span>
+        <span class="pr-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="#" class="partner-row">
+        <span class="pr-num">02</span>
+        <span class="pr-date">9 Mai 2025</span>
+        <span class="pr-name">Galerie Templon — Vernissage</span>
+        <span style="margin-left:auto;margin-right:20px;"><span class="pill" style="font-size:9px;">−50% membres</span></span>
+        <span class="pr-loc">Paris, France</span>
+        <span class="pr-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="#" class="partner-row">
+        <span class="pr-num">03</span>
+        <span class="pr-date">16 Mai 2025</span>
+        <span class="pr-name">Club Silencio — Soirée Privée</span>
+        <span style="margin-left:auto;margin-right:20px;"><span class="pill" style="font-size:9px;">Accès membres</span></span>
+        <span class="pr-loc">Paris, France</span>
+        <span class="pr-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="#" class="partner-row">
+        <span class="pr-num">04</span>
+        <span class="pr-date">28 Mai 2025</span>
+        <span class="pr-name">Afropunk Festival</span>
+        <span style="margin-left:auto;margin-right:20px;"><span class="pill" style="font-size:9px;">−30% membres</span></span>
+        <span class="pr-loc">Brooklyn, NYC</span>
+        <span class="pr-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a href="#" class="partner-row">
+        <span class="pr-num">05</span>
+        <span class="pr-date">4 Juin 2025</span>
+        <span class="pr-name">MARNI Showroom — Accès VIP</span>
+        <span style="margin-left:auto;margin-right:20px;"><span class="pill" style="font-size:9px;">Premium only</span></span>
+        <span class="pr-loc">Milan, Italie</span>
+        <span class="pr-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+  </script>
+</body>
+</html>

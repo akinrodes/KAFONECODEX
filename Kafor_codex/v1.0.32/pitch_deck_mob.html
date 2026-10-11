@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>RØDE x MOB HOTEL — Pitch Deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET & PRINT RULES ── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0A0A0A;
+      color: #EAE2D4;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    
+    #deck {
+      width: 1920px;
+      transform-origin: top left;
+      /* Smooth scrolling when sliding */
+      transition: transform 0.1s ease-out;
+    }
+    
+    
+    @page {
+      size: 1920px 1080px;
+      margin: 0mm;
+    }
+    
+    @media print {
+      html, body { margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible; }
+      #deck { transform: none !important; width: 100% !important; height: auto !important; }
+      .slide { page-break-after: always; height: 1080px !important; width: 1920px !important; position: relative; overflow: hidden; border-bottom: none !important; }
+      .controls { display: none !important; }
+    }
+
+    /* ── BASE SLIDE ── */
+    .slide {
+      width: 1920px; height: 1080px;
+      position: relative;
+      padding: 80px 120px;
+      display: flex; flex-direction: column;
+      background: #0A0A0A;
+      border-bottom: 2px solid #1a1a1a; /* Visual separation on screen */
+    }
+
+    /* ── TYPOGRAPHY ── */
+    h1, h2, h3, h4 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+    
+    .t-super {
+      font-size: 120px; font-weight: 900; line-height: 0.85; letter-spacing: -0.02em;
+      color: #EAE2D4; margin-bottom: 40px;
+    }
+    .t-title {
+      font-size: 68px; font-weight: 900; line-height: 0.9;
+      color: #B08D57; margin-bottom: 30px;
+    }
+    .t-sub {
+      font-size: 30px; font-weight: 700; letter-spacing: 0.05em;
+      color: #8C8478; margin-bottom: 20px;
+    }
+    .t-body {
+      font-size: 24px; font-weight: 300; line-height: 1.6;
+      color: rgba(234,226,212,0.8);
+      max-width: 900px;
+    }
+    
+    .accent { color: #B08D57; }
+
+    /* ── SLIDE LAYOUTS ── */
+    
+    /* Cover Slide */
+    .slide-cover {
+      justify-content: center; align-items: flex-start;
+      background: linear-gradient(to right, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.5)), url('https://images.unsplash.com/photo-1542359649-31e03cd4d909?q=80&w=1920&auto=format&fit=crop') center/cover;
+    }
+    .slide-cover .logo-lockup {
+      display: flex; align-items: center; gap: 40px; margin-bottom: 60px;
+    }
+    .slide-cover .logo-lockup img { height: 80px; filter: brightness(0) invert(1); }
+    .slide-cover .logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 60px; font-weight: 900; letter-spacing: 0.1em; }
+    .slide-cover .cross { font-size: 40px; color: #B08D57; font-weight: 300; }
+
+    /* Split Slide (Text L, Image R) */
+    .slide-split {
+      flex-direction: row; padding: 0;
+    }
+    .split-left {
+      width: 50%; padding: 120px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .split-right {
+      width: 50%; background: #1c1c1c; position: relative;
+    }
+    .split-right img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* Grid Slide (Photos Focus) */
+    .slide-grid {
+      justify-content: flex-start;
+    }
+    .photo-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+      margin-top: 40px; flex-grow: 1;
+    }
+    .photo-cell {
+      background: #1c1c1c; position: relative; border-radius: 8px; overflow: hidden;
+    }
+    .photo-cell img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 30px; background: linear-gradient(to top, rgba(10,10,10,0.9), transparent);
+      font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 0.05em;
+    }
+
+    /* ── UI HELPERS (Not printed) ── */
+    .controls {
+      position: fixed; bottom: 40px; right: 40px; z-index: 999;
+      display: flex; gap: 20px;
+    }
+    .btn {
+      background: #B08D57; color: #0A0A0A; border: none;
+      padding: 15px 30px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px;
+      border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .btn:hover { background: #c5a471; }
+    
+    .placeholder-hint {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(176,141,87,0.1); border: 2px dashed #B08D57;
+      font-family: 'Inter', sans-serif; font-size: 20px; color: #B08D57; text-align: center; padding: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- WRAPPER RESPONSIVE -->
+  <div id="deck">
+
+  <!-- Controls for the user -->
+  <div class="controls">
+    <button class="btn" onclick="window.print()">Exporter en PDF</button>
+  </div>
+
+  <!-- SLIDE 1 : COVER -->
+  <div class="slide slide-cover">
+    <div class="logo-lockup">
+      <span class="logo-text">RHODES</span>
+      <span class="cross">✕</span>
+      <span class="logo-text">MOB HOTEL</span>
+    </div>
+    <h2 class="t-sub">Proposition de Collaboration</h2>
+    <h1 class="t-super">CELEBRATING<br><span class="accent">THE DIASPORA</span></h1>
+    <p class="t-body" style="font-size: 28px; max-width: 800px; margin-top: 20px;">
+      Unir la force créative de la RHODES Africa Parade à l'écologie sociale et l'avant-gardisme du MOB HOTEL Paris Les Puces.
+    </p>
+  </div>
+
+  <!-- SLIDE 2 : THE VISION / SYNERGY -->
+  <div class="slide slide-split">
+    <div class="split-left">
+      <h3 class="t-sub">01 — La Synergie</h3>
+      <h2 class="t-title">POURQUOI<br>LE MOB ?</h2>
+      <p class="t-body" style="margin-bottom: 30px;">
+        Le MOB HOTEL n'est pas qu'un hôtel, c'est un lieu de vie, de culture et d'écologie sociale. Il refuse la conformité (pas de TV, place aux livres et à l'humain).
+      </p>
+      <p class="t-body">
+        <strong>RHODES Africa Parade</strong> partage cette ADN : nous mettons en lumière les créateurs émergents de la diaspora africaine hors des sentiers battus. Joindre nos forces à Saint-Ouen, c'est créer un <em>Happening</em> culturel authentique, premium et engagé.
+      </p>
+    </div>
+    <div class="split-right">
+      <img src="https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?q=80&w=1000&auto=format&fit=crop" alt="Vibe créative">
+    </div>
+  </div>
+
+  <!-- SLIDE 3 : WHAT IS RØDE AFRICA PARADE -->
+  <div class="slide slide-split">
+    <div class="split-right">
+      <!-- PLACEHOLDER INSTAGRAM @rhodesxafricaparade -->
+      <div class="placeholder-hint">
+        Remplace cette section par une photo de la Parade<br>
+        (src: @rhodesxafricaparade)
+      </div>
+      <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1000&auto=format&fit=crop" alt="Rode Africa Parade" style="opacity: 0.5;">
+    </div>
+    <div class="split-left">
+      <h3 class="t-sub">02 — Le Concept</h3>
+      <h2 class="t-title">C'EST QUOI<br>RHODES ?</h2>
+      <p class="t-body" style="margin-bottom: 30px;">
+        La RHODES Africa Parade n'est pas qu'un événement, c'est un mouvement. C’est la célébration de la mode, de l'art, de la musique et de l'identité plurielle.
+      </p>
+      <p class="t-body">
+        À travers des pop-ups exclusifs, des expositions et des performances live, nous connectons notre communauté (très engagée) avec des lieux d'exception.
+      </p>
+      <ul style="margin-top: 30px; color: rgba(234,226,212,0.8); font-size: 24px; font-weight: 300; line-height: 1.8; padding-left: 20px;">
+        <li>Mode & Créateurs Indépendants</li>
+        <li>Art Contemporain & Photographie</li>
+        <li>Networking & Communauté Créative</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 : PREVIOUS EDITIONS (GALLERY) -->
+  <div class="slide slide-grid">
+    <h3 class="t-sub">03 — Nos Précédents Événements</h3>
+    <h2 class="t-title">L'IMPACT RHODES</h2>
+    <p class="t-body">Un aperçu de nos derniers rassemblements (RHODES Africa Parade & RHODES X BIB).</p>
+    
+    <div class="photo-grid">
+      <!-- Photo 1 -->
+      <div class="photo-cell">
+        <div class="placeholder-hint" style="font-size: 16px;">Photo @rhodesxafricaparade<br>Modifier le tag img</div>
+        <img src="https://images.unsplash.com/photo-1511511450040-677116ff389e?q=80&w=800&auto=format&fit=crop" alt="Event" style="opacity:0.3">
+        <div class="photo-caption">FASHION SHOWCASE</div>
+      </div>
+      <!-- Photo 2 -->
+      <div class="photo-cell">
+        <div class="placeholder-hint" style="font-size: 16px;">Photo @rhodesxbib<br>Modifier le tag img</div>
+        <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=800&auto=format&fit=crop" alt="Event" style="opacity:0.3">
+        <div class="photo-caption">COMMUNAUTÉ & NETWORKING</div>
+      </div>
+      <!-- Photo 3 -->
+      <div class="photo-cell">
+        <div class="placeholder-hint" style="font-size: 16px;">Photo @rhodesxafricaparade<br>Modifier le tag img</div>
+        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop" alt="Event" style="opacity:0.3">
+        <div class="photo-caption">LIVE PERFORMANCE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 : THE EVENT AT MOB -->
+  <div class="slide slide-split">
+    <div class="split-left">
+      <h3 class="t-sub">04 — L'Événement</h3>
+      <h2 class="t-title">RHODES × MOB<br>LE DÉROULÉ</h2>
+      <p class="t-body" style="margin-bottom: 20px;">
+        Nous imaginons un <em>Happening</em> s'intégrant parfaitement dans l'écosystème du MOB HOTEL Paris.
+      </p>
+      <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 20px;">
+        <div>
+          <h4 style="color: #B08D57; font-size: 24px; letter-spacing: 0.05em;">ESPACE D'EXPRESSION ARTISTIQUE</h4>
+          <p class="t-body" style="font-size: 19px; line-height: 1.4;">Chaque créateur s'approprie un espace existant de l'hôtel. Fini le stand de vente classique : ils ajoutent leur propre décoration, des bijoux, des tabourets d'art, fusionnant leur identité de marque avec l'atmosphère du MOB. L'art s'y vend naturellement via une véritable immersion.</p>
+        </div>
+        <div>
+          <h4 style="color: #B08D57; font-size: 24px; letter-spacing: 0.05em;">DJ SET & MOB RADIO</h4>
+          <p class="t-body" style="font-size: 20px;">Un son Afrobeats / Amapiano / Soul en parfaite résonance avec la Webradio du MOB.</p>
+        </div>
+        <div>
+          <h4 style="color: #B08D57; font-size: 24px; letter-spacing: 0.05em;">FOOD & DRINKS</h4>
+          <p class="t-body" style="font-size: 20px;">Notre communauté profitera du restaurant 100% bio et de vos bars de quartier.</p>
+        </div>
+      </div>
+    </div>
+    <div class="split-right">
+      <!-- Photo de l'hôtel -->
+      <img src="https://images.unsplash.com/photo-1561501900-3701fa6a0864?q=80&w=1000&auto=format&fit=crop" alt="Mob Hotel Vibe">
+    </div>
+  </div>
+
+  <!-- SLIDE 6 : AUDIENCE & ROI -->
+  <div class="slide">
+    <h3 class="t-sub" style="text-align: center;">05 — Win-Win</h3>
+    <h2 class="t-title" style="text-align: center;">POURQUOI ACCUEILLIR LA PARADE ?</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; margin-top: 80px;">
+      <div style="text-align: center; padding: 40px; background: #1c1c1c; border-radius: 8px;">
+        <h4 style="color: #B08D57; font-size: 40px; margin-bottom: 20px;">AUDIENCE</h4>
+        <p class="t-body" style="font-size: 20px; text-align: center; margin: 0 auto;">
+          Attirez une cible jeune, créative, diversifiée et prescriptrice de tendances (20-35 ans, CSP+ & artistes) au cœur de Saint-Ouen.
+        </p>
+      </div>
+      
+      <div style="text-align: center; padding: 40px; background: #1c1c1c; border-radius: 8px;">
+        <h4 style="color: #B08D57; font-size: 40px; margin-bottom: 20px;">F&B REVENUE</h4>
+        <p class="t-body" style="font-size: 20px; text-align: center; margin: 0 auto;">
+          Un événement générateur de trafic pour le restaurant certifié AB et les bars de l'hôtel sur l'ensemble de la journée/soirée.
+        </p>
+      </div>
+      
+      <div style="text-align: center; padding: 40px; background: #1c1c1c; border-radius: 8px;">
+        <h4 style="color: #B08D57; font-size: 40px; margin-bottom: 20px;">IMAGE</h4>
+        <p class="t-body" style="font-size: 20px; text-align: center; margin: 0 auto;">
+          Renforcez l'ancrage culturel du MOB HOTEL en soutenant la diversité, l'entrepreneuriat et la créativité émergente.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 : CONTACT -->
+  <div class="slide slide-cover" style="align-items: center; text-align: center; background: linear-gradient(rgba(10,10,10,0.8), rgba(10,10,10,0.9)), url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1920&auto=format&fit=crop') center/cover;">
+    <h2 class="t-title" style="margin-bottom: 20px;">LET'S MAKE IT HAPPEN</h2>
+    <p class="t-body" style="font-size: 32px; margin-bottom: 60px; text-align: center;">
+      Organisons un appel ou une rencontre au MOB pour définir les modalités visuelles et l'installation du set-up créatif.
+    </p>
+    
+    <div style="display: flex; gap: 40px; justify-content: center;">
+      <div style="text-align: left;">
+        <h4 style="color: #B08D57; font-size: 24px; margin-bottom: 10px;">CONTACT</h4>
+        <p class="t-body" style="font-size: 24px;">contact@rode-africa.com<br>+33 6 XX XX XX XX</p>
+      </div>
+      <div style="text-align: left;">
+        <h4 style="color: #B08D57; font-size: 24px; margin-bottom: 10px;">RESEAUX</h4>
+        <p class="t-body" style="font-size: 24px;">@rhodesxafricaparade<br>@rhodesxbib</p>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- End Deck Wrapper -->
+  
+  <script>
+    // Adapte la taille du deck à l'écran tout en conservant le scroll vertical
+    function scaleDeck() {
+      const scale = window.innerWidth / 1920;
+      const deck = document.getElementById('deck');
+      
+      deck.style.transform = `scale(${scale})`;
+      
+      // Ajuste la hauteur du body pour éviter le grand espace blanc créé par le `transform`
+      const slidesCount = document.querySelectorAll('.slide').length;
+      document.body.style.height = (1080 * slidesCount * scale) + 'px';
+    }
+    
+    window.addEventListener('resize', scaleDeck);
+    scaleDeck(); // Lancement initial
+  </script>
+</body>
+</html>

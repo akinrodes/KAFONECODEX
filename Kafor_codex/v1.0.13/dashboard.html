@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0A0A0A;
+      color: #EAE2D4;
+      font-family: 'Barlow', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ══ LAYOUT ════════════════════════════════════════════════ */
+    .dash-layout {
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #0d0c0a;
+      border-right: 1px solid rgba(176,141,87,0.10);
+      display: flex;
+      flex-direction: column;
+      padding: 32px 0;
+      position: fixed;
+      top: 0; left: 0;
+      width: 220px;
+      height: 100vh;
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: 0.06em;
+      color: #EAE2D4;
+      text-decoration: none;
+      padding: 0 28px;
+      margin-bottom: 40px;
+      display: block;
+    }
+    .sidebar-logo:hover { color: #B08D57; }
+
+    .sidebar-section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.36em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.22);
+      padding: 0 28px;
+      margin-bottom: 8px;
+      margin-top: 24px;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      flex: 1;
+    }
+
+    .sidebar-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 28px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.40);
+      text-decoration: none;
+      transition: color 180ms, background 180ms;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav li a:hover {
+      color: rgba(234,226,212,0.80);
+      background: rgba(234,226,212,0.03);
+    }
+    .sidebar-nav li a.active {
+      color: #B08D57;
+      border-left-color: #B08D57;
+      background: rgba(176,141,87,0.06);
+    }
+    .sidebar-nav li a svg {
+      width: 15px; height: 15px; flex-shrink: 0;
+    }
+
+    .sidebar-bottom {
+      padding: 0 28px;
+      border-top: 1px solid rgba(234,226,212,0.06);
+      padding-top: 20px;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .sidebar-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(176,141,87,0.20);
+      border: 1px solid rgba(176,141,87,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #B08D57;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info { overflow: hidden; }
+    .sidebar-user-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: rgba(234,226,212,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-user-plan {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #B08D57;
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 9px 16px;
+      background: transparent;
+      border: 1px solid rgba(234,226,212,0.10);
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.35);
+      cursor: pointer;
+      transition: all 200ms;
+      text-align: center;
+    }
+    .btn-logout:hover {
+      border-color: rgba(234,226,212,0.25);
+      color: rgba(234,226,212,0.65);
+    }
+
+    /* ══ CONTENU PRINCIPAL ══════════════════════════════════════ */
+    .dash-main {
+      margin-left: 220px;
+      padding: 48px 48px 80px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 48px;
+    }
+
+    .dash-greeting {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #B08D57;
+      margin-bottom: 8px;
+    }
+
+    .dash-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(28px, 3vw, 44px);
+      letter-spacing: -0.01em;
+      color: #EAE2D4;
+      line-height: 1;
+    }
+
+    .btn-upgrade {
+      padding: 11px 24px;
+      background: #B08D57;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #0A0A0A;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 200ms;
+    }
+    .btn-upgrade:hover { background: #c9a26a; }
+
+    /* ── Stats cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: rgba(234,226,212,0.03);
+      border: 1px solid rgba(234,226,212,0.07);
+      border-radius: 12px;
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, #B08D57, transparent);
+      opacity: 0.4;
+    }
+
+    .stat-card-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.35);
+      margin-bottom: 12px;
+    }
+
+    .stat-card-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      color: #EAE2D4;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-card-delta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(234,226,212,0.30);
+    }
+    .stat-card-delta.up { color: rgba(120,200,120,0.70); }
+
+    /* ── Section titre ── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(234,226,212,0.60);
+    }
+
+    .section-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #B08D57;
+      text-decoration: none;
+    }
+    .section-link:hover { text-decoration: underline; }
+
+    /* ── Profil status ── */
+    .profile-status {
+      background: rgba(234,226,212,0.03);
+      border: 1px solid rgba(234,226,212,0.07);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+
+    .profile-completion {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .completion-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: conic-gradient(#B08D57 0% 40%, rgba(234,226,212,0.08) 40% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .completion-circle::before {
+      content: '';
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #0d0c0a;
+    }
+    .completion-pct {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #B08D57;
+      position: relative;
+      z-index: 1;
+    }
+
+    .completion-info { flex: 1; }
+    .completion-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #EAE2D4;
+      margin-bottom: 4px;
+    }
+    .completion-sub {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(234,226,212,0.40);
+    }
+
+    .completion-tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .task-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(234,226,212,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .task-check.done {
+      background: rgba(176,141,87,0.20);
+      border-color: rgba(176,141,87,0.40);
+    }
+    .task-check.done::after {
+      content: '✓';
+      font-size: 10px;
+      color: #B08D57;
+    }
+
+    .task-text {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(234,226,212,0.55);
+    }
+    .task-text.done { color: rgba(234,226,212,0.30); text-decoration: line-through; }
+
+    .task-action {
+      margin-left: auto;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #B08D57;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* ── Plan card ── */
+    .plan-card {
+      background: rgba(176,141,87,0.06);
+      border: 1px solid rgba(176,141,87,0.20);
+      border-radius: 12px;
+      padding: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .plan-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.36em;
+      text-transform: uppercase;
+      color: #B08D57;
+      background: rgba(176,141,87,0.15);
+      border: 1px solid rgba(176,141,87,0.30);
+      border-radius: 4px;
+      padding: 4px 10px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .plan-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 22px;
+      color: #EAE2D4;
+      margin-bottom: 6px;
+    }
+
+    .plan-desc {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(234,226,212,0.40);
+      max-width: 380px;
+    }
+
+    /* ══ RESPONSIVE ════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .dash-main { margin-left: 0; padding: 32px 20px 60px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .plan-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="dash-layout">
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">Kafora</a>
+
+    <span class="sidebar-section-label">Menu</span>
+    <ul class="sidebar-nav">
+      <li>
+        <a href="dashboard.html" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Vue d'ensemble
+        </a>
+      </li>
+      <li>
+        <a href="profil.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Mon profil
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Analytics
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Affiliation
+        </a>
+      </li>
+      <li>
+        <a href="evenements.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Événements
+        </a>
+      </li>
+    </ul>
+
+    <span class="sidebar-section-label">Compte</span>
+    <ul class="sidebar-nav">
+      <li>
+        <a href="premium.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Passer Premium
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">K</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName">Créateur</div>
+          <div class="sidebar-user-plan">Gratuit</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+    </div>
+  </aside>
+
+  <!-- ══ CONTENU ══════════════════════════════════════════════════ -->
+  <main class="dash-main">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <p class="dash-greeting">Tableau de bord</p>
+        <h1 class="dash-title" id="dashTitle">Bienvenue.</h1>
+      </div>
+      <a href="premium.html" class="btn-upgrade">Passer Premium ↗</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="stat-card-label">Vues du profil</p>
+        <p class="stat-card-value">0</p>
+        <p class="stat-card-delta">Ce mois-ci</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card-label">Clics sortants</p>
+        <p class="stat-card-value">0</p>
+        <p class="stat-card-delta">Liens affiliés</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card-label">Revenus affiliation</p>
+        <p class="stat-card-value">0 €</p>
+        <p class="stat-card-delta">En attente — Premium</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card-label">Position annuaire</p>
+        <p class="stat-card-value">—</p>
+        <p class="stat-card-delta">Complète ton profil</p>
+      </div>
+    </div>
+
+    <!-- Profil status -->
+    <div class="section-header">
+      <span class="section-title">Complétion du profil</span>
+      <a href="profil.html" class="section-link">Voir mon profil →</a>
+    </div>
+
+    <div class="profile-status">
+      <div class="profile-completion">
+        <div class="completion-circle">
+          <span class="completion-pct">20%</span>
+        </div>
+        <div class="completion-info">
+          <p class="completion-title">Profil incomplet</p>
+          <p class="completion-sub">Complète ton profil pour apparaître dans l'annuaire Kafora.</p>
+        </div>
+      </div>
+
+      <div class="completion-tasks">
+        <div class="task-row">
+          <div class="task-check done"></div>
+          <span class="task-text done">Créer un compte</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check"></div>
+          <span class="task-text">Ajouter une photo de profil</span>
+          <a href="#" class="task-action">Ajouter →</a>
+        </div>
+        <div class="task-row">
+          <div class="task-check"></div>
+          <span class="task-text">Rédiger ta biographie</span>
+          <a href="#" class="task-action">Rédiger →</a>
+        </div>
+        <div class="task-row">
+          <div class="task-check"></div>
+          <span class="task-text">Ajouter ta discipline et ta ville</span>
+          <a href="#" class="task-action">Ajouter →</a>
+        </div>
+        <div class="task-row">
+          <div class="task-check"></div>
+          <span class="task-text">Connecter ton Instagram</span>
+          <a href="#" class="task-action">Connecter →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan -->
+    <div class="section-header" style="margin-top: 40px;">
+      <span class="section-title">Mon plan</span>
+    </div>
+
+    <div class="plan-card">
+      <div>
+        <span class="plan-badge">Gratuit</span>
+        <p class="plan-title">Kafora Free</p>
+        <p class="plan-desc">Passe au plan Premium pour débloquer l'affiliation, les analytics avancées, la mise en avant en homepage et l'accès aux événements partenaires.</p>
+      </div>
+      <a href="premium.html" class="btn-upgrade" style="white-space:nowrap; flex-shrink:0;">Upgrade →</a>
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  // ── Auth : IIFE pour contrôle strict du flux ──
+  (function() {
+    function redirectToLogin() {
+      localStorage.removeItem('kafora-user');
+      window.location.replace('connexion.html');
+    }
+
+    const raw = localStorage.getItem('kafora-user');
+
+    // Pas de session → login (return stoppe tout le reste)
+    if (!raw) { redirectToLogin(); return; }
+
+    let user;
+    try {
+      user = JSON.parse(raw);
+      if (!user || typeof user !== 'object') throw new Error();
+    } catch(e) {
+      // Session corrompue → purge + login
+      redirectToLogin(); return;
+    }
+
+    // Session valide → hydrater l'interface
+    const firstName = user.firstName || (user.email ? user.email.split('@')[0] : 'Créateur');
+    const initials  = (user.firstName ? user.firstName[0] : 'K').toUpperCase();
+
+    document.getElementById('dashTitle').textContent     = 'Bienvenue, ' + firstName + '.';
+    document.getElementById('sidebarName').textContent   = firstName + (user.lastName ? ' ' + user.lastName : '');
+    document.getElementById('sidebarAvatar').textContent = initials;
+  })();
+
+  // ── Déconnexion ──
+  function logout() {
+    localStorage.removeItem('kafora-user');
+    window.location.replace('connexion.html');
+  }
+</script>
+
+</body>
+</html>

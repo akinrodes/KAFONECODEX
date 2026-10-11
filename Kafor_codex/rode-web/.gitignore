@@ -1,0 +1,27 @@
+# Dépendances Node
+node_modules/
+
+# Variables d'environnement (NE JAMAIS COMMITER)
+.env
+*.env.local
+*.env.production
+
+# Build Nuxt
+.nuxt/
+.output/
+dist/
+
+# Build AdonisJS
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data Docker local (ne pas versionner les données de la BDD)
+pg-data/
+mysql-data/

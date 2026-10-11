@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Discover The Culture</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    body { overflow: hidden; height: 100vh; }
+
+    .slide-dots-wrap {
+      position: absolute; bottom: 44px;
+      left: 50%; transform: translateX(-50%);
+      z-index: 10;
+    }
+    .hero-copy {
+      position: absolute; bottom: 100px; left: 48px;
+      z-index: 10;
+    }
+    .eyebrow { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .eyebrow-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 300;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: rgba(255,255,255,0.40);
+    }
+    @media (max-width: 768px) {
+      .hero-copy { left: 24px; bottom: 80px; }
+      .slide-dots-wrap { bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="premium.html" class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <section class="hero-section">
+
+    <div class="hero-slide active" style="background-image:url('file:///E:/AfroPunk/86b4849f724e79786db3ccd0b418a93c.jpg');"></div>
+    <div class="hero-slide" style="background-image:url('file:///E:/AfroPunk/c78917647cdcb2262e3424b8ec875098.jpg');"></div>
+    <div class="hero-slide" style="background-image:url('file:///E:/AfroPunk/edbf6e221e7d36de896a033428cf7866.jpg');"></div>
+
+    <div class="hero-vignette"></div>
+    <div class="hero-vignette-side"></div>
+
+    <div class="social-rail">
+      <div class="social-rail-inner">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <div class="eyebrow">
+        <span class="eyebrow-text">Mode · Art · Musique</span>
+        <span class="pill ghost">Saison 2025</span>
+      </div>
+      <h1 class="t-hero">Discover<br>The Culture</h1>
+    </div>
+
+    <div class="slide-dots-wrap">
+      <div class="slide-dots">
+        <button class="s-dot active" data-slide="0">01</button>
+        <button class="s-dot" data-slide="1">02</button>
+        <button class="s-dot" data-slide="2">03</button>
+      </div>
+    </div>
+
+  </section>
+
+  <script>
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots   = document.querySelectorAll('.s-dot');
+    let cur = 0;
+    function goTo(i) {
+      slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
+      cur = i;
+      slides[cur].classList.add('active'); dots[cur].classList.add('active');
+    }
+    dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.slide)));
+    setInterval(() => goTo((cur + 1) % slides.length), 5500);
+  </script>
+</body>
+</html>

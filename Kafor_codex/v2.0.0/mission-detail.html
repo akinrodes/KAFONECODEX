@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Détail de mission</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <script src="kafora-currency.js"></script>
+  <style>
+    .kcy-btn { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; padding:5px 10px; background:transparent; border:1px solid rgba(234,226,212,0.14); color:rgba(234,226,212,0.40); cursor:pointer; transition:all 180ms; }
+    .kcy-btn:hover { border-color:rgba(234,226,212,0.30); color:rgba(234,226,212,0.70); }
+    .kcy-btn.active { background:#B08D57; color:#0A0A0A; border-color:#B08D57; }
+  </style>
+  <style>
+    :root { --ink:#0A0A0A; --parch:#EAE2D4; --bronze:#B08D57; --ash:#8C8478; --border:rgba(234,226,212,0.08); --surface:#111010; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--ink); color:var(--parch); font-family:'Barlow',sans-serif; }
+
+    #navbar { position:fixed; top:0; left:0; right:0; z-index:200; display:flex; align-items:center; justify-content:space-between; padding:22px 48px; background:rgba(10,10,10,0.92); border-bottom:1px solid var(--border); backdrop-filter:blur(12px); }
+    .nav-logo { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:20px; letter-spacing:0.06em; color:var(--parch); text-decoration:none; }
+    .nav-logo:hover { color:var(--bronze); }
+    .nav-links { display:flex; gap:32px; list-style:none; }
+    .nav-links a { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:300; letter-spacing:0.22em; text-transform:uppercase; color:rgba(234,226,212,0.55); text-decoration:none; transition:color 200ms; }
+    .nav-links a:hover { color:var(--bronze); }
+    .nav-right { display:flex; gap:12px; }
+    .btn-nav { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; padding:9px 20px; border:1px solid var(--bronze); background:transparent; color:var(--bronze); text-decoration:none; transition:all 200ms; }
+    .btn-nav:hover { background:var(--bronze); color:var(--ink); }
+
+    .page-wrap { padding:120px 48px 80px; max-width:1100px; margin:0 auto; }
+    .breadcrumb { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; color:var(--ash); margin-bottom:40px; }
+    .breadcrumb a { color:var(--ash); text-decoration:none; transition:color 200ms; }
+    .breadcrumb a:hover { color:var(--bronze); }
+    .breadcrumb span { color:rgba(234,226,212,0.30); margin:0 10px; }
+
+    .detail-grid { display:grid; grid-template-columns:1fr 360px; gap:48px; align-items:start; }
+
+    /* ── CONTENU MISSION ── */
+    .mission-type-badge { display:inline-block; font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; background:rgba(176,141,87,0.12); color:var(--bronze); padding:4px 12px; margin-bottom:16px; }
+    .mission-title { font-family:'Barlow Condensed',sans-serif; font-size:clamp(36px,4vw,64px); font-weight:900; text-transform:uppercase; letter-spacing:0.04em; line-height:0.92; color:var(--parch); margin-bottom:24px; }
+    .mission-budget-row { display:flex; align-items:baseline; gap:8px; margin-bottom:32px; padding-bottom:32px; border-bottom:1px solid var(--border); }
+    .mission-budget { font-family:'Barlow Condensed',sans-serif; font-size:44px; font-weight:900; color:var(--parch); }
+    .mission-budget-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:300; letter-spacing:0.14em; color:var(--ash); }
+
+    .detail-section { margin-bottom:36px; }
+    .detail-section-title { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.32em; text-transform:uppercase; color:var(--ash); margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:10px; }
+    .detail-desc { font-family:'Barlow',sans-serif; font-size:15px; font-weight:300; line-height:1.8; color:rgba(234,226,212,0.75); }
+    .detail-specs { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .spec-item { background:var(--surface); border:1px solid var(--border); padding:16px 20px; }
+    .spec-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; color:var(--ash); margin-bottom:6px; }
+    .spec-val { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:var(--parch); }
+
+    /* ── SIDEBAR CANDIDATURE ── */
+    .cand-box { background:var(--surface); border:1px solid rgba(176,141,87,0.20); padding:32px; position:sticky; top:100px; }
+    .cand-box-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:900; text-transform:uppercase; letter-spacing:0.06em; color:var(--parch); margin-bottom:6px; }
+    .cand-box-sub { font-family:'Barlow',sans-serif; font-size:12px; font-weight:300; color:var(--ash); margin-bottom:24px; }
+    .cand-form-group { margin-bottom:14px; }
+    .cand-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; color:var(--ash); display:block; margin-bottom:6px; }
+    .cand-input, .cand-textarea {
+      width:100%; background:rgba(234,226,212,0.04); border:1px solid rgba(234,226,212,0.12);
+      color:var(--parch); padding:11px 14px;
+      font-family:'Barlow',sans-serif; font-size:13px; font-weight:300;
+      outline:none; transition:border-color 200ms;
+    }
+    .cand-input:focus, .cand-textarea:focus { border-color:var(--bronze); }
+    .cand-textarea { resize:vertical; min-height:90px; }
+    .btn-candidater-main {
+      width:100%; padding:14px; background:var(--bronze); color:var(--ink); border:none;
+      font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700;
+      letter-spacing:0.22em; text-transform:uppercase; cursor:pointer; transition:background 200ms;
+    }
+    .btn-candidater-main:hover { background:#c9a468; }
+    .cand-note { font-family:'Barlow',sans-serif; font-size:11px; font-weight:300; color:var(--ash); text-align:center; margin-top:12px; line-height:1.6; }
+
+    .producteur-card { display:flex; align-items:center; gap:14px; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
+    .prod-avatar { width:44px; height:44px; border-radius:50%; background:rgba(176,141,87,0.15); border:1px solid rgba(176,141,87,0.30); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:var(--bronze); flex-shrink:0; }
+    .prod-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:0.06em; color:var(--parch); }
+    .prod-note { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.14em; color:var(--ash); }
+
+    .success-banner { background:rgba(80,180,100,0.10); border:1px solid rgba(80,180,100,0.30); padding:16px 20px; margin-bottom:24px; display:none; }
+    .success-banner p { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(80,180,100,0.90); }
+
+    .not-found { text-align:center; padding:120px 48px; }
+    .not-found h2 { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; text-transform:uppercase; color:var(--parch); margin-bottom:12px; }
+    .not-found p { font-family:'Barlow',sans-serif; font-size:14px; color:var(--ash); }
+
+    @media (max-width:900px) { .detail-grid { grid-template-columns:1fr; } .cand-box { position:static; } }
+    @media (max-width:768px) { #navbar { padding:18px 20px; } .nav-links { display:none; } .page-wrap { padding:100px 20px 60px; } .detail-specs { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">Kafora</a>
+  <ul class="nav-links">
+    <li><a href="createurs.html">Créateurs</a></li>
+    <li><a href="casting.html">Casting</a></li>
+    <li><a href="missions.html">Missions</a></li>
+    <li><a href="evenements.html">Événements</a></li>
+    <li><a href="marques.html">Marques</a></li>
+    <li><a href="premium.html">Premium</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="connexion.html" class="btn-nav">Se connecter</a>
+  </div>
+</nav>
+
+<div class="page-wrap" id="pageContent">
+  <div class="breadcrumb" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div><a href="missions.html">Missions</a><span style="margin:0 10px;color:rgba(234,226,212,0.30)">›</span><span id="bcrumb">Chargement...</span></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:#8C8478">Devise</span>
+      <div id="currencyPicker" style="display:flex;gap:4px"></div>
+    </div>
+  </div>
+  <div id="missionContent"></div>
+</div>
+
+<script>
+const MISSIONS_DEFAUT = [
+  { id:'m1', titre:'Création de contenu beauté', type:'Publicité', budget:200000, desc:'Mettre en valeur nos produits de beauté dans une vidéo en respectant nos attentes de marque. Tournage en studio à Cotonou. La marque fournira les produits et le décor. Durée estimée : 1 journée complète.', lieu:'Cotonou', date:'2026-04-18', nbFaces:1, profil:'Femme', producteur:'MAD SARL', prodNote:'Aucun avis', at: Date.now() - 86400000*2 },
+  { id:'m2', titre:'Vidéo introduction pour une formation', type:'Publicité', budget:20000, desc:'Nous recherchons 6 faces pour tourner une vidéo publicitaire. On veut simuler une formation en cosmétique. Figurants ou créateurs de contenu bienvenus. Pas d\'expérience nécessaire.', lieu:'Atchodo', date:'2026-04-06', nbFaces:6, profil:'Homme et Femme', producteur:'Jolyberm', prodNote:'Aucun avis', at: Date.now() - 86400000*5 },
+  { id:'m3', titre:'Pub lancement Kafora Casting', type:'Publicité', budget:60000, desc:'Nous recherchons deux jeunes filles et un homme pour le tournage d\'une vidéo publicitaire pour le lancement de notre plateforme de casting. Style naturel et dynamique souhaité.', lieu:'Cotonou', date:'2026-04-10', nbFaces:3, profil:'Homme et Femme', producteur:'Kafora', prodNote:'★★★★★', at: Date.now() - 86400000*8 },
+  { id:'m4', titre:'Mannequin éditorial collections été', type:'Éditorial', budget:85000, desc:'Shooting éditorial pour notre nouvelle collection été. Cherchons mannequin avec expérience en mode africaine contemporaine. Ambiance solaire, couleurs vives.', lieu:'Dakar', date:'2026-05-02', nbFaces:2, profil:'Femme', producteur:'Studio Teranga', prodNote:'Aucun avis', at: Date.now() - 86400000 },
+  { id:'m5', titre:'Clip musical artiste afropop', type:'Clip', budget:150000, desc:'Clip pour un artiste afropop basé à Paris. Tournage 1 journée complète. Recherchons des figurants et danseurs pour des scènes de groupe.', lieu:'Paris', date:'2026-04-25', nbFaces:8, profil:'Homme et Femme', producteur:'Néo Records', prodNote:'Aucun avis', at: Date.now() - 86400000*3 },
+];
+
+function getMission(id) {
+  const custom = JSON.parse(localStorage.getItem('kafora-missions') || '[]');
+  return [...custom, ...MISSIONS_DEFAUT].find(m => m.id === id);
+}
+function formatDate(d) { return new Date(d).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+function formatBudget(b) { return kaforaFormat(b); }
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+const params = new URLSearchParams(window.location.search);
+const mId = params.get('id');
+const mission = getMission(mId);
+
+if (!mission) {
+  document.getElementById('missionContent').innerHTML = `<div class="not-found"><h2>Mission introuvable</h2><p>Cette mission n'existe plus ou a été supprimée.</p><br><a href="missions.html" style="color:var(--bronze);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;">← Retour aux missions</a></div>`;
+} else {
+  document.getElementById('bcrumb').textContent = mission.titre;
+  document.title = 'Kafora — ' + mission.titre;
+
+  document.getElementById('missionContent').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-left">
+        <span class="mission-type-badge">${mission.type}</span>
+        <h1 class="mission-title">${mission.titre}</h1>
+        <div class="mission-budget-row">
+          <div class="mission-budget">${formatBudget(mission.budget)}</div>
+          <span class="mission-budget-lbl">budget total</span>
+        </div>
+
+        <div class="detail-section">
+          <p class="detail-section-title">Description de la mission</p>
+          <p class="detail-desc">${mission.desc}</p>
+        </div>
+
+        <div class="detail-section">
+          <p class="detail-section-title">Détails pratiques</p>
+          <div class="detail-specs">
+            <div class="spec-item"><div class="spec-label">Lieu</div><div class="spec-val">${mission.lieu}</div></div>
+            <div class="spec-item"><div class="spec-label">Date de tournage</div><div class="spec-val">${formatDate(mission.date)}</div></div>
+            <div class="spec-item"><div class="spec-label">Nombre de faces</div><div class="spec-val">${mission.nbFaces} talent${mission.nbFaces > 1 ? 's' : ''}</div></div>
+            <div class="spec-item"><div class="spec-label">Profil recherché</div><div class="spec-val">${mission.profil || 'Tous profils'}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-right">
+        <div class="cand-box">
+          <div class="success-banner" id="successBanner"><p>✓ Candidature envoyée avec succès !</p></div>
+          <h3 class="cand-box-title">Candidater</h3>
+          <p class="cand-box-sub">Postulez à cette mission en quelques secondes.</p>
+
+          <div class="cand-form-group">
+            <label class="cand-label">Votre nom complet *</label>
+            <input type="text" class="cand-input" id="cNom" placeholder="Prénom Nom" />
+          </div>
+          <div class="cand-form-group">
+            <label class="cand-label">Email ou téléphone *</label>
+            <input type="text" class="cand-input" id="cContact" placeholder="email@exemple.com" />
+          </div>
+          <div class="cand-form-group">
+            <label class="cand-label">Message au producteur</label>
+            <textarea class="cand-textarea" id="cMsg" placeholder="Présentez-vous brièvement, pourquoi ce projet vous correspond..."></textarea>
+          </div>
+          <div class="cand-form-group">
+            <label class="cand-label">Lien profil Kafora (optionnel)</label>
+            <input type="text" class="cand-input" id="cProfil" placeholder="kafora.com/profil/votre-id" />
+          </div>
+
+          <button class="btn-candidater-main" onclick="candidater()">Envoyer ma candidature →</button>
+          <div id="paymentMethodNote" style="margin-top:14px;padding:12px 16px;border:1px solid rgba(234,226,212,0.08);background:rgba(234,226,212,0.03)"></div>
+
+          <div class="producteur-card">
+            <div class="prod-avatar">${initials(mission.producteur)}</div>
+            <div>
+              <div class="prod-name">${mission.producteur}</div>
+              <div class="prod-note">${mission.prodNote}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function candidater() {
+  const nom     = document.getElementById('cNom').value.trim();
+  const contact = document.getElementById('cContact').value.trim();
+  const msg     = document.getElementById('cMsg').value.trim();
+  const profil  = document.getElementById('cProfil').value.trim();
+
+  if (!nom || !contact) { alert('Veuillez renseigner votre nom et contact.'); return; }
+
+  const candidature = {
+    id: 'cand-' + Date.now(),
+    missionId: mission.id, missionTitre: mission.titre, producteur: mission.producteur,
+    nom, contact, msg, profil,
+    statut: 'En attente', at: Date.now()
+  };
+
+  const stored = JSON.parse(localStorage.getItem('kafora-candidatures') || '[]');
+  stored.unshift(candidature);
+  localStorage.setItem('kafora-candidatures', JSON.stringify(stored));
+
+  document.getElementById('successBanner').style.display = 'block';
+  document.getElementById('cNom').value = '';
+  document.getElementById('cContact').value = '';
+  document.getElementById('cMsg').value = '';
+  document.getElementById('cProfil').value = '';
+}
+
+function renderPaymentNote() {
+  const note = document.getElementById('paymentMethodNote');
+  if (!note || !mission) return;
+  const devise = mission.budgetDevise || 'XOF';
+  if (devise === 'XOF') {
+    note.innerHTML = `
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:rgba(80,180,100,0.80);margin-bottom:5px">✓ Paiement Mobile Money</p>
+      <p style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.45);line-height:1.6">Règlement en FCFA après la mission via MTN MoMo, Moov Flooz ou Orange Money. Directement sur Kafora. Plateforme certifiée.</p>`;
+  } else {
+    const sym = devise === 'EUR' ? '€ (EUR)' : '$ (USD)';
+    note.innerHTML = `
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:var(--bronze);margin-bottom:5px">Paiement en ${sym}</p>
+      <p style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:300;color:rgba(234,226,212,0.45);line-height:1.6">Le producteur règle via <strong style="color:rgba(234,226,212,0.65)">Gumroad</strong> ou <strong style="color:rgba(234,226,212,0.65)">Lemon Squeezy</strong>. Accessible depuis n'importe quel pays — Bénin inclus. L'encaissement direct sur Kafora arrivera prochainement.</p>`;
+  }
+}
+
+function refreshCurrencyDetail() {
+  if (!mission) return;
+  const budgetEl = document.querySelector('.mission-budget');
+  if (budgetEl) budgetEl.innerHTML = formatBudget(mission.budget) + '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:300;letter-spacing:0.14em;color:var(--ash);margin-left:8px">budget total</span>';
+  renderPaymentNote();
+}
+kaforaCurrencyPicker('currencyPicker', refreshCurrencyDetail);
+
+</script>
+</body>
+</html>

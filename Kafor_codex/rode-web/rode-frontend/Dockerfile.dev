@@ -1,0 +1,21 @@
+# Dockerfile.dev - RØDE Frontend (Nuxt.js) - Développement
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Installation des dépendances OS nécessaires
+RUN apk add --no-cache libc6-compat
+
+# Copie des fichiers de dépendances
+COPY package.json package-lock.json* ./
+
+# Installation des dépendances Node
+RUN npm install --legacy-peer-deps
+
+# Copie du reste du code source
+COPY . .
+
+EXPOSE 3000
+
+# Mode développement avec hot-reload
+CMD ["npm", "run", "dev"]

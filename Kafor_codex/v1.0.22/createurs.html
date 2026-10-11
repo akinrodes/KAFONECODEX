@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Créateurs</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    /* ── HERO ── */
+    .page-hero {
+      position: relative; width: 100vw; height: 70vh;
+      overflow: hidden; background: var(--ink);
+    }
+    .page-hero-img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 25%;
+      display: block;
+    }
+    .page-hero-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.3) 50%, transparent 100%);
+    }
+    .page-hero-copy {
+      position: absolute; bottom: 48px; left: 48px;
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-strip {
+      background: var(--parchment);
+      padding: 32px 48px;
+      border-bottom: 1px solid var(--dust);
+      display: flex; align-items: center; gap: 20px;
+    }
+    .search-wrap {
+      flex: 1; display: flex; align-items: center;
+      border: 1px solid var(--dust);
+      background: var(--cream);
+      padding: 14px 20px;
+      gap: 12px;
+    }
+    .search-wrap input {
+      flex: 1; background: none; border: none; outline: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.08em; color: var(--ink);
+    }
+    .search-wrap input::placeholder { color: var(--ash); }
+    .search-icon { color: var(--ash); display: flex; flex-shrink: 0; }
+
+    /* ── FILTERS ── */
+    .filter-strip {
+      background: var(--parchment);
+      padding: 16px 48px 20px;
+      display: flex; align-items: center;
+      gap: 10px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--dust);
+      overflow-x: auto;
+    }
+    .filter-strip::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.20em; text-transform: uppercase;
+      color: var(--ash); background: none;
+      border: 1px solid var(--dust);
+      padding: 6px 16px; cursor: pointer;
+      border-radius: 0; transition: all 200ms;
+    }
+    .filter-btn:hover, .filter-btn.on {
+      background: var(--ink); color: var(--void);
+      border-color: var(--ink);
+    }
+    .filter-sep {
+      width: 1px; height: 18px;
+      background: var(--dust); flex-shrink: 0;
+      margin: 0 6px;
+    }
+
+    /* ── CREATOR GRID ── */
+    .grid-wrap { padding: 52px 48px 80px; }
+    .grid-head {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 36px;
+    }
+    .creators-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--dust);
+    }
+    .grid-item { background: var(--parchment); }
+    .grid-item[hidden] { display: none; }
+
+    .c-card { padding: 0; }
+    .c-card-img { border-radius: 0; }
+    .c-card-info { padding: 12px 0 20px; }
+    .c-card-city {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ash);
+      margin-top: 4px;
+    }
+    .c-card-link {
+      display: block; margin-top: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 0.20em;
+      text-transform: uppercase; color: var(--ash);
+      text-decoration: none; transition: color 200ms;
+    }
+    .c-card:hover .c-card-link { color: var(--bronze); }
+
+    /* ── NO RESULTS ── */
+    .no-results {
+      display: none;
+      grid-column: 1 / -1;
+      padding: 80px 0;
+      text-align: center;
+      background: var(--parchment);
+    }
+    .no-results.visible { display: block; }
+    .no-results-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ash);
+    }
+
+    @media (max-width: 1100px) {
+      .creators-grid { grid-template-columns: repeat(3,1fr); }
+    }
+    @media (max-width: 768px) {
+      .page-hero { height: 55vh; }
+      .page-hero-copy { left: 24px; bottom: 32px; }
+      .search-strip, .filter-strip, .grid-wrap { padding-left: 24px; padding-right: 24px; }
+      .creators-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html" class="active">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="connexion.html" class="nav-icon" title="Connexion"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE HERO ══ -->
+  <section class="page-hero">
+    <img class="page-hero-img" src="file:///E:/AfroPunk/9d92497c5b2a8e5c2e28a56596a18fb0.jpg" alt="Créateurs Kafora" />
+    <div class="page-hero-over"></div>
+    <div class="social-rail">
+      <div class="social-rail-inner">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="page-hero-copy">
+      <p class="t-label light" style="margin-bottom:14px;">Annuaire Kafora</p>
+      <h1 class="t-hero" style="font-size:clamp(56px,8vw,130px);">Créateurs</h1>
+    </div>
+  </section>
+
+  <!-- ══ SEARCH ══ -->
+  <div class="search-strip">
+    <div class="search-wrap">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <input id="searchInput" type="text" placeholder="Rechercher un créateur, une discipline, une ville…" autocomplete="off" />
+    </div>
+    <button class="btn btn-primary" id="clearBtn" style="white-space:nowrap;display:none;">Effacer</button>
+  </div>
+
+  <!-- ══ FILTERS ══ -->
+  <div class="filter-strip">
+    <span class="t-label" style="margin-right:6px;">Discipline</span>
+    <button class="filter-btn on" data-filter="discipline" data-value="">Tous</button>
+    <button class="filter-btn" data-filter="discipline" data-value="mode">Mode</button>
+    <button class="filter-btn" data-filter="discipline" data-value="modèle">Modèle</button>
+    <button class="filter-btn" data-filter="discipline" data-value="photographie">Photographie</button>
+    <button class="filter-btn" data-filter="discipline" data-value="vidéo">Vidéo</button>
+    <button class="filter-btn" data-filter="discipline" data-value="cinéma">Cinéma</button>
+    <button class="filter-btn" data-filter="discipline" data-value="musique">Musique</button>
+    <button class="filter-btn" data-filter="discipline" data-value="danse">Danse</button>
+    <button class="filter-btn" data-filter="discipline" data-value="art">Art</button>
+    <button class="filter-btn" data-filter="discipline" data-value="sculpture">Sculpture</button>
+    <button class="filter-btn" data-filter="discipline" data-value="design">Design</button>
+    <button class="filter-btn" data-filter="discipline" data-value="architecture">Architecture</button>
+    <button class="filter-btn" data-filter="discipline" data-value="entreprise créative">Entreprise créative</button>
+    <div class="filter-sep"></div>
+    <span class="t-label" style="margin-right:6px;">Ville</span>
+    <button class="filter-btn on" data-filter="city" data-value="">Toutes</button>
+    <button class="filter-btn" data-filter="city" data-value="paris">Paris</button>
+    <button class="filter-btn" data-filter="city" data-value="abidjan">Abidjan</button>
+    <button class="filter-btn" data-filter="city" data-value="nyc">NYC</button>
+    <button class="filter-btn" data-filter="city" data-value="dakar">Dakar</button>
+    <button class="filter-btn" data-filter="city" data-value="accra">Accra</button>
+    <button class="filter-btn" data-filter="city" data-value="lagos">Lagos</button>
+    <div class="filter-sep"></div>
+    <button class="filter-btn" data-filter="premium" data-value="true">Premium only</button>
+  </div>
+
+  <!-- ══ GRID ══ -->
+  <section class="grid-wrap">
+    <div class="grid-head">
+      <span class="t-label" id="countLabel">12 créateurs</span>
+      <span class="t-caption">Trié par : Popularité</span>
+    </div>
+
+    <div class="creators-grid" id="creatorsGrid">
+
+      <div class="grid-item" data-name="amara diallo" data-discipline="mode" data-city="paris" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Amara Diallo</div>
+            <div class="c-card-city">Mode · Paris</div>
+            <a href="profil.html?creator=amara" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="kofi mensah" data-discipline="art" data-city="nyc" data-premium="true">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Kofi Mensah</div>
+            <div class="c-card-city">Art · NYC</div>
+            <a href="profil.html?creator=kofi" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="yasmine touré" data-discipline="musique" data-city="abidjan" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Yasmine Touré</div>
+            <div class="c-card-city">Musique · Abidjan</div>
+            <a href="profil.html?creator=yasmine" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="léa fontaine" data-discipline="mode" data-city="londres" data-premium="true">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Léa Fontaine</div>
+            <div class="c-card-city">Mode · Londres</div>
+            <a href="profil.html?creator=lea" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="brahim ndiaye" data-discipline="photographie" data-city="dakar" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/d613edb2f36b6672c163e35db1650f8e.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Brahim Ndiaye</div>
+            <div class="c-card-city">Photographie · Dakar</div>
+            <a href="profil.html?creator=brahim" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="sofia eze" data-discipline="art" data-city="lagos" data-premium="true">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/caaa4ddcefd16329089301daf7a22769.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Sofia Eze</div>
+            <div class="c-card-city">Art · Lagos</div>
+            <a href="profil.html?creator=sofia" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="marcus bell" data-discipline="mode" data-city="paris" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Marcus Bell</div>
+            <div class="c-card-city">Mode · Paris</div>
+            <a href="profil.html?creator=marcus" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="inès camara" data-discipline="photographie" data-city="paris" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Inès Camara</div>
+            <div class="c-card-city">Photographie · Paris</div>
+            <a href="profil.html?creator=ines" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="noah asante" data-discipline="musique" data-city="accra" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Noah Asante</div>
+            <div class="c-card-city">Musique · Accra</div>
+            <a href="profil.html?creator=noah" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="aïda traoré" data-discipline="mode" data-city="bamako" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/ddc1f140ec485d8ae3ee3e2204da0937.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Aïda Traoré</div>
+            <div class="c-card-city">Mode · Bamako</div>
+            <a href="profil.html?creator=aida" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="elias osei" data-discipline="art" data-city="berlin" data-premium="true">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/267b726556e0c96095c282aebaaa7250.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Elias Osei</div>
+            <div class="c-card-city">Art · Berlin</div>
+            <a href="profil.html?creator=elias" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="fatou ba" data-discipline="mode" data-city="dakar" data-premium="false">
+        <div class="c-card">
+          <div class="c-card-img"><img src="file:///E:/AfroPunk/22e59bcb003c982c719ddf7a5cda4d4b.jpg" alt="" /></div>
+          <div class="c-card-info">
+            <div class="c-card-name">Fatou Ba</div>
+            <div class="c-card-city">Mode · Dakar</div>
+            <a href="profil.html?creator=fatou" class="c-card-link">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-results" id="noResults">
+        <p class="no-results-label">Aucun créateur ne correspond à votre recherche</p>
+      </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:52px;">
+      <a href="#" class="btn btn-outline">Charger plus</a>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Nav scroll ──
+    const navbar = document.getElementById('navbar');
+    navbar.classList.remove('on-dark');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('solid', window.scrollY > 80);
+    });
+
+    // ── Filter state ──
+    const state = { discipline: '', city: '', premium: false, query: '' };
+
+    const items = Array.from(document.querySelectorAll('.grid-item[data-name]'));
+    const countLabel = document.getElementById('countLabel');
+    const noResults = document.getElementById('noResults');
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function applyFilters() {
+      let visible = 0;
+      const q = state.query.toLowerCase();
+
+      items.forEach(function(item) {
+        const disc = item.dataset.discipline;
+        const city = item.dataset.city;
+        const premium = item.dataset.premium === 'true';
+        const name = item.dataset.name;
+
+        const matchDisc = !state.discipline || disc === state.discipline;
+        const matchCity = !state.city || city === state.city;
+        const matchPremium = !state.premium || premium;
+        const matchQuery = !q || name.includes(q) || disc.includes(q) || city.includes(q);
+
+        const show = matchDisc && matchCity && matchPremium && matchQuery;
+        item.hidden = !show;
+        if (show) visible++;
+      });
+
+      countLabel.textContent = visible + ' créateur' + (visible > 1 ? 's' : '');
+      noResults.classList.toggle('visible', visible === 0);
+    }
+
+    // ── Filter buttons (radio within group, toggle for premium) ──
+    document.querySelectorAll('[data-filter]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const group = this.dataset.filter;
+        const value = this.dataset.value;
+
+        if (group === 'premium') {
+          this.classList.toggle('on');
+          state.premium = this.classList.contains('on');
+        } else {
+          document.querySelectorAll('[data-filter="' + group + '"]').forEach(function(b) {
+            b.classList.remove('on');
+          });
+          this.classList.add('on');
+          state[group] = value;
+        }
+        applyFilters();
+      });
+    });
+
+    // ── Live search ──
+    searchInput.addEventListener('input', function() {
+      state.query = this.value.trim();
+      clearBtn.style.display = state.query ? 'inline-flex' : 'none';
+      applyFilters();
+    });
+
+    clearBtn.addEventListener('click', function() {
+      searchInput.value = '';
+      state.query = '';
+      this.style.display = 'none';
+      applyFilters();
+    });
+  </script>
+</body>
+</html>

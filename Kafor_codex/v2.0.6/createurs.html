@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Créateurs</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    /* ── HERO ── */
+    .page-hero {
+      position: relative; width: 100vw; height: 70vh;
+      overflow: hidden; background: var(--ink);
+    }
+    .page-hero-img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 25%;
+      display: block;
+    }
+    .page-hero-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.3) 50%, transparent 100%);
+      pointer-events: none;
+    }
+    .page-hero-copy {
+      position: absolute; bottom: 48px; left: 48px;
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-strip {
+      background: var(--parchment);
+      padding: 32px 48px;
+      border-bottom: 1px solid var(--dust);
+      display: flex; align-items: center; gap: 20px;
+    }
+    .search-wrap {
+      flex: 1; display: flex; align-items: center;
+      border: 1px solid var(--dust);
+      background: var(--cream);
+      padding: 14px 20px;
+      gap: 12px;
+    }
+    .search-wrap input {
+      flex: 1; background: none; border: none; outline: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.08em; color: var(--ink);
+    }
+    .search-wrap input::placeholder { color: var(--ash); }
+    .search-icon { color: var(--ash); display: flex; flex-shrink: 0; }
+
+    /* ── FILTERS ── */
+    .filter-strip {
+      background: var(--parchment);
+      padding: 16px 48px 20px;
+      display: flex; align-items: center;
+      gap: 10px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--dust);
+      overflow-x: auto;
+    }
+    .filter-strip::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.20em; text-transform: uppercase;
+      color: var(--ash); background: none;
+      border: 1px solid var(--dust);
+      padding: 6px 16px; cursor: pointer;
+      border-radius: 0; transition: all 200ms;
+    }
+    .filter-btn:hover, .filter-btn.on {
+      background: var(--ink); color: var(--void);
+      border-color: var(--ink);
+    }
+    .filter-sep {
+      width: 1px; height: 18px;
+      background: var(--dust); flex-shrink: 0;
+      margin: 0 6px;
+    }
+
+    
+    /* ── CREATOR GRID ── */
+    .grid-wrap { padding: 52px 48px 80px; }
+    .grid-head {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 36px;
+    }
+    .creators-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 280px));
+      justify-content: center;
+      gap: 32px;
+    }
+    .grid-item { background: transparent; }
+    .grid-item[hidden] { display: none; }
+
+    /* ── PASS CARD STYLES (imported from index.html) ── */
+    .pass-card {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #EDE5D3;
+      border: 1px solid rgba(234,226,212,0.20);
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 18px 52px rgba(0,0,0,0.14), 0 4px 14px rgba(0,0,0,0.08); /* light-theme index shadow */
+      transition: transform 700ms cubic-bezier(0.34,1.25,0.64,1), box-shadow 350ms ease, opacity 450ms ease;
+    }
+    .pass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 48px 96px rgba(0,0,0,0.60);
+    }
+    .pass-card-header {
+      padding: 10px 14px 9px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(10,10,10,0.10);
+      background: rgba(176,141,87,0.10);
+    }
+    .pass-card-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.30em;
+      text-transform: uppercase; color: #0A0A0A;
+    }
+    .pass-card-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 300; letter-spacing: 0.14em; color: #8C8478;
+    }
+    .pass-card-photo {
+      width: 100%; height: 300px; overflow: hidden; background: #100e0a;
+    }
+    .pass-card-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      display: block; transition: transform 800ms cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .pass-card:hover .pass-card-photo img { transform: scale(1.06); }
+    .pass-card-info { padding: 12px 14px 8px; flex-grow: 1; }
+    .pass-card-creator-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 15px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #0A0A0A; line-height: 1.1;
+    }
+    .pass-card-discipline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 300; letter-spacing: 0.16em;
+      color: #6b5e4a; margin-top: 4px;
+    }
+    .pass-card-footer {
+      padding: 9px 14px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(10,10,10,0.08);
+    }
+    .pass-barcode { display: flex; gap: 1.5px; align-items: flex-end; height: 20px; }
+    .pass-barcode b { display: block; width: 1.5px; background: rgba(10,10,10,0.55); }
+    .pass-card-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 400; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #B08D57;
+      border: 1px solid #B08D57; padding: 3px 7px; border-radius: 2px;
+    }
+    @media (max-width: 1100px) {
+      .creators-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 260px)); gap: 20px; }
+    }
+    @media (max-width: 768px) {
+      .creators-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .pass-card-photo { height: 240px; }
+      .pass-card { border-radius: 12px; }
+    }
+
+    /* ── BADGE VÉRIFIÉ & BOOSTÉ ── */
+    .badge-verified {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+      color: #0A0A0A; background: #B08D57;
+      padding: 3px 8px;
+    }
+    .badge-boosted {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+      color: #B08D57; background: transparent; border: 1px solid #B08D57;
+      padding: 3px 8px;
+    }
+    .pass-card.is-boosted {
+      border: 1px solid rgba(176,141,87,0.6);
+      box-shadow: 0 0 30px rgba(176,141,87,0.15);
+    }
+    .pass-card-footer-row {
+      display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; flex-wrap: wrap;
+    }
+
+    /* ── NO RESULTS ── */
+    .no-results {
+      display: none;
+      grid-column: 1 / -1;
+      padding: 80px 0;
+      text-align: center;
+      background: var(--parchment);
+    }
+    .no-results.visible { display: block; }
+    .no-results-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ash);
+    }
+
+    @media (max-width: 1100px) {
+      /* Handled above */
+    }
+    @media (max-width: 768px) {
+      .page-hero { height: 55vh; }
+      .page-hero-copy { left: 24px; bottom: 32px; }
+      .search-strip, .filter-strip, .grid-wrap { padding-left: 24px; padding-right: 24px; }
+    }
+  
+    /* ══ BOUTON THÈME ═════════════════════════════════════════ */
+    .theme-toggle {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid rgba(234,226,212,0.18);
+      background: rgba(234,226,212,0.06); cursor: pointer;
+      color: rgba(234,226,212,0.55);
+      transition: border-color 250ms, background 250ms, color 250ms, transform 350ms cubic-bezier(0.34,1.4,0.64,1);
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: #B08D57; color: #B08D57; transform: rotate(20deg); }
+    .theme-toggle .icon-sun  { display: none; }
+    .theme-toggle .icon-moon { display: block; }
+
+    /* ══ THÈME FONCÉ (Par défaut sur index, reproduit ici) ════ */
+    body:not(.light-theme) {
+      background: #0A0A0A;
+      color: #EAE2D4;
+    }
+    body:not(.light-theme) .search-strip,
+    body:not(.light-theme) .filter-strip,
+    body:not(.light-theme) .no-results {
+      background: #0A0A0A;
+      border-color: #1c1c1c;
+    }
+    body:not(.light-theme) .search-wrap {
+      background: #111; border-color: #1c1c1c;
+    }
+    body:not(.light-theme) .search-wrap input { color: #EAE2D4; }
+    body:not(.light-theme) .filter-btn {
+      color: #8C8478; border-color: #1c1c1c;
+    }
+    body:not(.light-theme) .filter-btn:hover,
+    body:not(.light-theme) .filter-btn.on {
+      background: #EAE2D4; color: #0A0A0A; border-color: #EAE2D4;
+    }
+    body:not(.light-theme) .filter-sep { background: #1c1c1c; }
+
+    /* ══ THÈME CLAIR ═════════════════════════════════════════ */
+    body.light-theme .theme-toggle {
+      border-color: #B08D57; background: rgba(176,141,87,0.10); color: #B08D57;
+    }
+    body.light-theme .theme-toggle .icon-sun  { display: block; }
+    body.light-theme .theme-toggle .icon-moon { display: none; }
+    
+    body.light-theme #navbar.solid { background: #EAE2D4 !important; border-bottom-color: #D6CCBC !important; }
+    body.light-theme .nav-logo { color: #0A0A0A !important; }
+    body.light-theme .nav-center a { color: rgba(10,10,10,0.50) !important; }
+    body.light-theme .nav-center a:hover, body.light-theme .nav-center a.active { color: #B08D57 !important; }
+    body.light-theme .nav-icon { color: rgba(10,10,10,0.55) !important; }
+    body.light-theme .nav-icon:hover { color: #B08D57 !important; }
+
+    /* ══ ENHANCEMENTS ÉDITORIAUX ══════════════════════════════ */
+
+    /* Grain cinéma sur le héro */
+    .page-hero::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 2;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    /* Radial gradient bronze sur le héro */
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 50%, rgba(176,141,87,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 20%, rgba(176,141,87,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    /* Marquee ticker séparateur */
+    .creators-ticker {
+      overflow: hidden;
+      background: #0A0A0A;
+      padding: 10px 0;
+      border-bottom: 1px solid #1c1c1c;
+    }
+    body.light-theme .creators-ticker { background: #EAE2D4; border-bottom-color: #D8CEBA; }
+    .creators-ticker-track {
+      display: flex;
+      width: max-content;
+      animation: creators-scroll 32s linear infinite;
+    }
+    .creators-ticker-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.40em;
+      text-transform: uppercase;
+      color: rgba(176,141,87,0.45);
+      padding: 0 28px;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 28px;
+    }
+    .creators-ticker-item::after { content: '·'; font-size: 14px; opacity: 0.4; }
+    @keyframes creators-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* Grid section numérotation */
+    .grid-head {
+      border-bottom: 1px solid rgba(176,141,87,0.12);
+      padding-bottom: 16px;
+      margin-bottom: 36px;
+    }
+
+    /* Pass card grain overlay */
+    .pass-card { position: relative; }
+    .pass-card::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      border-radius: 18px;
+    }
+
+    /* Barcode deco dans l'espace no-results */
+    .no-results-barcode {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 24px;
+      justify-content: center;
+      margin-bottom: 16px;
+      opacity: 0.15;
+    }
+    .no-results-barcode span {
+      display: block;
+      width: 2px;
+      background: currentColor;
+    }
+
+    /* Amélioration tags éditoriaux */
+    .pass-card-tag {
+      transition: background 250ms, color 250ms;
+    }
+    .pass-card:hover .pass-card-tag {
+      background: #B08D57;
+      color: #0A0A0A;
+    }
+
+    /* Grid-head golden rule */
+    .grid-rule {
+      width: 48px; height: 1px;
+      background: #B08D57;
+      margin-bottom: 20px;
+      transition: width 400ms cubic-bezier(0.34,1.25,0.64,1);
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="galerie.html">Galerie</a></li>
+      <li><a href="createurs.html" class="active">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+      <li><a href="marques.html">Marques</a></li>
+    </ul>
+    <div class="nav-right">
+      <!-- Toggle thème clair / sombre -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème" onclick="toggleTheme()" style="margin-right: 12px;">
+        <!-- Lune (mode sombre actif) -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Soleil (mode clair actif) -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="connexion.html" class="nav-icon" title="Connexion"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE HERO ══ -->
+  <section class="page-hero">
+    <img class="page-hero-img" src="file:///E:/AfroPunk/9d92497c5b2a8e5c2e28a56596a18fb0.jpg" alt="Créateurs Kafora" />
+    <div class="page-hero-over"></div>
+    <div class="social-rail">
+      <div class="social-rail-inner">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="page-hero-copy">
+      <p class="t-label light" style="margin-bottom:14px;">Annuaire Kafora</p>
+      <h1 class="t-hero" style="font-size:clamp(56px,8vw,130px);">Créateurs</h1>
+    </div>
+  </section>
+
+  <!-- ══ TICKER ══ -->
+  <div class="creators-ticker">
+    <div class="creators-ticker-track">
+      <span class="creators-ticker-item">300+ Créateurs</span>
+      <span class="creators-ticker-item">Mode · Art · Musique · Danse · Photographie</span>
+      <span class="creators-ticker-item">Paris · Dakar · Accra · Lagos · Londres · NYC</span>
+      <span class="creators-ticker-item">Diaspora Africaine · Kafora Directory</span>
+      <span class="creators-ticker-item">300+ Créateurs</span>
+      <span class="creators-ticker-item">Mode · Art · Musique · Danse · Photographie</span>
+      <span class="creators-ticker-item">Paris · Dakar · Accra · Lagos · Londres · NYC</span>
+      <span class="creators-ticker-item">Diaspora Africaine · Kafora Directory</span>
+    </div>
+  </div>
+
+  <!-- ══ SEARCH ══ -->
+  <div class="search-strip">
+    <div class="search-wrap">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <input id="searchInput" type="text" placeholder="Rechercher un créateur, une discipline, une ville…" autocomplete="off" />
+    </div>
+    <button class="btn btn-primary" id="clearBtn" style="white-space:nowrap;display:none;">Effacer</button>
+  </div>
+
+  <!-- ══ FILTERS ══ -->
+  <div class="filter-strip">
+    <span class="t-label" style="margin-right:6px;">Discipline</span>
+    <button class="filter-btn on" data-filter="discipline" data-value="">Tous</button>
+    <button class="filter-btn" data-filter="discipline" data-value="mode">Mode</button>
+    <button class="filter-btn" data-filter="discipline" data-value="modèle">Modèle</button>
+    <button class="filter-btn" data-filter="discipline" data-value="photographie">Photographie</button>
+    <button class="filter-btn" data-filter="discipline" data-value="vidéo">Vidéo</button>
+    <button class="filter-btn" data-filter="discipline" data-value="cinéma">Cinéma</button>
+    <button class="filter-btn" data-filter="discipline" data-value="musique">Musique</button>
+    <button class="filter-btn" data-filter="discipline" data-value="danse">Danse</button>
+    <button class="filter-btn" data-filter="discipline" data-value="art">Art</button>
+    <button class="filter-btn" data-filter="discipline" data-value="sculpture">Sculpture</button>
+    <button class="filter-btn" data-filter="discipline" data-value="design">Design</button>
+    <button class="filter-btn" data-filter="discipline" data-value="architecture">Architecture</button>
+    <button class="filter-btn" data-filter="discipline" data-value="entreprise créative">Entreprise créative</button>
+    <div class="filter-sep"></div>
+    <span class="t-label" style="margin-right:6px;">Ville</span>
+    <button class="filter-btn on" data-filter="city" data-value="">Toutes</button>
+    <button class="filter-btn" data-filter="city" data-value="paris">Paris</button>
+    <button class="filter-btn" data-filter="city" data-value="abidjan">Abidjan</button>
+    <button class="filter-btn" data-filter="city" data-value="nyc">NYC</button>
+    <button class="filter-btn" data-filter="city" data-value="dakar">Dakar</button>
+    <button class="filter-btn" data-filter="city" data-value="accra">Accra</button>
+    <button class="filter-btn" data-filter="city" data-value="lagos">Lagos</button>
+    <button class="filter-btn" data-filter="city" data-value="londres">Londres</button>
+    <button class="filter-btn" data-filter="city" data-value="bamako">Bamako</button>
+    <button class="filter-btn" data-filter="city" data-value="berlin">Berlin</button>
+    <div class="filter-sep"></div>
+    <button class="filter-btn" data-filter="premium" data-value="true">Premium only</button>
+  </div>
+
+  <!-- ══ GRID ══ -->
+  <section class="grid-wrap">
+    <div class="grid-rule"></div>
+    <div class="grid-head">
+      <span class="t-label" id="countLabel">12 créateurs</span>
+      <select id="sortSelect" class="t-caption" style="background:none; border:none; outline:none; font-family:'Barlow Condensed', sans-serif; font-size:12px; font-weight:300; letter-spacing:0.10em; color:var(--ash); cursor:pointer;">
+        <option value="pop">Trier par : Popularité</option>
+        <option value="az">Trier par : A-Z</option>
+        <option value="za">Trier par : Z-A</option>
+      </select>
+    </div>
+
+    <div class="creators-grid" id="creatorsGrid">
+
+      <div class="grid-item" data-name="amara diallo" data-discipline="mode" data-city="paris" data-premium="false" data-verified="true" data-boosted="true">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=amara'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg" alt="Amara Diallo" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Amara Diallo</div>
+            <div class="pass-card-discipline">Mode · Paris</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="kofi mensah" data-discipline="art" data-city="nyc" data-premium="true" data-verified="true">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=kofi'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg" alt="Kofi Mensah" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Kofi Mensah</div>
+            <div class="pass-card-discipline">Art · NYC</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="yasmine touré" data-discipline="musique" data-city="abidjan" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=yasmine'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/4c561677cfe53dcfdeb273b154502010.jpg" alt="Yasmine Touré" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Yasmine Touré</div>
+            <div class="pass-card-discipline">Musique · Abidjan</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="léa fontaine" data-discipline="mode" data-city="londres" data-premium="true">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=lea'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/85c32384e6da3e856fe7ba8db9429914.jpg" alt="Léa Fontaine" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Léa Fontaine</div>
+            <div class="pass-card-discipline">Mode · Londres</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="brahim ndiaye" data-discipline="photographie" data-city="dakar" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=brahim'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/d613edb2f36b6672c163e35db1650f8e.jpg" alt="Brahim Ndiaye" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Brahim Ndiaye</div>
+            <div class="pass-card-discipline">Photographie · Dakar</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="sofia eze" data-discipline="art" data-city="lagos" data-premium="true">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=sofia'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/caaa4ddcefd16329089301daf7a22769.jpg" alt="Sofia Eze" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Sofia Eze</div>
+            <div class="pass-card-discipline">Art · Lagos</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="marcus bell" data-discipline="mode" data-city="paris" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=marcus'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg" alt="Marcus Bell" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Marcus Bell</div>
+            <div class="pass-card-discipline">Mode · Paris</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="inès camara" data-discipline="photographie" data-city="paris" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=ines'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg" alt="Inès Camara" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Inès Camara</div>
+            <div class="pass-card-discipline">Photographie · Paris</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="noah asante" data-discipline="musique" data-city="accra" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=noah'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg" alt="Noah Asante" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Noah Asante</div>
+            <div class="pass-card-discipline">Musique · Accra</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="aïda traoré" data-discipline="mode" data-city="bamako" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=aida'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/ddc1f140ec485d8ae3ee3e2204da0937.jpg" alt="Aïda Traoré" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Aïda Traoré</div>
+            <div class="pass-card-discipline">Mode · Bamako</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="elias osei" data-discipline="art" data-city="berlin" data-premium="true">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=elias'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/267b726556e0c96095c282aebaaa7250.jpg" alt="Elias Osei" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Elias Osei</div>
+            <div class="pass-card-discipline">Art · Berlin</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-item" data-name="fatou ba" data-discipline="mode" data-city="dakar" data-premium="false">
+        <div class="pass-card" onclick="window.location.href='profil.html?creator=fatou'">
+          <div class="pass-card-header">
+            <span class="pass-card-brand">Kafora Pass</span>
+            <span class="pass-card-num">CP / 25</span>
+          </div>
+          <div class="pass-card-photo">
+            <img src="file:///E:/AfroPunk/22e59bcb003c982c719ddf7a5cda4d4b.jpg" alt="Fatou Ba" />
+          </div>
+          <div class="pass-card-info">
+            <div class="pass-card-creator-name">Fatou Ba</div>
+            <div class="pass-card-discipline">Mode · Dakar</div>
+          </div>
+          <div class="pass-card-footer">
+            <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+            <span class="pass-card-tag">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-results" id="noResults">
+        <p class="no-results-label">Aucun créateur ne correspond à votre recherche</p>
+      </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:52px;">
+      <a href="#" class="btn btn-outline">Charger plus</a>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+      <li><a href="casting.html">Casting</a></li>
+      <li><a href="missions.html">Missions</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+        <li><a href="marques.html">Marques</a></li>
+      <li><a href="marques.html">Marques</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Injection du Créateur Connecté (S'il est Boosté ou Vérifié) ──
+    const uStr = localStorage.getItem('kafora-user');
+    const pStr = localStorage.getItem('kafora-profil');
+    if (uStr && pStr) {
+      const u = JSON.parse(uStr);
+      const p = JSON.parse(pStr);
+      if (u.kaforaBoost || u.kaforaVerified) {
+        const name = ((p.fn || p.firstName || '') + ' ' + (p.ln || p.lastName || '')).trim() || 'Mon Profil';
+        const disc = (p.discs && p.discs[0]) || 'Créateur';
+        const city = p.city || '—';
+        const photo = p.photo || 'https://via.placeholder.com/400x500/100e0a/eae2d4?text=PHOTO';
+        
+        const div = document.createElement('div');
+        div.className = 'grid-item';
+        div.dataset.name = name.toLowerCase();
+        div.dataset.discipline = disc.toLowerCase();
+        div.dataset.city = city.toLowerCase();
+        div.dataset.premium = 'false';
+        if (u.kaforaVerified) div.dataset.verified = 'true';
+        if (u.kaforaBoost) div.dataset.boosted = 'true';
+        
+        div.innerHTML = `
+          <div class="pass-card" onclick="window.location.href='dashboard.html'">
+            <div class="pass-card-header">
+              <span class="pass-card-brand">Kafora Pass</span>
+              <span class="pass-card-num">CP / MOI</span>
+            </div>
+            <div class="pass-card-photo">
+              <img src="${photo}" alt="${name}" />
+            </div>
+            <div class="pass-card-info">
+              <div class="pass-card-creator-name">${name}</div>
+              <div class="pass-card-discipline">${disc} · ${city}</div>
+            </div>
+            <div class="pass-card-footer">
+              <div class="pass-barcode"><b style="height:100%"></b><b style="height:60%"></b><b style="height:100%"></b><b style="height:40%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:55%"></b><b style="height:75%"></b><b style="height:100%"></b><b style="height:45%"></b><b style="height:90%"></b><b style="height:65%"></b><b style="height:100%"></b><b style="height:50%"></b><b style="height:80%"></b><b style="height:100%"></b><b style="height:35%"></b><b style="height:70%"></b><b style="height:100%"></b><b style="height:60%"></b></div>
+              <span class="pass-card-tag" style="display:none;"></span>
+            </div>
+          </div>
+        `;
+        document.getElementById('creatorsGrid').prepend(div);
+      }
+    }
+
+    // ── Toggle thème clair / sombre ──
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('kafora-theme', isLight ? 'light' : 'dark');
+    }
+    // Restaure la préférence au chargement
+    if (localStorage.getItem('kafora-theme') === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+
+    // ── Nav scroll ──
+    const navbar = document.getElementById('navbar');
+    navbar.classList.remove('on-dark');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('solid', window.scrollY > 80);
+    });
+
+    // ── Injection badges vérifié et boosté ──
+    document.querySelectorAll('.grid-item').forEach(function(item) {
+      const footer = item.querySelector('.pass-card-footer');
+      if (!footer) return;
+      const inner = footer.innerHTML;
+      
+      let badges = '';
+      if (item.dataset.boosted === 'true') {
+        badges += '<span class="badge-boosted">★ En vedette</span>';
+        item.querySelector('.pass-card').classList.add('is-boosted');
+      }
+      if (item.dataset.verified === 'true') {
+        badges += '<span class="badge-verified">✓ Vérifié</span>';
+      }
+      
+      footer.innerHTML = '<div class="pass-card-footer-row">' + inner + '<div style="display:flex;gap:4px;">' + badges + '</div></div>';
+    });
+
+    // ── Filter & Sort state ──
+    const state = { discipline: '', city: '', premium: false, query: '' };
+
+    const items = Array.from(document.querySelectorAll('.grid-item[data-name]'));
+    // Boosted items go first in initial order
+    const initialOrder = items.slice().sort(function(a, b) {
+      const aB = a.dataset.boosted === 'true' ? 0 : 1;
+      const bB = b.dataset.boosted === 'true' ? 0 : 1;
+      return aB - bB;
+    });
+    
+    const countLabel = document.getElementById('countLabel');
+    const noResults = document.getElementById('noResults');
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const sortSelect = document.getElementById('sortSelect');
+    const creatorsGrid = document.getElementById('creatorsGrid');
+
+    function applyFilters() {
+      let visible = 0;
+      const q = state.query.toLowerCase();
+
+      // 1. Appliquer le tri
+      const sortVal = sortSelect.value;
+      const sortedItems = items.slice().sort(function(a, b) {
+        if (sortVal === 'az') {
+          return a.dataset.name.localeCompare(b.dataset.name);
+        } else if (sortVal === 'za') {
+          return b.dataset.name.localeCompare(a.dataset.name);
+        } else {
+          return initialOrder.indexOf(a) - initialOrder.indexOf(b);
+        }
+      });
+      
+      // Réinsérer dans le DOM dans le bon ordre (avant '#noResults')
+      sortedItems.forEach(function(item) {
+        creatorsGrid.insertBefore(item, noResults);
+      });
+
+      // 2. Appliquer les filtres
+      items.forEach(function(item) {
+        const disc = item.dataset.discipline;
+        const city = item.dataset.city;
+        const premium = item.dataset.premium === 'true';
+        const name = item.dataset.name;
+
+        const matchDisc = !state.discipline || disc === state.discipline;
+        const matchCity = !state.city || city === state.city;
+        const matchPremium = !state.premium || premium;
+        const matchQuery = !q || name.includes(q) || disc.includes(q) || city.includes(q);
+
+        const show = matchDisc && matchCity && matchPremium && matchQuery;
+        item.hidden = !show;
+        if (show) visible++;
+      });
+
+      countLabel.textContent = visible + ' créateur' + (visible > 1 ? 's' : '');
+      noResults.classList.toggle('visible', visible === 0);
+    }
+
+    sortSelect.addEventListener('change', applyFilters);
+
+    // ── Filter buttons (radio within group, toggle for premium) ──
+    document.querySelectorAll('[data-filter]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const group = this.dataset.filter;
+        const value = this.dataset.value;
+
+        if (group === 'premium') {
+          this.classList.toggle('on');
+          state.premium = this.classList.contains('on');
+        } else {
+          document.querySelectorAll('[data-filter="' + group + '"]').forEach(function(b) {
+            b.classList.remove('on');
+          });
+          this.classList.add('on');
+          state[group] = value;
+        }
+        applyFilters();
+      });
+    });
+
+    // ── Live search ──
+    searchInput.addEventListener('input', function() {
+      state.query = this.value.trim();
+      clearBtn.style.display = state.query ? 'inline-flex' : 'none';
+      applyFilters();
+    });
+
+    clearBtn.addEventListener('click', function() {
+      searchInput.value = '';
+      state.query = '';
+      this.style.display = 'none';
+      applyFilters();
+    });
+  </script>
+</body>
+</html>

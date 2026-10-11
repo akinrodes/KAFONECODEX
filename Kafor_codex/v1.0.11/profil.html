@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Amara Diallo · Mode Paris</title>
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    /* ── PROFILE HERO ── */
+    .profil-hero {
+      position: relative; width: 100vw; height: 100vh;
+      overflow: hidden; background: var(--ink);
+    }
+    .profil-hero img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 15%;
+      display: block;
+    }
+    .profil-hero-over {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top,
+        rgba(10,10,10,1) 0%,
+        rgba(10,10,10,0.5) 40%,
+        transparent 70%
+      );
+    }
+    .profil-identity {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 0 48px 52px;
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+    }
+    .profil-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(56px, 8vw, 120px);
+      line-height: 0.88; letter-spacing: -0.025em;
+      color: var(--void);
+    }
+    .profil-meta { text-align: right; flex-shrink: 0; padding-bottom: 12px; }
+    .profil-stats {
+      display: flex; gap: 32px; margin-top: 20px;
+    }
+    .stat { text-align: right; }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 28px;
+      color: var(--void); letter-spacing: -0.02em; line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ash);
+      margin-top: 4px;
+    }
+
+    /* ── PROFILE BODY ── */
+    .profil-body { background: var(--ink); }
+
+    /* Bio strip */
+    .bio-strip {
+      padding: 52px 48px; border-bottom: 1px solid #1c1c1c;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+    }
+    .bio-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 300;
+      letter-spacing: 0.06em; line-height: 1.7;
+      color: rgba(234,226,212,0.55);
+      grid-column: span 2;
+    }
+    .bio-tags { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+
+    /* CTA row */
+    .cta-row {
+      padding: 32px 48px; border-bottom: 1px solid #1c1c1c;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .cta-row-left {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ash);
+    }
+    .cta-row-btns { display: flex; gap: 12px; }
+
+    /* ── PORTFOLIO GRID ── */
+    .portfolio-section { padding: 64px 48px; background: var(--ink); }
+    .portfolio-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 36px;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1px;
+      background: #1c1c1c;
+    }
+    .port-tile {
+      position: relative; overflow: hidden; cursor: pointer;
+      background: var(--ink);
+    }
+    .port-tile-img {
+      width: 100%; aspect-ratio: 3/4;
+      object-fit: cover; display: block;
+      transition: transform 700ms ease;
+    }
+    .port-tile:nth-child(2) .port-tile-img { aspect-ratio: 3/2; }
+    .port-tile:nth-child(5) .port-tile-img { aspect-ratio: 3/2; }
+    .port-tile:hover .port-tile-img { transform: scale(1.04); }
+    .port-tile-over {
+      position: absolute; inset: 0;
+      background: rgba(10,10,10,0);
+      display: flex; align-items: flex-end; padding: 20px;
+      transition: background 300ms;
+    }
+    .port-tile:hover .port-tile-over { background: rgba(10,10,10,0.65); }
+    .port-tile-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--bronze);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 300ms, transform 300ms;
+    }
+    .port-tile:hover .port-tile-label { opacity: 1; transform: translateY(0); }
+
+    /* ── EXPERIENCES ── */
+    .experiences-section {
+      padding: 64px 48px; background: #080808;
+      border-top: 1px solid #1c1c1c;
+    }
+    .exp-row {
+      display: flex; align-items: flex-start;
+      padding: 24px 0; border-bottom: 1px solid #1c1c1c;
+      gap: 32px;
+    }
+    .exp-year {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ash);
+      width: 72px; flex-shrink: 0; padding-top: 3px;
+    }
+    .exp-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 18px;
+      letter-spacing: 0.02em; text-transform: uppercase;
+      color: var(--parchment); width: 200px; flex-shrink: 0;
+    }
+    .exp-role {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.06em; color: var(--ash); flex: 1;
+      padding-top: 4px;
+    }
+    .exp-tag { flex-shrink: 0; }
+
+    /* ── AFFILIATION CTA ── */
+    .affil-section {
+      padding: 80px 48px;
+      background: var(--bronze);
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 40px;
+    }
+    .affil-copy .t-sub { color: var(--void); margin-bottom: 10px; }
+    .affil-copy p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.65);
+    }
+
+    @media (max-width: 900px) {
+      .profil-identity { flex-direction: column; align-items: flex-start; gap: 20px; padding: 0 24px 40px; }
+      .profil-meta { text-align: left; }
+      .profil-stats { justify-content: flex-start; }
+      .bio-strip { grid-template-columns: 1fr; padding: 40px 24px; }
+      .bio-text { grid-column: 1; }
+      .bio-tags { align-items: flex-start; }
+      .cta-row, .portfolio-section, .experiences-section, .affil-section { padding-left: 24px; padding-right: 24px; }
+      .portfolio-grid { grid-template-columns: repeat(2,1fr); }
+      .exp-brand { width: 140px; }
+      .affil-section { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar" class="on-dark">
+    <a href="index.html" class="nav-logo">Kafora</a>
+    <ul class="nav-center">
+      <li><a href="createurs.html" class="active">Créateurs</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="kafora.html">Notre ADN</a></li>
+      <li><a href="titans.html">Titans</a></li>
+      <li><a href="premium.html">Premium</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <a href="premium.html" class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="profil-hero">
+    <img src="file:///E:/AfroPunk/6fb830fe4265057425a90408bedb3b48.jpg" alt="Amara Diallo" />
+    <div class="profil-hero-over"></div>
+    <div class="social-rail"><div class="social-rail-inner"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a></div></div>
+
+    <div class="profil-identity">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <span class="t-label light">Mode · Paris, France</span>
+          <span class="pill">Premium</span>
+        </div>
+        <h1 class="profil-name">Amara<br>Diallo</h1>
+      </div>
+      <div class="profil-meta">
+        <div class="profil-stats">
+          <div class="stat">
+            <div class="stat-num">48k</div>
+            <div class="stat-label">Followers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">124</div>
+            <div class="stat-label">Collaborations</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">6</div>
+            <div class="stat-label">Ans d'activité</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <div class="profil-body">
+
+    <!-- BIO -->
+    <div class="bio-strip">
+      <p class="bio-text">Styliste et directrice artistique basée à Paris, spécialisée dans la mode contemporaine africaine. Fondatrice du collectif Wax Moderne. Collaborations avec Jacquemus, Asos Africa, et LVMH Métiers d'Art. Représente une génération de créateurs qui réinventent le dialogue entre l'héritage africain et l'esthétique du luxe parisien.</p>
+      <div class="bio-tags">
+        <span class="pill">Haute Couture</span>
+        <span class="pill">Direction Artistique</span>
+        <span class="pill">Wax & Textile</span>
+        <span class="pill">Casting Mode</span>
+      </div>
+    </div>
+
+    <!-- CTA ROW -->
+    <div class="cta-row">
+      <span class="cta-row-left">Contacter · Collaborer · Recruter</span>
+      <div class="cta-row-btns">
+        <a href="#portfolio" class="btn btn-ghost" style="padding:11px 24px;font-size:11px;">Voir le portfolio</a>
+        <a href="#" class="btn btn-bronze" style="padding:11px 24px;font-size:11px;">Visiter la boutique →</a>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO GRID -->
+    <section class="portfolio-section" id="portfolio">
+      <div class="portfolio-header">
+        <h2 class="t-sub" style="color:var(--parchment);">Portfolio</h2>
+        <span class="t-label">SS2025 Collection</span>
+      </div>
+      <div class="portfolio-grid">
+        <div class="port-tile">
+          <img class="port-tile-img" src="file:///E:/AfroPunk/71c9355a09e0bcbb933442127fa67adb.jpg" alt="" />
+          <div class="port-tile-over"><span class="port-tile-label">Wax Moderne SS25</span></div>
+        </div>
+        <div class="port-tile">
+          <img class="port-tile-img" src="file:///E:/AfroPunk/79eeb1e2a7fe6db9984d911c1dd15a82.jpg" alt="" />
+          <div class="port-tile-over"><span class="port-tile-label">Editorial Jacquemus</span></div>
+        </div>
+        <div class="port-tile">
+          <img class="port-tile-img" src="file:///E:/AfroPunk/84ccceffca1c045c77c578ea83feb4cf.jpg" alt="" />
+          <div class="port-tile-over"><span class="port-tile-label">Capsule ASOS Africa</span></div>
+        </div>
+        <div class="port-tile">
+          <img class="port-tile-img" src="file:///E:/AfroPunk/8a9359b093539eadca0c720f980ef191.jpg" alt="" />
+          <div class="port-tile-over"><span class="port-tile-label">LVMH Métiers d'Art</span></div>
+        </div>
+        <div class="port-tile">
+          <img class="port-tile-img" src="file:///E:/AfroPunk/8cb2d83fde90c38b44cb993cb454c0e0.jpg" alt="" />
+          <div class="port-tile-over"><span class="port-tile-label">Backstage Paris FW</span></div>
+        </div>
+        <div class="port-tile">
+          <img class="port-tile-img" src="file:///E:/AfroPunk/92d024d51c5fcb4e0675985054f87cf3.jpg" alt="" />
+          <div class="port-tile-over"><span class="port-tile-label">Collectif Wax Moderne</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCES -->
+    <section class="experiences-section">
+      <div style="margin-bottom:36px;display:flex;justify-content:space-between;align-items:baseline;">
+        <h2 class="t-sub" style="color:var(--parchment);">Expériences</h2>
+        <span class="t-label">CV Créateur</span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-year">2024</span>
+        <span class="exp-brand">LVMH</span>
+        <span class="exp-role">Directrice Artistique — Métiers d'Art Africa Collection</span>
+        <span class="exp-tag"><span class="pill">Mode</span></span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-year">2023</span>
+        <span class="exp-brand">Jacquemus</span>
+        <span class="exp-role">Styliste Éditoriale — Campagne Soleil de l'Afrique</span>
+        <span class="exp-tag"><span class="pill">Mode</span></span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-year">2023</span>
+        <span class="exp-brand">ASOS Africa</span>
+        <span class="exp-role">Co-Créatrice — Capsule Collection Wax Moderne × ASOS</span>
+        <span class="exp-tag"><span class="pill">Collaboration</span></span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-year">2022</span>
+        <span class="exp-brand">Paris FW</span>
+        <span class="exp-role">Directrice Casting — Présentation Afro Couture Week</span>
+        <span class="exp-tag"><span class="pill">Événement</span></span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-year">2019</span>
+        <span class="exp-brand">Fondation</span>
+        <span class="exp-role">Fondatrice du Collectif Wax Moderne, Paris</span>
+        <span class="exp-tag"><span class="pill">Entrepreneuriat</span></span>
+      </div>
+    </section>
+
+    <!-- AFFILIATION CTA -->
+    <section class="affil-section">
+      <div class="affil-copy">
+        <div class="t-sub">Boutique Amara Diallo</div>
+        <p>Pièces en édition limitée · Livraison mondiale · Mobile Money accepté</p>
+      </div>
+      <a href="#" class="btn btn-primary">Visiter la boutique →</a>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="index.html" class="footer-logo">Kafora</a>
+      <ul class="footer-links">
+        <li><a href="createurs.html">Créateurs</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="titans.html">Titans</a></li>
+        <li><a href="premium.html">Premium</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">TikTok</a><a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Kafora — Tous droits réservés</span>
+      <span class="footer-copy">Paris · Abidjan · NYC</span>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('solid', window.scrollY > 60);
+    });
+
+    // ── Données par créateur ──────────────────────────────────
+    const CREATORS = {
+      amara: {
+        title:      'Kafora — Amara Diallo · Mode Paris',
+        heroImg:    'file:///E:/AfroPunk/6fb830fe4265057425a90408bedb3b48.jpg',
+        discipline: 'Mode · Paris, France',
+        name:       'Amara<br>Diallo',
+        followers:  '48k',
+        collabs:    '124',
+        years:      '6',
+        bio:        'Styliste et directrice artistique basée à Paris, spécialisée dans la mode contemporaine africaine. Fondatrice du collectif Wax Moderne. Collaborations avec Jacquemus, Asos Africa, et LVMH Métiers d\'Art.',
+        tags:       ['Haute Couture', 'Direction Artistique', 'Wax & Textile', 'Casting Mode'],
+      },
+      kofi: {
+        title:      'Kafora — Kofi Mensah · Art Contemporain',
+        heroImg:    'file:///C:/Users/toto/Documents/te/1eb230d1dfa1e0d22dd2c42d7c9243e8.jpg',
+        discipline: 'Art Contemporain · Accra, Ghana',
+        name:       'Kofi<br>Mensah',
+        followers:  '32k',
+        collabs:    '87',
+        years:      '8',
+        bio:        'Artiste plasticien basé à Accra, dont le travail explore la mémoire collective de la diaspora africaine à travers la peinture, l\'installation et la photographie. Expositions à Lagos, Londres et New York.',
+        tags:       ['Peinture', 'Installation', 'Photographie', 'Art Urbain'],
+      },
+      lea: {
+        title:      'Kafora — Léa Traoré · Musique Dakar',
+        heroImg:    'file:///C:/Users/toto/Documents/te/2cbc89ee1e084a77dac918173a63a68f.jpg',
+        discipline: 'Musique · Dakar, Sénégal',
+        name:       'Léa<br>Traoré',
+        followers:  '61k',
+        collabs:    '53',
+        years:      '5',
+        bio:        'Artiste musicale et productrice basée à Dakar. Son univers mêle afrobeats, soul et sonorités mandingues. Tournées internationales, collaborations avec des labels européens et africains.',
+        tags:       ['Afrobeats', 'Soul', 'Production', 'Live Performance'],
+      },
+      nia: {
+        title:      'Kafora — Nia Osei · Photographie Londres',
+        heroImg:    'file:///C:/Users/toto/Documents/te/36b3634cb200cf3a6f9fea2151046d14.jpg',
+        discipline: 'Photographie · Londres, Royaume-Uni',
+        name:       'Nia<br>Osei',
+        followers:  '27k',
+        collabs:    '96',
+        years:      '4',
+        bio:        'Photographe documentaire et de mode basée à Londres. Son travail célèbre l\'identité noire britannique et afro-caribéenne. Publiée dans Vogue UK, i-D et Dazed & Confused.',
+        tags:       ['Mode', 'Documentaire', 'Portrait', 'Editorial'],
+      },
+    };
+
+    // ── Lecture du paramètre ?creator= ────────────────────────
+    const param   = new URLSearchParams(window.location.search).get('creator') || 'amara';
+    const data    = CREATORS[param] || CREATORS.amara;
+
+    // Titre de la page
+    document.title = data.title;
+
+    // Hero : photo + discipline + nom
+    document.querySelector('.profil-hero img').src          = data.heroImg;
+    document.querySelector('.profil-hero img').alt          = data.name.replace('<br>', ' ');
+    document.querySelector('.profil-identity .t-label').textContent = data.discipline;
+    document.querySelector('.profil-name').innerHTML        = data.name;
+
+    // Stats
+    const statNums = document.querySelectorAll('.stat-num');
+    statNums[0].textContent = data.followers;
+    statNums[1].textContent = data.collabs;
+    statNums[2].textContent = data.years;
+
+    // Bio + tags
+    document.querySelector('.bio-text').textContent = data.bio;
+    const tagsWrap = document.querySelector('.bio-tags');
+    tagsWrap.innerHTML = data.tags.map(t => `<span class="pill">${t}</span>`).join('');
+  </script>
+</body>
+</html>

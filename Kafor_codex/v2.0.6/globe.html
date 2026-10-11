@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — La Diaspora en Mouvement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;overflow:hidden;}
+    body{background:#0a0810;color:#EAE2D4;font-family:'Barlow',sans-serif;}
+    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 90% 90% at 60% 48%,rgba(150,130,195,0.10) 0%,transparent 62%),#0a0810;}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+    .nav-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:0.12em;color:#c4935a;text-decoration:none;}
+    .nav-links{list-style:none;display:flex;gap:28px;}
+    .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:300;letter-spacing:0.22em;text-transform:uppercase;color:rgba(234,226,212,0.30);text-decoration:none;transition:color 150ms;}
+    .nav-links a:hover,.nav-links a.active{color:#c4935a;}
+    .layout{position:fixed;inset:0;z-index:1;display:flex;align-items:stretch;}
+    .left{width:300px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:100px 0 60px 48px;border-right:1px solid rgba(196,147,90,0.07);}
+    .eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.44em;text-transform:uppercase;color:#c4935a;margin-bottom:20px;}
+    .title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(44px,4.2vw,64px);line-height:0.88;color:#ede5d5;letter-spacing:-0.01em;margin-bottom:24px;}
+    .desc{font-size:13px;font-weight:300;color:rgba(234,226,212,0.35);line-height:1.80;max-width:210px;margin-bottom:40px;}
+    .stats{display:flex;flex-direction:column;gap:18px;}
+    .srow{display:flex;align-items:baseline;gap:10px;padding-bottom:18px;border-bottom:1px solid rgba(196,147,90,0.06);}
+    .srow:last-child{border-bottom:none;padding-bottom:0;}
+    .snum{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(26px,2.2vw,38px);color:#ede5d5;line-height:1;}
+    .snum.a{color:#c4935a;}
+    .slbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.28em;text-transform:uppercase;color:rgba(234,226,212,0.18);}
+    .cta-link{margin-top:44px;display:inline-flex;align-items:center;gap:12px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#c4935a;text-decoration:none;transition:gap 200ms;}
+    .cta-link:hover{gap:20px;}
+    .cta-link::after{content:'';display:block;width:28px;height:1px;background:#c4935a;transition:width 200ms;}
+    .cta-link:hover::after{width:44px;}
+    .gcenter{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;}
+    .gwrap{position:relative;width:min(72vh,calc(100% - 20px));aspect-ratio:1;cursor:grab;user-select:none;}
+    .gwrap:active{cursor:grabbing;}
+    #gc{width:100%;height:100%;display:block;}
+    .hint{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:rgba(196,147,90,0.22);white-space:nowrap;}
+    #tt{position:fixed;pointer-events:none;z-index:300;background:rgba(10,8,16,0.97);border:1px solid rgba(196,147,90,0.28);padding:8px 14px;transform:translate(-50%,calc(-100% - 10px));opacity:0;transition:opacity 120ms;white-space:nowrap;}
+    #tt.show{opacity:1;}
+    .tt-c{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#ede5d5;}
+    .tt-n{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:#c4935a;}
+    .panel{position:fixed;top:0;right:0;bottom:0;width:360px;z-index:250;background:rgba(10,8,14,0.98);border-left:1px solid rgba(196,147,90,0.10);backdrop-filter:blur(28px);transform:translateX(100%);transition:transform 380ms cubic-bezier(0.34,1.25,0.64,1);display:flex;flex-direction:column;overflow:hidden;}
+    .panel.open{transform:translateX(0);}
+    .ph{padding:28px 28px 20px;border-bottom:1px solid rgba(196,147,90,0.07);flex-shrink:0;}
+    .phr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;}
+    .pcity{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;color:#ede5d5;line-height:1;}
+    .pclose{width:30px;height:30px;flex-shrink:0;background:none;border:1px solid rgba(234,226,212,0.08);color:rgba(234,226,212,0.28);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 160ms;}
+    .pclose:hover{border-color:rgba(196,147,90,0.35);color:#c4935a;}
+    .pcountry{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.26em;text-transform:uppercase;color:rgba(234,226,212,0.25);}
+    .pcount{margin-top:14px;display:flex;align-items:baseline;gap:10px;}
+    .pcount-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:38px;color:#c4935a;line-height:1;}
+    .pcount-l{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(234,226,212,0.18);line-height:1.4;}
+    .pbody{flex:1;overflow-y:auto;padding:20px 28px 28px;}
+    .pseclbl{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:0.36em;text-transform:uppercase;color:rgba(234,226,212,0.15);margin-bottom:12px;}
+    .mc{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(234,226,212,0.04);text-decoration:none;transition:padding-left 150ms;}
+    .mc:last-of-type{border-bottom:none;}
+    .mc:hover{padding-left:4px;}
+    .mav{width:40px;height:40px;flex-shrink:0;border-radius:6px;background:rgba(196,147,90,0.09);border:1px solid rgba(196,147,90,0.16);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;color:#c4935a;}
+    .mn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#ede5d5;line-height:1;margin-bottom:3px;}
+    .md{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.20em;text-transform:uppercase;color:rgba(234,226,212,0.25);}
+    .mb{margin-left:auto;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;color:#c4935a;}
+    .pghost{margin-top:16px;padding:18px;background:rgba(196,147,90,0.04);border:1px solid rgba(196,147,90,0.08);text-align:center;}
+    .pgn{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;color:rgba(196,147,90,0.65);line-height:1;margin-bottom:4px;}
+    .pgl{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:400;letter-spacing:0.24em;text-transform:uppercase;color:rgba(234,226,212,0.15);}
+    .pcta{display:block;margin-top:20px;padding:12px 16px;background:#c4935a;color:#0a0810;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;text-decoration:none;text-align:center;transition:opacity 180ms;}
+    .pcta:hover{opacity:0.88;}
+    @media(max-width:900px){.left{display:none;}.panel{width:100%;max-width:380px;}}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+<nav class="nav">
+  <a href="index.html" class="nav-logo">KAFORA</a>
+  <ul class="nav-links">
+    <li><a href="createurs.html">Cr&#233;ateurs</a></li>
+    <li><a href="casting.html">Casting</a></li>
+    <li><a href="missions.html">Missions</a></li>
+    <li><a href="globe.html" class="active">Globe</a></li>
+    <li><a href="premium.html">Premium</a></li>
+    <li><a href="marques.html">Marques</a></li>
+  </ul>
+</nav>
+<div class="layout">
+  <aside class="left">
+    <div class="eyebrow">R&#233;seau mondial &#183; Kafora</div>
+    <h1 class="title">LA<br>DIASPORA<br>EN<br>MOUVEMENT</h1>
+    <p class="desc">De Lagos &#224; Paris, de Londres &#224; Dakar &#8212; les cr&#233;ateurs de la diaspora africaine sont partout. Kafora les r&#233;unit.</p>
+    <div class="stats">
+      <div class="srow"><div class="snum a" id="cnt">0</div><div class="slbl">Cr&#233;ateurs inscrits</div></div>
+      <div class="srow"><div class="snum">47</div><div class="slbl">Villes</div></div>
+      <div class="srow"><div class="snum">28</div><div class="slbl">Pays</div></div>
+      <div class="srow"><div class="snum">5</div><div class="slbl">Continents</div></div>
+    </div>
+    <a href="createurs.html" class="cta-link">Explorer les cr&#233;ateurs</a>
+  </aside>
+  <div class="gcenter">
+    <div class="gwrap" id="gw">
+      <canvas id="gc"></canvas>
+      <span class="hint">&#8635; Glisser pour explorer &#183; Cliquer sur une ville</span>
+    </div>
+  </div>
+</div>
+<div id="tt"><div class="tt-c" id="ttc"></div><div class="tt-n" id="ttn"></div></div>
+<div id="panel" class="panel">
+  <div class="ph">
+    <div class="phr">
+      <div><div class="pcity" id="pci">&#8212;</div><div class="pcountry" id="pco">&#8212;</div></div>
+      <button class="pclose" onclick="closePanel()">&#10005;</button>
+    </div>
+    <div class="pcount"><div class="pcount-n" id="pcn">&#8212;</div><div class="pcount-l">cr&#233;ateurs<br>dans cette ville</div></div>
+  </div>
+  <div class="pbody" id="pb"></div>
+</div>
+
+<script>
+var AFRICA=[[35.8,-5.9],[36.4,-4.5],[36.9,-2.0],[37.1,0.2],[36.8,3.0],[37.0,6.5],[37.2,8.5],[37.5,9.8],[37.1,11.1],[33.5,11.5],[32.8,12.3],[31.5,13.3],[30.5,15.5],[31.2,20.0],[31.5,25.0],[30.5,27.0],[30.0,30.0],[31.3,32.0],[30.0,32.5],[27.9,34.0],[25.0,36.5],[22.3,37.0],[19.0,38.5],[16.0,39.5],[14.0,41.5],[12.5,43.5],[11.5,44.0],[11.5,51.0],[10.5,51.5],[9.0,49.5],[5.0,48.0],[2.0,45.0],[1.0,42.0],[-4.0,39.6],[-6.8,40.0],[-10.0,40.5],[-13.5,40.5],[-17.0,39.5],[-22.0,35.5],[-25.5,34.0],[-28.0,32.5],[-30.0,31.5],[-33.5,27.5],[-34.8,20.0],[-34.3,18.5],[-34.0,17.5],[-32.0,17.0],[-29.0,17.2],[-28.5,16.5],[-25.0,15.2],[-22.0,14.5],[-17.0,12.0],[-15.0,12.0],[-13.5,12.5],[-10.0,13.5],[-5.0,12.0],[-4.5,11.5],[-2.0,9.5],[0.5,8.5],[1.5,9.5],[3.0,9.5],[4.0,8.5],[4.0,6.0],[4.5,5.0],[4.5,3.0],[5.0,2.0],[5.5,1.5],[5.5,0.0],[5.5,-2.0],[5.0,-4.0],[4.5,-7.5],[4.4,-8.5],[5.0,-10.0],[6.5,-11.5],[8.5,-13.0],[10.0,-14.7],[11.0,-15.0],[12.0,-16.5],[12.7,-17.0],[14.7,-17.5],[15.5,-17.2],[16.5,-16.5],[20.0,-17.0],[21.0,-17.0],[23.0,-16.0],[26.0,-14.5],[27.7,-13.2],[28.0,-12.0],[29.0,-9.8],[30.0,-9.8],[31.5,-9.5],[33.5,-7.5],[35.0,-6.5],[35.8,-5.9]];
+var MADAGASCAR=[[-12.5,49.2],[-15.5,50.5],[-18.0,49.5],[-22.0,47.5],[-25.5,44.7],[-25.6,45.1],[-24.0,43.5],[-20.0,44.0],[-16.0,44.5],[-13.5,48.5],[-12.5,49.2]];
+var EUROPE=[[71.0,28.0],[68.5,17.0],[67.0,14.5],[65.5,14.0],[63.5,8.5],[62.0,5.0],[58.5,5.0],[57.5,8.0],[55.0,8.5],[55.5,10.0],[55.5,12.0],[55.5,14.5],[56.0,16.0],[56.5,18.0],[58.5,17.5],[60.5,18.0],[62.5,18.0],[65.0,25.0],[60.5,28.0],[59.5,25.5],[56.0,21.0],[54.5,18.5],[50.0,19.0],[47.5,22.0],[45.5,30.0],[44.5,33.5],[45.5,37.5],[47.5,39.5],[43.5,41.0],[41.0,29.0],[43.0,28.5],[44.5,29.0],[46.5,30.5],[36.9,28.0],[37.0,22.0],[37.5,21.0],[40.5,19.5],[41.5,20.0],[40.0,18.5],[38.0,16.0],[42.0,13.5],[44.0,9.2],[43.5,7.5],[43.3,5.5],[43.5,3.0],[43.8,-1.8],[43.4,-8.2],[41.9,-8.7],[38.7,-9.2],[36.0,-9.0],[36.0,-5.4]];
+var ASIA=[[36.5,36.5],[37.5,44.0],[38.5,48.0],[40.0,52.0],[42.0,52.5],[44.0,51.5],[43.0,52.0],[46.0,51.0],[48.5,46.0],[47.0,39.5],[50.0,57.0],[55.0,62.0],[60.0,68.0],[65.0,73.0],[71.0,70.0],[73.0,80.5],[73.0,87.0],[72.0,104.0],[74.0,112.0],[73.5,130.0],[70.0,135.0],[67.0,141.0],[65.0,141.0],[60.0,141.0],[55.0,137.0],[46.5,135.0],[43.0,133.5],[42.0,131.0],[40.0,130.0],[35.0,129.5],[33.5,126.5],[30.0,122.0],[25.0,121.5],[22.0,114.0],[20.0,110.0],[14.0,108.0],[10.0,104.0],[2.5,103.0],[1.5,104.0],[3.0,101.0],[5.5,100.5],[6.0,99.5],[8.0,98.5],[10.0,98.5],[13.0,100.5],[15.5,100.5],[20.0,110.0],[13.0,100.0],[9.0,77.5],[8.5,77.0],[9.0,76.5],[11.5,74.5],[15.5,73.5],[18.0,72.5],[21.0,70.0],[22.5,68.5],[23.0,60.5],[25.0,57.5],[22.0,59.5],[20.0,57.5],[16.5,53.0],[13.0,50.0],[12.5,45.0],[12.5,43.5],[15.0,42.0],[20.0,38.5],[22.0,36.5],[27.9,34.0],[29.8,32.5],[30.9,32.3],[36.5,36.5]];
+var NORTH_AMERICA=[[71.5,-157.0],[71.0,-156.0],[70.0,-148.0],[69.5,-141.0],[60.0,-141.0],[58.5,-137.0],[56.0,-134.0],[54.5,-132.0],[52.0,-128.5],[48.5,-124.5],[46.0,-124.0],[40.0,-124.5],[35.5,-121.0],[32.5,-117.0],[30.0,-115.0],[28.0,-110.5],[23.5,-109.0],[23.0,-109.5],[22.5,-106.5],[19.0,-104.5],[16.0,-96.0],[15.5,-92.5],[16.0,-89.0],[15.5,-88.5],[16.0,-86.0],[16.5,-85.5],[17.5,-83.5],[9.5,-79.5],[8.0,-77.5],[8.0,-76.5],[9.5,-79.5],[10.0,-75.5],[11.0,-74.0],[13.5,-70.0],[18.5,-66.0],[18.5,-72.0],[19.5,-72.5],[20.0,-75.0],[23.0,-82.0],[25.0,-80.5],[30.0,-81.0],[27.5,-82.5],[25.5,-80.5],[29.5,-83.0],[29.5,-89.5],[29.0,-90.5],[28.5,-95.5],[26.0,-97.5],[28.0,-97.0],[30.0,-95.0],[30.5,-89.0],[35.0,-75.5],[40.5,-74.0],[41.5,-70.0],[44.0,-66.0],[47.0,-61.0],[47.5,-53.5],[52.5,-55.5],[56.0,-60.5],[60.0,-64.0],[62.5,-68.0],[63.5,-72.0],[65.0,-75.0],[66.5,-80.0],[67.5,-85.0],[68.0,-94.5],[71.5,-97.5],[71.0,-104.0],[70.0,-130.0],[71.0,-156.0]];
+var SOUTH_AMERICA=[[11.5,-72.5],[11.0,-74.0],[10.0,-75.5],[8.0,-77.5],[5.5,-77.0],[1.5,-79.0],[-1.0,-80.0],[-3.0,-80.5],[-5.0,-81.0],[-6.0,-81.0],[-8.0,-79.5],[-10.0,-78.5],[-13.0,-76.5],[-16.5,-75.5],[-18.0,-70.5],[-20.0,-70.5],[-23.0,-70.5],[-26.0,-70.5],[-30.0,-71.5],[-33.0,-71.5],[-36.5,-73.0],[-38.0,-73.5],[-41.5,-73.5],[-43.5,-74.0],[-45.0,-74.5],[-46.0,-75.5],[-47.5,-75.5],[-49.5,-75.0],[-51.0,-75.0],[-52.0,-74.0],[-53.5,-70.5],[-54.0,-67.0],[-54.5,-65.5],[-55.5,-65.0],[-55.5,-67.0],[-53.5,-70.5],[-52.5,-68.5],[-52.0,-69.0],[-51.5,-57.5],[-50.0,-50.5],[-47.5,-48.5],[-46.0,-43.5],[-43.5,-42.5],[-40.0,-38.5],[-35.0,-35.5],[-28.0,-29.5],[-23.0,-43.5],[-23.5,-45.5],[-22.5,-44.5],[-22.0,-41.0],[-20.0,-40.5],[-15.5,-39.0],[-12.0,-37.5],[-8.0,-35.0],[-7.0,-35.0],[-5.5,-35.5],[-2.5,-40.5],[-1.0,-46.5],[0.5,-51.0],[2.0,-51.5],[3.5,-52.5],[5.5,-54.5],[7.5,-57.0],[8.0,-60.0],[7.5,-61.5],[6.5,-61.5],[6.0,-63.5],[4.5,-64.0],[3.5,-67.5],[2.5,-67.0],[2.5,-63.5],[1.5,-60.5],[3.0,-60.5],[4.0,-57.5],[6.5,-57.0],[7.5,-57.0],[8.5,-60.5],[10.5,-62.0],[11.5,-69.5],[11.5,-72.5]];
+var AUSTRALIA=[[-14.5,129.5],[-14.0,135.5],[-12.5,136.5],[-11.5,132.5],[-13.0,136.5],[-12.5,141.5],[-16.0,145.5],[-19.5,147.5],[-23.0,150.5],[-26.5,153.0],[-28.5,153.5],[-32.5,152.5],[-34.0,151.0],[-37.5,150.0],[-39.5,148.0],[-38.5,146.5],[-38.5,145.5],[-38.0,144.5],[-38.5,143.0],[-37.5,140.0],[-36.5,137.0],[-35.5,136.5],[-34.0,135.0],[-32.5,133.5],[-32.5,130.5],[-34.0,122.0],[-34.5,119.5],[-34.5,116.0],[-32.0,115.5],[-29.5,114.5],[-27.5,114.0],[-26.0,113.5],[-24.5,113.0],[-22.0,114.0],[-20.5,116.5],[-20.0,119.0],[-19.5,120.5],[-17.5,122.0],[-16.0,123.5],[-14.5,126.5],[-14.0,128.5],[-14.5,129.5]];
+</script>
+
+<script>
+var NAMED={
+  paris:[{name:'Amara Diallo',disc:'Mode',v:true},{name:'Fatou Sow',disc:'Photographie',v:true}],
+  accra:[{name:'Kofi Mensah',disc:'Art Contemporain',v:true}],
+  dakar:[{name:'L\u00e9a Traoré',disc:'Musique',v:false}],
+  londres:[{name:'Nia Osei',disc:'Photographie',v:true},{name:'Kwame Asante',disc:'Mode',v:true}],
+  abidjan:[{name:'Malik Tour\u00e9',disc:'Cin\u00e9ma',v:false}],
+  johannesburg:[{name:'Zara Nkosi',disc:'Danse',v:true}],
+  bamako:[{name:'Issa Kon\u00e9',disc:'Architecture',v:false}],
+  bruxelles:[{name:'A\u00efsha Mbaye',disc:'Design',v:true}],
+  montreal:[{name:'Omar Dieng',disc:'Sculpture',v:false}],
+  capetown:[{name:'Imani Dlamini',disc:'Modelling',v:true}]
+};
+var CITIES=[
+  {id:'lagos',name:'Lagos',country:'Nigeria',lat:6.45,lon:3.40,count:182,af:true},
+  {id:'dakar',name:'Dakar',country:'S\u00e9n\u00e9gal',lat:14.69,lon:-17.44,count:147,af:true},
+  {id:'abidjan',name:'Abidjan',country:"C\u00f4te d'Ivoire",lat:5.35,lon:-4.00,count:131,af:true},
+  {id:'accra',name:'Accra',country:'Ghana',lat:5.55,lon:-0.20,count:96,af:true},
+  {id:'douala',name:'Douala',country:'Cameroun',lat:4.05,lon:9.70,count:89,af:true},
+  {id:'kinshasa',name:'Kinshasa',country:'RDC',lat:-4.32,lon:15.32,count:73,af:true},
+  {id:'nairobi',name:'Nairobi',country:'Kenya',lat:-1.28,lon:36.82,count:55,af:true},
+  {id:'casablanca',name:'Casablanca',country:'Maroc',lat:33.59,lon:-7.62,count:43,af:true},
+  {id:'addisabeba',name:'Addis-Abeba',country:'\u00c9thiopie',lat:9.03,lon:38.74,count:29,af:true},
+  {id:'conakry',name:'Conakry',country:'Guin\u00e9e',lat:9.54,lon:-13.68,count:19,af:true},
+  {id:'johannesburg',name:'Johannesburg',country:'Afrique du Sud',lat:-26.20,lon:28.04,count:49,af:true},
+  {id:'capetown',name:'Cape Town',country:'Afrique du Sud',lat:-33.92,lon:18.42,count:36,af:true},
+  {id:'bamako',name:'Bamako',country:'Mali',lat:12.65,lon:-8.00,count:30,af:true},
+  {id:'paris',name:'Paris',country:'France',lat:48.85,lon:2.35,count:212,af:false},
+  {id:'londres',name:'Londres',country:'Royaume-Uni',lat:51.50,lon:-0.12,count:158,af:false},
+  {id:'bruxelles',name:'Bruxelles',country:'Belgique',lat:50.85,lon:4.35,count:68,af:false},
+  {id:'amsterdam',name:'Amsterdam',country:'Pays-Bas',lat:52.37,lon:4.90,count:32,af:false},
+  {id:'lisbonne',name:'Lisbonne',country:'Portugal',lat:38.72,lon:-9.14,count:20,af:false},
+  {id:'newyork',name:'New York',country:'\u00c9tats-Unis',lat:40.71,lon:-74.00,count:68,af:false},
+  {id:'montreal',name:'Montr\u00e9al',country:'Canada',lat:45.50,lon:-73.57,count:39,af:false},
+  {id:'miami',name:'Miami',country:'\u00c9tats-Unis',lat:25.77,lon:-80.19,count:23,af:false},
+  {id:'saopaulo',name:'S\u00e3o Paulo',country:'Br\u00e9sil',lat:-23.55,lon:-46.63,count:13,af:false},
+  {id:'dubai',name:'Duba\u00ef',country:'\u00c9mirats arabes',lat:25.20,lon:55.27,count:15,af:false}
+];
+
+// 3D math
+function xyz(lat,lon,R){var ph=(90-lat)*Math.PI/180,th=(lon+180)*Math.PI/180;return{x:-R*Math.sin(ph)*Math.cos(th),y:R*Math.cos(ph),z:R*Math.sin(ph)*Math.sin(th)};}
+function ry(p,a){var c=Math.cos(a),s=Math.sin(a);return{x:p.x*c-p.z*s,y:p.y,z:p.x*s+p.z*c};}
+function rx(p,a){var c=Math.cos(a),s=Math.sin(a);return{x:p.x,y:p.y*c-p.z*s,z:p.y*s+p.z*c};}
+function pr(p,f,cx,cy){var z=p.z+f;return{x:p.x*(f/z)+cx,y:p.y*(f/z)+cy};}
+function cc(r,g,b,a){return 'rgba('+r+','+g+','+b+','+a+')';}
+
+var AY=0.55,AX=0.22,pulse=0;
+var drag=false,lx=0,ly=0,arot=true,atimer=null,hov=null;
+var gw=document.getElementById('gw'),gc=document.getElementById('gc'),gctx=gc.getContext('2d');
+var SZ=0,R=0,FOV=0;
+
+function resize(){
+  var dpr=window.devicePixelRatio||1;
+  SZ=gw.clientWidth; R=SZ*0.42; FOV=R*4.5;
+  gc.width=SZ*dpr; gc.height=SZ*dpr; gctx.scale(dpr,dpr);
+}
+
+// Draw continent polygon (clipped to sphere)
+function drawPoly(pts, warm){
+  var cx=SZ/2,cy=SZ/2;
+  gctx.beginPath();
+  for(var i=0;i<pts.length;i++){
+    var p=rx(ry(xyz(pts[i][0],pts[i][1],R),AY),AX);
+    var s=pr(p,FOV,cx,cy);
+    i===0?gctx.moveTo(s.x,s.y):gctx.lineTo(s.x,s.y);
+  }
+  gctx.closePath();
+  var g=gctx.createLinearGradient(cx-R*0.68,cy-R*0.68,cx+R*0.50,cy+R*0.68);
+  if(warm){
+    // Africa — warmer, terracotta
+    g.addColorStop(0,   cc(218,203,165,0.94));
+    g.addColorStop(0.22,cc(202,182,138,0.91));
+    g.addColorStop(0.50,cc(158,98,42,0.90));
+    g.addColorStop(0.78,cc(78,42,12,0.93));
+    g.addColorStop(1,   cc(24,12,4,0.96));
+  } else {
+    // Other continents — cooler, grey-sand
+    g.addColorStop(0,   cc(200,196,178,0.90));
+    g.addColorStop(0.25,cc(180,172,148,0.86));
+    g.addColorStop(0.55,cc(112,90,58,0.85));
+    g.addColorStop(0.82,cc(55,38,18,0.88));
+    g.addColorStop(1,   cc(16,10,4,0.92));
+  }
+  gctx.fillStyle=g;
+  gctx.fill();
+}
+
+function drawGlobe(){
+  var cx=SZ/2,cy=SZ/2;
+  gctx.clearRect(0,0,SZ,SZ);
+
+  // Lavender halo
+  var hz=gctx.createRadialGradient(cx,cy,R*0.72,cx,cy,R*1.62);
+  hz.addColorStop(0,cc(165,145,215,0.16)); hz.addColorStop(0.40,cc(165,145,215,0.06));
+  hz.addColorStop(0.72,cc(165,145,215,0.02)); hz.addColorStop(1,cc(165,145,215,0));
+  gctx.fillStyle=hz; gctx.beginPath(); gctx.arc(cx,cy,R*1.62,0,Math.PI*2); gctx.fill();
+
+  // Ocean base (deep blue-indigo)
+  var oc=gctx.createRadialGradient(cx-R*0.28,cy-R*0.28,0,cx+R*0.15,cy+R*0.25,R*1.02);
+  oc.addColorStop(0,  cc(42,50,75,0.95));
+  oc.addColorStop(0.45,cc(22,26,42,0.98));
+  oc.addColorStop(1,  cc(6,6,12,1.00));
+  gctx.fillStyle=oc; gctx.beginPath(); gctx.arc(cx,cy,R,0,Math.PI*2); gctx.fill();
+
+  // Clip sphere for continents
+  gctx.save();
+  gctx.beginPath(); gctx.arc(cx,cy,R-0.5,0,Math.PI*2); gctx.clip();
+
+  // Draw continents (back-face artifacts hidden by limb darkening)
+  drawPoly(EUROPE, false);
+  drawPoly(ASIA, false);
+  drawPoly(NORTH_AMERICA, false);
+  drawPoly(SOUTH_AMERICA, false);
+  drawPoly(AUSTRALIA, false);
+  drawPoly(AFRICA, true);       // Africa drawn last = on top
+  drawPoly(MADAGASCAR, true);
+
+  // Directional relief overlay (top-left light source — matches the image)
+  var rl=gctx.createLinearGradient(cx-R*0.72,cy-R*0.72,cx+R*0.52,cy+R*0.70);
+  rl.addColorStop(0,   cc(215,202,168,0.28));
+  rl.addColorStop(0.30,cc(195,168,108,0.10));
+  rl.addColorStop(0.58,cc(88,56,18,0.08));
+  rl.addColorStop(1,   cc(10,5,2,0.32));
+  gctx.fillStyle=rl; gctx.fillRect(cx-R,cy-R,R*2,R*2);
+
+  gctx.restore();
+
+  // City connection lines (Africa)
+  var vis=CITIES.map(function(c){
+    var p=rx(ry(xyz(c.lat,c.lon,R),AY),AX);
+    var s=pr(p,FOV,cx,cy);
+    return{city:c,x:s.x,y:s.y,z:p.z};
+  }).filter(function(v){return v.z>-R*0.12;});
+  vis.sort(function(a,b){return a.z-b.z;});
+
+  var afv=vis.filter(function(v){return v.city.af&&v.z>R*0.06;});
+  for(var i=0;i<afv.length;i++){for(var j=i+1;j<afv.length;j++){
+    var al=Math.min(afv[i].z,afv[j].z)/R*0.06;
+    gctx.beginPath(); gctx.moveTo(afv[i].x,afv[i].y); gctx.lineTo(afv[j].x,afv[j].y);
+    gctx.strokeStyle=cc(196,128,60,al); gctx.lineWidth=0.5; gctx.stroke();
+  }}
+
+  // City dots
+  vis.forEach(function(v){
+    var city=v.city,x=v.x,y=v.y,z=v.z;
+    var isHov=hov&&hov.id===city.id, isN=!!NAMED[city.id];
+    var depth=Math.max(0,z/R), alpha=Math.min(1,depth*2.8+0.18);
+    var br=city.af?(2.8+Math.sqrt(city.count/20)):(1.8+Math.sqrt(city.count/30));
+    var dr=br*(0.5+depth*0.62);
+    var dc=city.af?[198,130,62]:[130,155,185];
+    var rc=city.af?[165,75,35]:[85,118,158];
+
+    if(isN||isHov){
+      var pr2=dr+5+Math.sin(pulse*2.6)*2.8;
+      gctx.beginPath(); gctx.arc(x,y,pr2,0,Math.PI*2);
+      gctx.strokeStyle=cc(dc[0],dc[1],dc[2],0.13*alpha); gctx.lineWidth=1; gctx.stroke();
+      gctx.beginPath(); gctx.arc(x,y,dr+2.5,0,Math.PI*2);
+      gctx.strokeStyle=cc(dc[0],dc[1],dc[2],0.35*alpha); gctx.lineWidth=0.8; gctx.stroke();
+      var gw2=gctx.createRadialGradient(x,y,0,x,y,dr*4.5);
+      gw2.addColorStop(0,cc(dc[0],dc[1],dc[2],0.18*alpha));
+      gw2.addColorStop(1,cc(dc[0],dc[1],dc[2],0));
+      gctx.fillStyle=gw2; gctx.beginPath(); gctx.arc(x,y,dr*4.5,0,Math.PI*2); gctx.fill();
+    }
+    var hl=[Math.min(255,dc[0]+55),Math.min(255,dc[1]+48),Math.min(255,dc[2]+32)];
+    var dg=gctx.createRadialGradient(x-dr*0.38,y-dr*0.40,0,x+dr*0.18,y+dr*0.22,dr*1.25);
+    dg.addColorStop(0,cc(hl[0],hl[1],hl[2],alpha));
+    dg.addColorStop(0.5,cc(dc[0],dc[1],dc[2],alpha*0.88));
+    dg.addColorStop(1,cc(rc[0],rc[1],rc[2],alpha*0.55));
+    gctx.fillStyle=dg; gctx.beginPath(); gctx.arc(x,y,dr,0,Math.PI*2); gctx.fill();
+  });
+
+  // Specular highlight (top-left)
+  var sp=gctx.createRadialGradient(cx-R*0.42,cy-R*0.44,0,cx-R*0.26,cy-R*0.30,R*0.92);
+  sp.addColorStop(0,   cc(215,202,168,0.20));
+  sp.addColorStop(0.30,cc(215,202,168,0.06));
+  sp.addColorStop(1,   cc(215,202,168,0));
+  gctx.fillStyle=sp; gctx.beginPath(); gctx.arc(cx,cy,R,0,Math.PI*2); gctx.fill();
+
+  // Limb darkening (strong — hides back-face polygon artifacts)
+  var ld=gctx.createRadialGradient(cx,cy,R*0.68,cx,cy,R);
+  ld.addColorStop(0,   cc(0,0,0,0));
+  ld.addColorStop(0.68,cc(4,2,1,0.18));
+  ld.addColorStop(0.88,cc(3,1,0,0.60));
+  ld.addColorStop(1,   cc(2,1,0,0.90));
+  gctx.fillStyle=ld; gctx.beginPath(); gctx.arc(cx,cy,R,0,Math.PI*2); gctx.fill();
+}
+
+function loop(){pulse+=0.015;if(arot&&!drag)AY+=0.0022;drawGlobe();requestAnimationFrame(loop);}
+
+function hitCity(mx,my){
+  var rect=gc.getBoundingClientRect(),cx=SZ/2,cy=SZ/2;
+  var px=(mx-rect.left)*(SZ/rect.width),py=(my-rect.top)*(SZ/rect.height);
+  var best=null,bd=22;
+  CITIES.forEach(function(c){
+    var p=rx(ry(xyz(c.lat,c.lon,R),AY),AX);
+    if(p.z<=0)return;
+    var s=pr(p,FOV,cx,cy);
+    var d=Math.hypot(s.x-px,s.y-py);
+    if(d<bd){bd=d;best=c;}
+  });
+  return best;
+}
+
+gw.addEventListener('mousedown',function(e){drag=true;arot=false;clearTimeout(atimer);lx=e.clientX;ly=e.clientY;});
+window.addEventListener('mousemove',function(e){
+  if(drag){AY+=(e.clientX-lx)*0.007;AX+=(e.clientY-ly)*0.007;AX=Math.max(-1.25,Math.min(1.25,AX));lx=e.clientX;ly=e.clientY;}
+  var c=hitCity(e.clientX,e.clientY);hov=c;
+  var t=document.getElementById('tt');
+  if(c){document.getElementById('ttc').textContent=c.name;document.getElementById('ttn').textContent=c.count+' cr\u00e9ateurs';t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';t.classList.add('show');gw.style.cursor='pointer';}
+  else{t.classList.remove('show');gw.style.cursor=drag?'grabbing':'grab';}
+});
+window.addEventListener('mouseup',function(){drag=false;atimer=setTimeout(function(){arot=true;},3500);});
+gw.addEventListener('click',function(e){var c=hitCity(e.clientX,e.clientY);if(c)openPanel(c);});
+gw.addEventListener('touchstart',function(e){drag=true;arot=false;clearTimeout(atimer);lx=e.touches[0].clientX;ly=e.touches[0].clientY;},{passive:true});
+gw.addEventListener('touchmove',function(e){AY+=(e.touches[0].clientX-lx)*0.007;AX+=(e.touches[0].clientY-ly)*0.007;AX=Math.max(-1.25,Math.min(1.25,AX));lx=e.touches[0].clientX;ly=e.touches[0].clientY;},{passive:true});
+gw.addEventListener('touchend',function(){drag=false;atimer=setTimeout(function(){arot=true;},3500);});
+
+function openPanel(city){
+  arot=false;
+  var theta=(city.lon+180)*Math.PI/180; AY=-(theta-Math.PI/2); AX=-city.lat*Math.PI/180*0.5;
+  document.getElementById('pci').textContent=city.name;
+  document.getElementById('pco').textContent=city.country;
+  document.getElementById('pcn').textContent=city.count;
+  var named=NAMED[city.id]||[],ghost=city.count-named.length,html='';
+  if(named.length>0){
+    html+='<div class="pseclbl">Profils en avant</div>';
+    html+=named.map(function(cr){
+      var init=cr.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2);
+      var href='profil.html?creator='+cr.name.split(' ')[0].toLowerCase();
+      return '<a href="'+href+'" class="mc"><div class="mav">'+init+'</div><div><div class="mn">'+cr.name+'</div><div class="md">'+cr.disc+'</div></div>'+(cr.v?'<div class="mb">&#10022; V&#233;rifi&#233;</div>':'')+'</a>';
+    }).join('');
+  }
+  if(ghost>0) html+='<div class="pghost"><div class="pgn">+'+ghost+'</div><div class="pgl">talents sur Kafora \u00e0 '+city.name+'</div></div>';
+  html+='<a href="createurs.html" class="pcta">Voir tous les cr&#233;ateurs &#8594;</a>';
+  document.getElementById('pb').innerHTML=html;
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel(){document.getElementById('panel').classList.remove('open');arot=true;}
+
+function animCnt(el,t,d){
+  var t0=performance.now();
+  (function tick(now){var tt=Math.min((now-t0)/d,1);var e=1-Math.pow(1-tt,3);el.textContent=Math.round(e*t).toLocaleString('fr-FR');if(tt<1)requestAnimationFrame(tick);})(t0);
+}
+window.addEventListener('resize',resize);
+resize(); loop();
+animCnt(document.getElementById('cnt'),1571,2200);
+</script></body></html>

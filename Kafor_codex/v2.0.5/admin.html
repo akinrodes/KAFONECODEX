@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kafora — Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;700;900&family=Barlow:wght@300;400&family=Inter:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="rode.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0A0A0A; --parch: #EAE2D4; --bronze: #B08D57;
+      --ash: #8C8478; --surface: #0d0c0a;
+      --border: rgba(176,141,87,0.10); --muted: rgba(234,226,212,0.35);
+    }
+    body { background: var(--ink); color: var(--parch); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 32px 0; z-index: 100;
+      overflow: hidden;
+    }
+    .sidebar::after {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    .sidebar-logo { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:20px; letter-spacing:0.06em; color:var(--parch); text-decoration:none; padding:0 28px; margin-bottom:40px; display:block; flex-shrink:0; position: relative; z-index: 1;}
+    .sidebar-logo:hover { color:var(--bronze); }
+    .sidebar-menu { flex:1; overflow-y:auto; display:flex; flex-direction:column; padding-bottom:10px; position: relative; z-index: 1;}
+    .sidebar-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:400; letter-spacing:0.36em; text-transform:uppercase; color:rgba(234,226,212,0.20); padding:0 28px; margin:20px 0 6px; flex-shrink: 0; }
+    .sidebar-nav { list-style:none; }
+    .sidebar-nav li a { display:flex; align-items:center; gap:12px; padding:11px 28px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:300; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); text-decoration:none; cursor:pointer; border-left:2px solid transparent; transition:color 180ms,background 180ms; }
+    .sidebar-nav li a.active { color:var(--bronze); border-left-color:var(--bronze); background:rgba(176,141,87,0.06); }
+    .sidebar-bottom { padding:20px 28px 0; border-top:1px solid rgba(234,226,212,0.06); flex-shrink: 0; margin-bottom: 20px; position: relative; z-index: 1; }
+
+    /* ══ MAIN ══ */
+    .dash-main { margin-left:220px; padding:48px 48px 80px; min-height:100vh; position: relative;}
+    .dash-main::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; pointer-events: none;
+    }
+    
+    .dash-content { position: relative; z-index: 1;}
+
+    .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; }
+    .page-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.32em; text-transform:uppercase; color:var(--bronze); margin-bottom:6px; }
+    .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:clamp(28px,3vw,44px); letter-spacing:-0.01em; color:var(--parch); line-height:1; }
+
+    /* ══ TABLES ══ */
+    .card { background:rgba(234,226,212,0.03); border:1px solid rgba(234,226,212,0.08); border-radius:12px; padding:28px; margin-bottom:24px; }
+    .card-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(234,226,212,0.65); margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid rgba(234,226,212,0.10); }
+
+    .table-container { width: 100%; overflow-x: auto; }
+    .admin-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    .admin-table th { 
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; 
+      color:rgba(234,226,212,0.3); text-align:left; padding:12px 16px; border-bottom:1px solid rgba(234,226,212,0.1); 
+    }
+    .admin-table td { padding:16px; border-bottom:1px solid rgba(234,226,212,0.05); }
+    .admin-table tr:hover td { background: rgba(234,226,212,0.02); }
+    
+    .user-info { display:flex; align-items:center; gap:12px; }
+    .user-avatar { width:32px; height:32px; border-radius:50%; background:rgba(176,141,87,0.15); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; color:var(--bronze); border:1px solid rgba(176,141,87,0.3); flex-shrink:0;}
+    .user-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:var(--parch); letter-spacing:0.02em; }
+    .user-email { font-family:'Barlow',sans-serif; font-size:11px; font-weight:300; color:rgba(234,226,212,0.4); }
+
+    .badge { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; padding:4px 10px; border-radius:4px; border:1px solid transparent; display:inline-block;}
+    .badge.pending { background:rgba(220,160,60,0.1); color:rgba(220,160,60,0.9); border-color:rgba(220,160,60,0.3); }
+    .badge.active { background:rgba(120,200,120,0.1); color:rgba(120,200,120,0.9); border-color:rgba(120,200,120,0.3); }
+    .badge.rejected { background:rgba(220,80,60,0.1); color:rgba(220,80,60,0.9); border-color:rgba(220,80,60,0.3); }
+
+    .actions { display:flex; gap:8px; }
+    .btn-action { 
+      padding:6px 12px; background:transparent; border:1px solid rgba(234,226,212,0.15); border-radius:4px; 
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; 
+      color:rgba(234,226,212,0.7); cursor:pointer; transition:all 200ms;
+    }
+    .btn-action:hover { background:rgba(234,226,212,0.05); color:var(--parch); }
+    .btn-approve { border-color:rgba(120,200,120,0.3); color:rgba(120,200,120,0.8); }
+    .btn-approve:hover { background:rgba(120,200,120,0.1); color:rgba(120,200,120,1); border-color:rgba(120,200,120,0.6); }
+    .btn-reject { border-color:rgba(220,80,60,0.3); color:rgba(220,80,60,0.8); }
+    .btn-reject:hover { background:rgba(220,80,60,0.1); color:rgba(220,80,60,1); border-color:rgba(220,80,60,0.6); }
+
+    .role-text { font-family:'Barlow',sans-serif; font-size:12px; font-weight:300; color:rgba(234,226,212,0.6); text-transform:capitalize;}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">Kafora Admin</a>
+  <div class="sidebar-menu">
+    <span class="sidebar-label">Gestion</span>
+    <ul class="sidebar-nav">
+      <li><a href="#" class="active">Validation Comptes</a></li>
+      <li><a href="#">Annuaire Créateurs</a></li>
+      <li><a href="#">Gestion Casting</a></li>
+      <li><a href="#">Revenus</a></li>
+    </ul>
+  </div>
+  <div class="sidebar-bottom">
+    <button class="btn-action" style="width:100%; border-color:rgba(220,80,60,0.3); color:rgba(220,80,60,0.8)" onclick="window.location.href='index.html'">Quitter l'Admin</button>
+  </div>
+</aside>
+
+<main class="dash-main">
+  <div class="dash-content">
+    <div class="page-header">
+      <div>
+        <p class="page-eyebrow">Administration Hub</p>
+        <h1 class="page-title">Validation des Comptes</h1>
+      </div>
+    </div>
+
+    <!-- PENDING REQUESTS -->
+    <div class="card">
+      <p class="card-title">Demandes en attente</p>
+      <div class="table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Créateur</th>
+              <th>Rôle</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingTable">
+            <!-- Rendu JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPROVED USERS -->
+    <div class="card">
+      <p class="card-title">Comptes validés récemment</p>
+      <div class="table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Créateur</th>
+              <th>Rôle</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="approvedTable">
+            <!-- Rendu JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // Access control
+  const curUserStr = localStorage.getItem('kafora-user');
+  let isAdmin = false;
+  try {
+    const u = JSON.parse(curUserStr);
+    if (u && u.role === 'admin') isAdmin = true;
+  } catch(e) {}
+
+  if (!isAdmin) {
+    window.location.replace('connexion.html'); // Not authorized
+  }
+
+  // Mockup data for administration
+  let adminUsers = [
+    { id: '1', fn: 'Aisha', ln: 'Kamara', email: 'aisha@example.com', role: 'createur', date: 'Aujourd\'hui', status: 'pending' },
+    { id: '2', fn: 'Marcus', ln: 'Okafor', email: 'marcus.okafor@gmail.com', role: 'producteur', date: 'Hier', status: 'pending' },
+    { id: '3', fn: 'Léa', ln: 'Traoré', email: 'lea@kafora.com', role: 'createur', date: 'Hier', status: 'pending' },
+    { id: '4', fn: 'Kofi', ln: 'Mensah', email: 'kofi@kafora.com', role: 'createur', date: 'Il y a 2 jours', status: 'active' },
+    { id: '5', fn: 'Amara', ln: 'Diallo', email: 'amara@kafora.com', role: 'createur', date: 'Il y a 3 jours', status: 'active' },
+  ];
+
+  // Try to pick up the locally registered user if it exists in pending status
+  const localUserStr = localStorage.getItem('kafora-user');
+  if (localUserStr) {
+    try {
+      const u = JSON.parse(localUserStr);
+      if (u.status === 'pending') {
+        // If they are not already in the mockup array, add them
+        const exists = adminUsers.find(a => a.email === u.email);
+        if (!exists && u.email) {
+          adminUsers.unshift({
+            id: 'local_' + Date.now(),
+            fn: u.firstName || 'User',
+            ln: u.lastName || '',
+            email: u.email,
+            role: u.role || 'createur',
+            date: 'À l\'instant',
+            status: 'pending'
+          });
+        }
+      }
+    } catch(e) {}
+  }
+
+  function renderTables() {
+    const pendingList = adminUsers.filter(u => u.status === 'pending');
+    const approvedList = adminUsers.filter(u => u.status === 'active');
+
+    const pendingHtml = pendingList.map(u => `
+      <tr>
+        <td>
+          <div class="user-info">
+            <div class="user-avatar">${u.fn.substring(0,1).toUpperCase()}</div>
+            <div>
+              <div class="user-name">${u.fn} ${u.ln}</div>
+              <div class="user-email">${u.email}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="role-text">${u.role}</span></td>
+        <td><span class="role-text" style="color:rgba(234,226,212,0.4)">${u.date}</span></td>
+        <td><span class="badge pending">En attente</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn-action" onclick="viewProfile('${u.id}')">Voir</button>
+            <button class="btn-action btn-approve" onclick="updateStatus('${u.id}', 'active', '${u.email}')">Approuver</button>
+            <button class="btn-action btn-reject" onclick="updateStatus('${u.id}', 'rejected', '${u.email}')">Refuser</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    const approvedHtml = approvedList.map(u => `
+      <tr>
+        <td>
+          <div class="user-info">
+            <div class="user-avatar" style="border-color:rgba(120,200,120,0.4); color:rgba(120,200,120,0.9)">${u.fn.substring(0,1).toUpperCase()}</div>
+            <div>
+              <div class="user-name">${u.fn} ${u.ln}</div>
+              <div class="user-email">${u.email}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="role-text">${u.role}</span></td>
+        <td><span class="role-text" style="color:rgba(234,226,212,0.4)">${u.date}</span></td>
+        <td><span class="badge active">Actif</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn-action" onclick="viewProfile('${u.id}')">Voir</button>
+            <button class="btn-action">Suspendre</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('pendingTable').innerHTML = pendingHtml || '<tr><td colspan="5" style="text-align:center;color:rgba(234,226,212,0.3)">Aucune demande en attente</td></tr>';
+    document.getElementById('approvedTable').innerHTML = approvedHtml || '<tr><td colspan="5" style="text-align:center;color:rgba(234,226,212,0.3)">Aucun compte validé récent</td></tr>';
+  }
+
+  function updateStatus(id, newStatus, email) {
+    // 1. Mettre à jour la base de données admin mockup
+    const userIndex = adminUsers.findIndex(u => u.id === id);
+    if (userIndex > -1) {
+      adminUsers[userIndex].status = newStatus;
+    }
+
+    // 2. Si c'est l'utilisateur actuellement stocké dans localStorage, le mettre à jour
+    try {
+      const localStr = localStorage.getItem('kafora-user');
+      if (localStr) {
+        let u = JSON.parse(localStr);
+        if (u.email === email && u.status === 'pending') {
+          u.status = newStatus;
+          localStorage.setItem('kafora-user', JSON.stringify(u));
+        }
+      }
+    } catch(e) {}
+
+    renderTables();
+  }
+
+  // Initial render
+  renderTables();
+
+  function viewProfile(id) {
+    const user = adminUsers.find(u => u.id === id);
+    if (!user) return;
+    
+    const modalContent = `
+      <div style="margin-bottom: 12px; display:flex; align-items:center; gap:12px;">
+        <div style="width:40px; height:40px; border-radius:50%; background:rgba(176,141,87,0.15); display:flex; align-items:center; justify-content:center; color:var(--bronze); font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700;">
+          ${user.fn.substring(0,1).toUpperCase()}${user.ln.substring(0,1).toUpperCase()}
+        </div>
+        <div>
+          <div style="font-size:18px; font-weight:700; color:var(--parch)">${user.fn} ${user.ln}</div>
+          <div style="font-size:12px; color:rgba(234,226,212,0.5)">${user.email}</div>
+        </div>
+      </div>
+      <div style="margin-bottom: 16px; padding:12px; background:rgba(234,226,212,0.03); border-radius:8px;">
+        <div style="margin-bottom: 8px"><strong>Rôle choisi :</strong> <span style="text-transform:capitalize; color:var(--parch)">${user.role}</span></div>
+        <div style="margin-bottom: 8px"><strong>Adhésion :</strong> ${user.date}</div>
+        <div style="margin-bottom: 0px"><strong>Statut actuel :</strong> <span style="text-transform:capitalize; color:${user.status === 'active' ? 'rgba(120,200,120,0.8)' : (user.status==='rejected' ? 'rgba(220,80,60,0.8)' : 'rgba(220,160,60,0.8)')}">${user.status}</span></div>
+      </div>
+      <div style="margin-bottom: 24px; font-size:12px; color:rgba(234,226,212,0.4)">
+        <em>Détails complets du portfolio non renseignés à l'inscription. Le créateur complètera son profil de marque après validation.</em>
+      </div>
+      
+      <div style="display:flex; gap:12px">
+        ${user.status === 'pending' ? `
+          <button style="flex:1; padding:12px; background:rgba(120,200,120,0.1); color:rgba(120,200,120,0.9); border:1px solid rgba(120,200,120,0.3); border-radius:6px; cursor:pointer; font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; font-size:12px; letter-spacing:0.1em; font-weight:700;" onclick="updateStatus('${user.id}', 'active', '${user.email}'); document.getElementById('profileModal').style.display='none'">Approuver</button>
+          <button style="flex:1; padding:12px; background:rgba(220,80,60,0.1); color:rgba(220,80,60,0.9); border:1px solid rgba(220,80,60,0.3); border-radius:6px; cursor:pointer; font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; font-size:12px; letter-spacing:0.1em; font-weight:700;" onclick="updateStatus('${user.id}', 'rejected', '${user.email}'); document.getElementById('profileModal').style.display='none'">Refuser</button>
+        ` : `
+          <button style="width:100%; padding:12px; background:transparent; color:var(--parch); border:1px solid rgba(234,226,212,0.2); border-radius:6px; cursor:pointer; font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; font-size:12px; letter-spacing:0.1em;" onclick="document.getElementById('profileModal').style.display='none'">Fermer</button>
+        `}
+      </div>
+    `;
+    
+    document.getElementById('modalContent').innerHTML = modalContent;
+    document.getElementById('profileModal').style.display = 'flex';
+  }
+</script>
+
+<div id="profileModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(5px)">
+  <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:32px; width:450px; max-width:90%">
+    <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+      <h3 style="font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; color:var(--parch)">Dossier Créateur</h3>
+      <button onclick="document.getElementById('profileModal').style.display='none'" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size:24px; line-height:1">&times;</button>
+    </div>
+    <div id="modalContent" style="font-family:'Barlow',sans-serif; font-size:14px; color:rgba(234,226,212,0.8); line-height:1.6">
+      <!-- Content dynamically injected -->
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

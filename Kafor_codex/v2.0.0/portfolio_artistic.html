@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafora — Profile Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Barlow:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="kafora-db.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Barlow', 'sans-serif'], condensed: ['"Barlow Condensed"', 'sans-serif'] }, colors: { brand: { gold: '#B08D57', dark: '#0A0A0A', cream: '#EAE2D4' } } } }
+    }
+  </script>
+  <style>
+    body { background-color: theme('colors.brand.dark'); color: theme('colors.brand.cream'); overflow-x: hidden; cursor: none; }
+    a, button { cursor: none; }
+    .blind-mask { -webkit-mask-image: repeating-linear-gradient(to right, black 0px, black 6px, transparent 6px, transparent 12px); mask-image: repeating-linear-gradient(to right, black 0px, black 6px, transparent 6px, transparent 12px); }
+    @keyframes shift-mask { 0% { -webkit-mask-position: 0 0; mask-position: 0 0; } 100% { -webkit-mask-position: 12px 0; mask-position: 12px 0; } }
+    .blind-mask-animated { animation: shift-mask 10s linear infinite; }
+    #custom-cursor, #custom-cursor-dot { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 50; mix-blend-mode: difference; }
+    #custom-cursor { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #B08D57; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
+    #custom-cursor-dot { width: 8px; height: 8px; border-radius: 50%; background: #B08D57; transform: translate(-50%, -50%); }
+    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0A0A0A; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #B08D57; }
+    .reveal-up { opacity: 0; transform: translateY(50px); }
+    .exp-media-link-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 16rem; width: 16rem; flex-shrink: 0; border-radius: 0px; 
+      background: rgba(255,255,255,0.03); color: var(--brand-cream);
+      text-decoration: none; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.1); transition: all 300ms;
+    }
+    .exp-media-link-btn:hover { background: var(--brand-gold); color: black; border-color: var(--brand-gold); }
+    @media (max-width: 768px) { .exp-media-link-btn { height: 10rem; width: 10rem; font-size: 12px; } }
+  </style>
+</head>
+<body class="min-h-screen relative text-brand-cream selection:bg-brand-gold selection:text-black">
+  <!-- Custom Cursor -->
+  <div id="custom-cursor" class="hidden md:block"></div>
+  <div id="custom-cursor-dot" class="hidden md:block"></div>
+  <!-- Nav -->
+  <nav class="fixed top-0 left-0 w-full p-6 md:p-8 flex justify-between items-center z-40 mix-blend-difference">
+    <a href="createurs.html" class="text-2xl font-condensed font-black tracking-tighter uppercase cursor-pointer hover:text-brand-gold transition">Kafora<span class="text-brand-gold">.</span></a>
+    <button id="menu-btn" class="p-2 focus:outline-none hover:text-brand-gold transition-colors"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+  </nav>
+  <!-- Menu -->
+  <div id="menu-overlay" class="fixed inset-0 bg-brand-dark z-30 flex flex-col justify-center items-center invisible" style="clip-path: circle(0% at 100% 0);">
+    <ul class="text-center space-y-8 text-5xl md:text-8xl font-condensed font-black tracking-tighter uppercase">
+      <li class="menu-item opacity-0 translate-y-10"><a href="#home" class="hover:text-brand-gold transition-colors block">Home</a></li>
+      <li class="menu-item opacity-0 translate-y-10"><a href="#work" class="hover:text-brand-gold transition-colors block">Portfolio</a></li>
+      <li class="menu-item opacity-0 translate-y-10"><a href="#about" class="hover:text-brand-gold transition-colors block">About</a></li>
+      <li class="menu-item opacity-0 translate-y-10"><a href="createurs.html" class="hover:text-brand-gold transition-colors block">Back to grid</a></li>
+    </ul>
+  </div>
+  <!-- Hero -->
+  <section id="home" class="relative h-screen w-full flex items-center justify-center overflow-hidden bg-brand-dark">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#B08D57] to-[#5a482d] opacity-50"></div>
+    <div class="absolute inset-0 flex items-center justify-center">
+       <div id="hero-img" class="w-full h-full bg-cover bg-center blind-mask blind-mask-animated grayscale contrast-[1.2] brightness-75 mix-blend-multiply transition-all duration-[2s]"></div>
+       <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(to right, rgba(0,0,0,0.85) 0px, rgba(0,0,0,0.85) 6px, transparent 6px, transparent 12px);"></div>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent opacity-90"></div>
+    <div class="absolute bottom-12 md:bottom-24 left-6 md:left-12 mix-blend-difference z-10">
+      <h1 class="text-6xl md:text-[8rem] font-condensed font-black tracking-tighter uppercase leading-[0.85] text-white">
+        <span id="h-line1" class="block opacity-0 translate-y-20">Creative</span>
+        <span id="h-line2" class="block opacity-0 translate-y-20 text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-[#e8c081]">Direction</span>
+      </h1>
+      <p id="h-desc" class="mt-6 text-lg md:text-2xl max-w-lg font-light tracking-wide text-gray-300 opacity-0">Digital art portfolio. Exploring the boundaries of perception through light, shadow and culture.</p>
+    </div>
+    <div id="h-scroll" class="absolute bottom-12 right-6 md:right-12 flex flex-col items-center gap-2 mix-blend-difference opacity-0">
+      <span class="text-xs uppercase tracking-widest font-condensed rotate-90 mb-8">Scroll</span>
+      <div class="w-px h-16 bg-gray-600 relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1/2 bg-brand-gold scroll-dot"></div></div>
+    </div>
+  </section>
+  <!-- Work -->
+  <section id="work" class="py-24 md:py-32 px-6 md:px-12 bg-brand-dark relative z-10">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 md:mb-24 gap-6">
+      <h2 class="text-5xl md:text-8xl font-condensed font-black tracking-tighter uppercase leading-none reveal-up">Selected<br/>Work</h2>
+    </div>
+    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16"></div>
+  </section>
+  <!-- Experiences -->
+  <section id="experiences" class="py-24 md:py-32 px-6 md:px-12 bg-brand-dark relative z-10">
+    <div class="mb-16 md:mb-24">
+      <h2 class="text-5xl md:text-8xl font-condensed font-black tracking-tighter uppercase leading-none reveal-up">Experiences</h2>
+      <div class="h-[2px] w-24 bg-brand-gold mt-8 reveal-up exp-brand-color-border"></div>
+    </div>
+    <div id="experiences-list" class="flex flex-col gap-0 max-w-5xl mx-auto"></div>
+  </section>
+  <!-- About -->
+  <section id="about" class="py-32 bg-brand-gold text-brand-dark overflow-hidden flex flex-col items-center justify-center relative z-10">
+    <div class="w-full relative flex overflow-x-hidden">
+      <div id="marquee-text" class="whitespace-nowrap flex text-7xl md:text-[12rem] font-condensed font-black uppercase tracking-tighter leading-none">
+        <span class="mx-8 marquee-part">LET'S CREATE SOMETHING</span><span class="mx-8 text-transparent marquee-part" style="-webkit-text-stroke: 2px #0A0A0A;">ARTIST</span>
+        <span class="mx-8 marquee-part">LET'S CREATE SOMETHING</span><span class="mx-8 text-transparent marquee-part" style="-webkit-text-stroke: 2px #0A0A0A;">ARTIST</span>
+      </div>
+    </div>
+    <div class="mt-24 text-center px-6 reveal-up">
+      <p id="artist-bio" class="text-2xl md:text-4xl font-sans font-medium max-w-4xl mx-auto leading-tight"></p>
+    </div>
+  </section>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+    const MOCK_DATA = {
+      amara: { id: 'amara', name: "Amara Diallo", city: "Paris", discipline: "Direction Artistique", style: "Mode", heroImage: "file:///E:/AfroPunk/00eb0d7f9cf46110b1323fb532d7b578.jpg", bio: "Directrice artistique basée à Paris.", 
+        experiences: [
+          { year: '2024', brand: 'Vogue France', role: 'Directrice de Création', description: 'Direction artistique du shooting exclusif Fashion Week de Paris. Supervision des équipes de stylisme et gestion des sets complexes.', linkedProfile: 'vogue', media: ['file:///E:/AfroPunk/e74efe60a95879573e07255b59fcd1e9.jpg', 'file:///E:/AfroPunk/e7ca30197ff55a5d8b8d182df3d3f997.jpg', 'file:///E:/AfroPunk/e8efb2d315c0cf421331db3594ee6212.jpg'] },
+          { year: '2022 - 2023', brand: 'Jacquemus', role: 'Styliste Senior', description: 'Stylisme pour la collection "Soleil de l\'Afrique".\nMise en valeur des tissus traditionnels africains dans une approche moderne et asymétrique. Collaboration sur la scénographie du défilé. Instagram pré-chargé en exemple.', media: ['file:///E:/AfroPunk/ebbdb4b91f4aa794044a5d0640dd0bce.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] }
+        ],
+        projects: [{id:1, title:'NEON DREAMS', category:'Photo', image:'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1470&auto=format&fit=crop'}] },
+      kofi: { id: 'kofi', name: "Kofi Mensah", city: "NYC", discipline: "Art Contemporain", style: "Sculpture/Digital", heroImage: "file:///E:/AfroPunk/1993275857acda88412000aacc20c7ac.jpg", bio: "Sculpteur digital.", 
+        experiences: [
+          { year: '2024', brand: 'MoMA', role: 'Exposition collective — New Voices', description: 'Installation digitale immersive avec projection mapping sur 4 espaces distincts. Utilisation de technologies interactives.', media: ['file:///E:/AfroPunk/f0284401c31e2abdf456651ac960b4d7.jpg', 'https://www.instagram.com/p/DWg-PBul2UF/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ==', 'https://www.instagram.com/reel/DRCP1lDjOtg/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='] },
+          { year: '2024', brand: 'Tate Modern', role: 'Résidence artistique — African Program', description: 'Création d\'un corpus d\'oeuvres 3D avec focus sur les masques culturels modélisés et intégrés dans un décor onirique urbain.', media: ['file:///E:/AfroPunk/ed22ba242943b39456246d71ef190208.jpg'] }
+        ],
+        projects: [{id:1, title:'THE ANCESTOR', category:'3D', image:'https://images.unsplash.com/photo-1544256718-3b6102ddf82e?q=80&w=1470&auto=format&fit=crop'}] }
+    };
+    const defaultData = MOCK_DATA['amara']; // Simplifié pour la sauvegarde
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const creatorId = params.get('creator') || 'amara';
+      let data;
+      
+      if (creatorId === 'me') {
+        const p = JSON.parse(localStorage.getItem('kafora-profil') || '{}');
+        const u = JSON.parse(localStorage.getItem('kafora-user') || '{}');
+        const fn = p.fn || u.firstName || 'Ton';
+        const ln = p.ln || u.lastName || 'Nom';
+        data = {
+          name: fn + ' ' + ln,
+          city: p.city || 'Ville inconnue',
+          discipline: (p.discs && p.discs.length > 0) ? p.discs[0] : 'Créatif',
+          style: (p.discs && p.discs.length > 1) ? p.discs[1] : 'Kafora',
+          heroImage: p.photo || defaultData.heroImage,
+          bio: p.bio || 'Aucune biographie renseignée.',
+          experiences: p.experiences || [],
+          projects: (p.portfolio || []).map(function(item) {
+            return { title: item.label, image: item.img || item.image, affiliateUrl: item.affiliateUrl || null, affiliatePartner: item.affiliatePartner || 'unknown' };
+          })
+        };
+        // Optionnel : adapter les couleurs Cursor/Bordures si l'utilisateur a changé l'accent dans l'espace builder
+        if(p.accentColor) {
+          setTimeout(() => {
+            document.getElementById('custom-cursor').style.borderColor = p.accentColor;
+            document.getElementById('custom-cursor-dot').style.background = p.accentColor;
+            document.querySelectorAll('.blind-mask').forEach(el=> el.style.backgroundColor = p.accentColor);
+            document.querySelectorAll('.exp-brand-color-bg').forEach(el=> el.style.backgroundColor = p.accentColor);
+            document.querySelectorAll('.exp-brand-color-border').forEach(el=> el.style.backgroundColor = p.accentColor);
+            document.getElementById('h-line2').className = `block opacity-0 translate-y-20 text-transparent bg-clip-text`;
+            document.getElementById('h-line2').style.backgroundImage = `linear-gradient(to right, ${p.accentColor}, #e8c081)`;
+          }, 100);
+        }
+      } else {
+        data = MOCK_DATA[creatorId.toLowerCase()] || defaultData;
+      }
+
+      document.getElementById('hero-img').style.backgroundImage = `url('${data.heroImage}')`;
+      document.getElementById('h-line1').innerText = data.discipline;
+      document.getElementById('h-line2').innerText = data.style;
+      document.getElementById('h-desc').innerText = data.bio;
+      document.getElementById('artist-bio').innerText = data.bio;
+      
+      const mp = document.querySelectorAll('.marquee-part');
+      mp[0].innerText = data.name.toUpperCase(); mp[1].innerText = data.city.toUpperCase();
+      mp[2].innerText = data.name.toUpperCase(); mp[3].innerText = data.city.toUpperCase();
+
+      const grid = document.getElementById('projects-grid');
+      let displayProjects = data.projects ? [...data.projects] : [];
+      if (typeof kaforaGetNativeAds === 'function') {
+        const ads = kaforaGetNativeAds();
+        ads.forEach((ad, i) => {
+          displayProjects.splice(1 + i, 0, {
+            title: ad.brand + ' — ' + ad.role,
+            image: ad.media[0],
+            affiliateUrl: ad.url,
+            isAd: true,
+            badgeLabel: ad.badge || 'Sponsorisé'
+          });
+        });
+      }
+
+      displayProjects.forEach((proj, idx) => {
+        const tag = proj.affiliateUrl ? 'a' : 'div';
+        const attrs = proj.affiliateUrl
+          ? `href="${proj.affiliateUrl || '#'}" onclick="handleAffiliateClick(event,'${proj.affiliateUrl}','${creatorId}','${proj.affiliatePartner||'unknown'}')" `
+          : '';
+        const badge = proj.affiliateUrl && !proj.isAd
+          ? `<span class="absolute top-3 right-3 bg-brand-gold text-black text-[8px] font-bold tracking-[0.22em] uppercase px-2 py-1 opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">Voir →</span>`
+          : '';
+        const adBadge = proj.isAd ? `<span class="absolute top-3 left-3 bg-white text-black text-[8px] font-bold tracking-[0.22em] uppercase px-2 py-1 opacity-100">${proj.badgeLabel}</span>` : '';
+        grid.insertAdjacentHTML('beforeend', `<${tag} ${attrs}class="group cursor-pointer reveal-up block no-underline text-white"><div class="relative overflow-hidden aspect-[4/5] mb-6"><div class="absolute inset-0 bg-cover bg-center ${proj.isAd ? '' : 'transition-transform hover:scale-110'}" style="background-image:url('${proj.image}')"></div>${adBadge}${badge}</div><h3 class="text-3xl font-condensed font-black">${proj.title}</h3></${tag}>`);
+      });
+
+      const expList = document.getElementById('experiences-list');
+      if (data.experiences && data.experiences.length > 0) {
+        expList.innerHTML = data.experiences.map((exp, i) => {
+          let firstLetter = exp.brand ? exp.brand.charAt(0).toUpperCase() : '✦';
+          let descHtml = exp.description ? `<p class="mt-4 text-brand-cream/70 text-lg md:text-xl font-sans font-light leading-relaxed max-w-4xl">${exp.description.replace(/\n/g, '<br>')}</p>` : '';
+          let linkedinHtml = exp.linkedProfile ? `<a href="profil.html?creator=${exp.linkedProfile}" class="inline-block mt-3 text-xs font-condensed font-bold tracking-[0.2em] bg-brand-gold exp-brand-color-bg text-black px-3 py-1 uppercase hover:opacity-80 transition-opacity">🔗 Profil Associé</a>` : '';
+          let mediaHtml = '';
+          if (exp.media && exp.media.length > 0) {
+            mediaHtml = `<div class="flex gap-4 mt-8 overflow-x-auto pb-4 items-start" style="scrollbar-width: thin;">
+              ${exp.media.map(m => {
+                 if(m.includes('instagram.com/p/') || m.includes('instagram.com/reel/')) {
+                    let igUrl = m.split('?')[0];
+                    if(!igUrl.endsWith('/')) igUrl += '/';
+                    return `<iframe src="${igUrl}embed" width="300" height="380" frameborder="0" scrolling="no" allowtransparency="true" class="shrink-0 bg-white border border-white/5 opacity-90 hover:opacity-100 transition-opacity"></iframe>`;
+                 }
+                 if(m.includes('tiktok.com') || (!m.match(/\.(jpeg|jpg|gif|png|webp)/i) && m.startsWith('http'))) {
+                    return `<a href="${m}" target="_blank" class="exp-media-link-btn shrink-0">🔗 Voir le lien</a>`;
+                 }
+                 return `<img src="${m}" class="h-[380px] object-cover border border-white/5 opacity-80 hover:opacity-100 transition-opacity shrink-0" alt="Media" loading="lazy" />`;
+              }).join('')}
+            </div>`;
+          }
+
+          return `
+            <div class="exp-artistic-item flex gap-8 md:gap-12 opacity-0 translate-y-8">
+              <div class="flex flex-col items-center shrink-0 w-16 md:w-20">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-brand-gold exp-brand-color-bg text-black flex items-center justify-center font-condensed font-black text-3xl md:text-5xl z-10">
+                  ${firstLetter}
+                </div>
+                <div class="flex-1 w-[1px] bg-white/20 mt-4 mb-[-2rem] z-0 exp-line"></div>
+              </div>
+              <div class="flex-1 pb-20 pt-2 md:pt-3">
+                <h3 class="font-condensed text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-none">${exp.role}</h3>
+                <div class="flex flex-wrap items-center gap-3 md:gap-6 mt-4">
+                  <span class="text-brand-cream font-sans font-medium text-xl md:text-2xl">${exp.brand}</span>
+                  <span class="text-brand-cream/40 font-condensed tracking-widest text-sm md:text-lg uppercase">· ${exp.year}</span>
+                </div>
+                ${linkedinHtml}
+                ${descHtml}
+                ${mediaHtml}
+              </div>
+            </div>`;
+        }).join('');
+        const lastLine = expList.querySelector('.exp-artistic-item:last-child .exp-line');
+        if (lastLine) lastLine.style.display = 'none';
+      } else {
+        document.getElementById('experiences').style.display = 'none';
+      }
+
+      gsap.to('#h-line1', { y: 0, opacity: 1, duration: 1 }); gsap.to('#h-line2', { y: 0, opacity: 1, duration: 1, delay: 0.2 });
+      gsap.to('#h-desc', { opacity: 1, duration: 1, delay: 0.5 }); gsap.to('#h-scroll', { opacity: 1, delay: 0.8 });
+      gsap.to('.scroll-dot', { y: 64, repeat: -1, duration: 1.5 });
+      gsap.to("#marquee-text", { x: "-50%", ease: "linear", duration: 15, repeat: -1 });
+      document.querySelectorAll('.reveal-up').forEach(el => gsap.to(el, { y: 0, opacity: 1, scrollTrigger: { trigger: el, start: "top 85%" } }));
+      ScrollTrigger.batch('.exp-artistic-item', { onEnter: batch => gsap.to(batch, { y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: 'power2.out' }), start: 'top 85%' });
+
+      const cursor = document.getElementById('custom-cursor'), dot = document.getElementById('custom-cursor-dot');
+      window.addEventListener('mousemove', e => { gsap.to(dot, {x:e.clientX, y:e.clientY, duration:0.1}); gsap.to(cursor, {x:e.clientX, y:e.clientY, duration:0.5}); });
+    });
+
+    // ── Attribution affiliation 30 jours ──
+    function handleAffiliateClick(e, affiliateUrl, creatorId, partnerId) {
+      e.preventDefault();
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      localStorage.setItem(
+        'kafora-attribution-' + creatorId,
+        JSON.stringify({ creatorId: creatorId, partnerId: partnerId, expiry: expiry, at: Date.now() })
+      );
+      window.open(affiliateUrl, '_blank', 'noopener');
+    }
+  </script>
+</body>
+</html>
